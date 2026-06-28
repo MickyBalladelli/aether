@@ -15,7 +15,6 @@ type GridPoint = WeatherLocation & {
 const OPEN_METEO_ENDPOINT = '/api/weather'
 const CURRENT_FIELDS = [
   'temperature_2m',
-  'precipitation',
   'rain',
   'showers',
   'snowfall',
@@ -23,6 +22,10 @@ const CURRENT_FIELDS = [
   'cloud_cover',
   'wind_speed_10m',
   'wind_direction_10m'
+]
+
+const HOURLY_FIELDS = [
+  'precipitation'
 ]
 const THUNDERSTORM_CODES = new Set([95, 96, 99])
 const FRESHNESS = 5 * 60 * 1000
@@ -180,7 +183,9 @@ async function fetchWeatherBatch(points: GridPoint[]): Promise<WeatherMapSample[
   const params = new URLSearchParams({
     latitude: points.map(point => point.latitude.toFixed(5)).join(','),
     longitude: points.map(point => point.longitude.toFixed(5)).join(','),
-    current: CURRENT_FIELDS.join(',')
+    current: CURRENT_FIELDS.join(','),
+    hourly: HOURLY_FIELDS.join(','),
+    forecast_days: '1'
   })
   const response = await fetch(`${OPEN_METEO_ENDPOINT}?${params.toString()}`)
 
@@ -203,7 +208,8 @@ function mapWeatherSample(point: GridPoint | undefined, payload: OpenMeteoRespon
   }
 
   const current = payload.current
-  const precipitation = current.precipitation
+  const hourlyPrecip = payload.hourly?.precipitation?.[0] ?? 0
+  const precipitation = Math.max(hourlyPrecip, current.rain ?? 0, current.showers ?? 0, current.snowfall ?? 0)
   const rawWindSpeed = current.wind_speed_10m
 
   return {

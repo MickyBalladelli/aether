@@ -4,7 +4,8 @@ const THUNDERSTORM_CODES = new Set([95, 96, 99])
 
 export function translateWeather(payload: OpenMeteoResponse, location: WeatherLocation): WeatherConfig {
   const current = payload.current
-  const precipitation = current.precipitation
+  const hourlyPrecip = payload.hourly?.precipitation?.[0] ?? 0
+  const precipitation = Math.max(hourlyPrecip, current.rain ?? 0, current.showers ?? 0, current.snowfall ?? 0)
   const rawWindSpeed = current.wind_speed_10m
   const cloudOpacity = clamp(current.cloud_cover / 100, 0, 1)
   const windSpeed = clamp(rawWindSpeed / 80, 0, 1)

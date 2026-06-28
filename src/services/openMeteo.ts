@@ -7,7 +7,6 @@ const FORECAST_STALE_AGE = 6 * 60 * 60 * 1000
 const CURRENT_FIELDS = [
   'temperature_2m',
   'relative_humidity_2m',
-  'precipitation',
   'rain',
   'showers',
   'snowfall',
