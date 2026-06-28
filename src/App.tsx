@@ -1,5 +1,5 @@
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react'
 import { AetherHeader } from './components/AetherHeader'
 import { AetherMap } from './components/AetherMap'
 import { MapWeatherTooltip } from './components/MapWeatherTooltip'
@@ -52,6 +52,7 @@ export default function App() {
   const [status, setStatus] = useState('Reading sky')
   const [selectedLocation, setSelectedLocation] = useState<WeatherLocation>(defaultCity)
   const [weatherMode, setWeatherMode] = useState<WeatherMode>('temperature')
+  const mapWeatherMode = useDeferredValue(weatherMode)
   const [viewport, setViewport] = useState<WeatherViewport | null>(null)
   const [mapSamples, setMapSamples] = useState<WeatherMapSample[]>([])
   const [pointerWeather, setPointerWeather] = useState<MapWeatherPointer | null>(null)
@@ -194,7 +195,7 @@ export default function App() {
       <main className="app-shell">
         <AetherMap
           location={selectedLocation}
-          mode={weatherMode}
+          mode={mapWeatherMode}
           samples={displayedSamples}
           onViewportChange={handleViewportChange}
           onPointerWeatherChange={handlePointerWeatherChange}

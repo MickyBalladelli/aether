@@ -100,14 +100,19 @@ export class WeatherMapAnimation {
   }
 
   setData(samples: WeatherMapSample[], mode: WeatherMode) {
-    if (mode !== this.mode || samples !== this.samples) {
+    const samplesChanged = samples !== this.samples
+
+    if (mode !== this.mode || samplesChanged) {
       this.resetParticles()
       this.lightning = []
     }
 
     this.samples = samples
     this.mode = mode
-    this.temperatureTextureDirty = true
+
+    if (samplesChanged) {
+      this.temperatureTextureDirty = true
+    }
 
     if (this.reducedMotion) {
       this.render(0, 0)
