@@ -308,7 +308,23 @@ function buildVisibleGrid(viewport: WeatherViewport): GridPoint[] {
     }
   }
 
-  return distributePoints(Array.from(points.values()), MAX_GRID_POINTS)
+  const centerLongitude = normalizeLongitude(west + (east - west) / 2)
+  const centerLatitude = (viewport.north + viewport.south) / 2
+  const centerKey = getWeatherCacheKey(centerLatitude, centerLongitude)
+  const centerPoint: GridPoint = {
+    label: `grid-focus-${sampleZoom}`,
+    latitude: centerLatitude,
+    longitude: centerLongitude,
+    showBadge: false
+  }
+  const distributed = distributePoints(
+    Array.from(points.values()).filter(point => (
+      getWeatherCacheKey(point.latitude, point.longitude) !== centerKey
+    )),
+    MAX_GRID_POINTS - 1
+  )
+
+  return [centerPoint, ...distributed]
 }
 
 function getGridSpacing(viewport: WeatherViewport) {

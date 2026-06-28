@@ -1,6 +1,5 @@
 import L from 'leaflet'
 import type { AirQualityMapSample, WeatherMapSample, WeatherMode } from '../types/weather'
-import { JET_STREAM_SAMPLE_ZOOM } from '../weather/constants'
 
 type Particle = {
   x: number
@@ -511,9 +510,6 @@ export class WeatherMapAnimation {
     )
     const paths = JET_STREAM_COLORS.map(() => new Path2D())
     const usedBuckets = new Set<number>()
-    const smoothingDistanceSquared = 14000 * (
-      2 ** (2 * (this.map.getZoom() - JET_STREAM_SAMPLE_ZOOM))
-    )
 
     this.context.save()
     this.context.lineCap = 'round'
@@ -529,8 +525,7 @@ export class WeatherMapAnimation {
         particle.x,
         particle.y,
         availableSamples,
-        true,
-        smoothingDistanceSquared
+        true
       )
       const speed = 24 + Math.min(field.speed, 320) * 0.72
       const tail = 12 + Math.min(field.speed, 320) * 0.17
@@ -735,8 +730,7 @@ function windFieldAt(
   x: number,
   y: number,
   samples: ProjectedSample[],
-  useJetStream = false,
-  smoothingDistanceSquared = 14000
+  useJetStream = false
 ) {
   let vectorX = 0
   let vectorY = 0
@@ -746,7 +740,7 @@ function windFieldAt(
     const distanceX = projected.x - x
     const distanceY = projected.y - y
     const distanceSquared = distanceX * distanceX + distanceY * distanceY
-    const weight = 1 / (distanceSquared + smoothingDistanceSquared)
+    const weight = 1 / Math.max(distanceSquared, 64)
     const speed = useJetStream
       ? projected.sample.jetStreamSpeed
       : projected.sample.rawWindSpeed
@@ -758,7 +752,7 @@ function windFieldAt(
       continue
     }
 
-    const vector = windVector(angle, useJetStream)
+    const vector = windVector(angle)
 
     vectorX += vector.x * speed * weight
     vectorY += vector.y * speed * weight
@@ -777,12 +771,10 @@ function windFieldAt(
   }
 }
 
-function windVector(angle: number, reverse = false) {
-  const direction = reverse ? -1 : 1
-
+function windVector(angle: number) {
   return {
-    x: -Math.sin(angle) * direction,
-    y: Math.cos(angle) * direction
+    x: -Math.sin(angle),
+    y: Math.cos(angle)
   }
 }
 
