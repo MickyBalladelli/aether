@@ -317,13 +317,11 @@ body {
 }
 
 .panel-title {
-  overflow: hidden;
   color: #f7fcff;
   font-size: 20px;
   font-weight: 750;
-  line-height: 1.05;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1.15;
+  overflow-wrap: break-word;
 }
 
 .panel-subtitle {

@@ -11,7 +11,7 @@ import {
   getCachedAirQualityMapSamples,
   interpolateAirQualityAt
 } from './services/airQuality'
-import { searchCity } from './services/geocoding'
+import { reverseGeocode, searchCity } from './services/geocoding'
 import { fetchOpenMeteoForecast } from './services/openMeteo'
 import {
   WEATHER_REFRESH_INTERVAL,
@@ -242,6 +242,16 @@ export default function App() {
     }
   }, [viewport])
 
+  async function handleMapClick(location: WeatherLocation) {
+    setStatus('Locating')
+    const label = await reverseGeocode(location.latitude, location.longitude)
+
+    setSelectedLocation({
+      ...location,
+      label
+    })
+  }
+
   async function handleCitySearch(query: string) {
     try {
       setStatus('Searching city')
@@ -263,6 +273,7 @@ export default function App() {
           airQualitySamples={airQualitySamples}
           onViewportChange={handleViewportChange}
           onPointerWeatherChange={handlePointerWeatherChange}
+          onMapClick={handleMapClick}
         />
         <MapWeatherTooltip reading={pointerWeather} />
         <AetherHeader

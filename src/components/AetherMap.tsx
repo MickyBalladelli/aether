@@ -20,6 +20,7 @@ type AetherMapProps = {
   airQualitySamples: AirQualityMapSample[]
   onViewportChange: (viewport: WeatherViewport) => void
   onPointerWeatherChange: (reading: MapWeatherPointer | null) => void
+  onMapClick: (location: WeatherLocation) => void
 }
 
 export function AetherMap({
@@ -28,7 +29,8 @@ export function AetherMap({
   samples,
   airQualitySamples,
   onViewportChange,
-  onPointerWeatherChange
+  onPointerWeatherChange,
+  onMapClick
 }: AetherMapProps) {
   const elementRef = useRef<HTMLDivElement | null>(null)
   const initialLocationRef = useRef(location)
@@ -39,6 +41,7 @@ export function AetherMap({
   const samplesRef = useRef(samples)
   const airQualitySamplesRef = useRef(airQualitySamples)
   const pointerCallbackRef = useRef(onPointerWeatherChange)
+  const clickCallbackRef = useRef(onMapClick)
   const pointerRefreshRef = useRef<() => void>(() => {})
   const lastPointerRef = useRef<{
     latitude: number
@@ -61,7 +64,8 @@ export function AetherMap({
 
   useEffect(() => {
     pointerCallbackRef.current = onPointerWeatherChange
-  }, [onPointerWeatherChange])
+    clickCallbackRef.current = onMapClick
+  }, [onPointerWeatherChange, onMapClick])
 
   useEffect(() => {
     if (!elementRef.current || mapRef.current) {
@@ -156,6 +160,13 @@ export function AetherMap({
       lastPointerRef.current = null
       pointerCallbackRef.current(null)
     }
+    const handleMapClick = (event: L.LeafletMouseEvent) => {
+      clickCallbackRef.current({
+        label: `${event.latlng.lat.toFixed(3)}, ${event.latlng.lng.toFixed(3)}`,
+        latitude: event.latlng.lat,
+        longitude: event.latlng.lng
+      })
+    }
     pointerRefreshRef.current = emitPointerWeather
     const handleWindowResize = () => {
       map.invalidateSize()
@@ -165,6 +176,7 @@ export function AetherMap({
     map.on('moveend zoomend resize', scheduleViewport)
     map.on('move zoom resize', animation.invalidate, animation)
     map.on('mousemove', handleMouseMove)
+    map.on('click', handleMapClick)
     map.on('movestart zoomstart', clearPointerWeather)
     elementRef.current.addEventListener('mouseleave', clearPointerWeather)
     window.addEventListener('resize', handleWindowResize)
@@ -178,6 +190,7 @@ export function AetherMap({
       map.off('moveend zoomend resize', scheduleViewport)
       map.off('move zoom resize', animation.invalidate, animation)
       map.off('mousemove', handleMouseMove)
+      map.off('click', handleMapClick)
       map.off('movestart zoomstart', clearPointerWeather)
       elementRef.current?.removeEventListener('mouseleave', clearPointerWeather)
       pointerRefreshRef.current = () => {}
@@ -273,9 +286,9 @@ function formatMetric(sample: WeatherMapSample, mode: WeatherMode) {
 
 function escapeHtml(value: string) {
   return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
+    .replace(/&/g, '&')
+    .replace(/</g, '<')
+    .replace(/>/g, '>')
+    .replace(/"/g, '"')
     .replace(/'/g, '&#039;')
 }
