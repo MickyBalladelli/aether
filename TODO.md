@@ -20,7 +20,6 @@
 
 - [ ] Add a dark map tile option.
 - [ ] Add radar opacity controls.
-- [ ] Add sunrise and sunset to the forecast.
 - [ ] Add keyboard map navigation and improved screen-reader labels.
 - [ ] Add PWA support for a stronger offline experience.
 

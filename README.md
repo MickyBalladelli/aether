@@ -18,6 +18,7 @@ Aether is an interactive full-screen weather map built with React, TypeScript, M
 - Weather values at the mouse position
 - City search and animated map navigation
 - Persistent browser cache using IndexedDB
+- Installable PWA with offline app shell and cached weather responses
 - Automatic background refresh while the app is open
 - Responsive, compact map controls
 - Vercel deployment configuration

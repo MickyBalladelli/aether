@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import type { Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
+import { VitePWA } from 'vite-plugin-pwa'
 import {
   AIR_QUALITY_PARAMETER_CONFIG,
   WEATHER_PARAMETER_CONFIG,
@@ -142,7 +143,67 @@ export default defineConfig(({ mode }) => {
     define: {
       'import.meta.env.VITE_AETHER_BUILD_VERSION': JSON.stringify(buildVersion)
     },
-    plugins: [react(), localWeatherApi()]
+    plugins: [
+      react(),
+      VitePWA({
+        registerType: 'autoUpdate',
+        manifest: {
+          name: 'Aether Weather Map',
+          short_name: 'Aether',
+          description: 'Interactive live weather map with wind, radar, air quality, and Jet Stream layers.',
+          theme_color: '#071014',
+          background_color: '#071014',
+          display: 'standalone',
+          orientation: 'any',
+          scope: '/',
+          start_url: '/',
+          icons: [
+            {
+              src: '/pwa-192x192.png',
+              sizes: '192x192',
+              type: 'image/png'
+            },
+            {
+              src: '/pwa-512x512.png',
+              sizes: '512x512',
+              type: 'image/png'
+            },
+            {
+              src: '/pwa-512x512.png',
+              sizes: '512x512',
+              type: 'image/png',
+              purpose: 'maskable'
+            }
+          ]
+        },
+        workbox: {
+          cleanupOutdatedCaches: true,
+          globPatterns: ['**/*.{js,css,html,svg,png,ico}'],
+          globIgnores: ['**/example.png'],
+          runtimeCaching: [
+            {
+              urlPattern: ({ url }) => (
+                url.origin === self.location.origin &&
+                url.pathname.startsWith('/api/')
+              ),
+              handler: 'NetworkFirst',
+              options: {
+                cacheName: 'aether-api',
+                networkTimeoutSeconds: 4,
+                cacheableResponse: {
+                  statuses: [0, 200]
+                },
+                expiration: {
+                  maxEntries: 120,
+                  maxAgeSeconds: 24 * 60 * 60
+                }
+              }
+            }
+          ]
+        }
+      }),
+      localWeatherApi()
+    ]
   }
 })
 
