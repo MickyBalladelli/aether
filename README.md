@@ -21,6 +21,7 @@ Aether is an interactive full-screen weather map built with React, TypeScript, M
 - Installable PWA with offline app shell and cached weather responses
 - Automatic background refresh while the app is open
 - Responsive, compact map controls
+- Standard OpenStreetMap and CARTO Dark Matter tile styles
 - Vercel deployment configuration
 
 ## Data sources
@@ -29,6 +30,7 @@ Aether is an interactive full-screen weather map built with React, TypeScript, M
 - [Copernicus Atmosphere Monitoring Service (CAMS)](https://atmosphere.copernicus.eu/) supplies modeled air-quality data through the Open-Meteo Air Quality API.
 - [RainViewer](https://www.rainviewer.com/api.html) supplies precipitation radar tiles.
 - [OpenStreetMap](https://www.openstreetmap.org/) supplies the base map.
+- [CARTO](https://carto.com/basemaps/) supplies the optional Dark Matter base map.
 - [MeteoGate](https://meteogate.eu/) supplies official European high-temperature warnings from MeteoAlarm members.
 
 Open-Meteo data is licensed under [CC BY 4.0](https://open-meteo.com/en/license). Air-quality data requires attribution to both CAMS and Open-Meteo. RainViewer requires attribution and its free API is intended for personal, educational, and small-scale community use. OpenStreetMap tiles must follow the [tile usage policy](https://operations.osmfoundation.org/policies/tiles/).

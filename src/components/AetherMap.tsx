@@ -19,6 +19,9 @@ const WORLD_BOUNDS = L.latLngBounds(
   [-85.05112878, -180],
   [85.05112878, 180]
 )
+const MAP_TILE_STYLE_KEY = 'aether:map-tile-style'
+
+type MapTileStyle = 'standard' | 'dark'
 
 type AetherMapProps = {
   location: WeatherLocation
@@ -99,11 +102,44 @@ export function AetherMap({
       worldCopyJump: false
     })
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      noWrap: true,
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map)
+    const standardTiles = L.tileLayer(
+      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      {
+        maxZoom: 19,
+        noWrap: true,
+        attribution: '&copy; OpenStreetMap contributors'
+      }
+    )
+    const darkTiles = L.tileLayer(
+      'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+      {
+        subdomains: 'abcd',
+        maxZoom: 20,
+        noWrap: true,
+        attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+      }
+    )
+    const tileStyle = loadMapTileStyle()
+    const initialTiles = tileStyle === 'dark' ? darkTiles : standardTiles
+
+    initialTiles.addTo(map)
+
+    const tileControl = L.control.layers(
+      {
+        Standard: standardTiles,
+        Dark: darkTiles
+      },
+      undefined,
+      {
+        collapsed: true,
+        position: 'topright'
+      }
+    ).addTo(map)
+    const handleTileStyleChange = (event: L.LayersControlEvent) => {
+      saveMapTileStyle(event.name === 'Dark' ? 'dark' : 'standard')
+    }
+
+    map.on('baselayerchange', handleTileStyleChange)
     map.attributionControl.addAttribution(
       'Weather <a href="https://open-meteo.com/" target="_blank">Open-Meteo</a> · Air quality <a href="https://atmosphere.copernicus.eu/" target="_blank">CAMS</a>'
     )
@@ -219,12 +255,14 @@ export function AetherMap({
       map.off('move zoom resize', animation.invalidate, animation)
       map.off('mousemove', handleMouseMove)
       map.off('click', handleMapClick)
+      map.off('baselayerchange', handleTileStyleChange)
       map.off('movestart zoomstart', clearPointerWeather)
       elementRef.current?.removeEventListener('mouseleave', clearPointerWeather)
       pointerRefreshRef.current = () => {}
       pointerCallbackRef.current(null)
       animation.destroy()
       radar.destroy()
+      tileControl.remove()
       map.remove()
       mapRef.current = null
       badgeLayerRef.current = null
@@ -342,4 +380,22 @@ function escapeHtml(value: string) {
     .replace(/>/g, '>')
     .replace(/"/g, '"')
     .replace(/'/g, '&#039;')
+}
+
+function loadMapTileStyle(): MapTileStyle {
+  try {
+    return window.localStorage.getItem(MAP_TILE_STYLE_KEY) === 'dark'
+      ? 'dark'
+      : 'standard'
+  } catch {
+    return 'standard'
+  }
+}
+
+function saveMapTileStyle(style: MapTileStyle) {
+  try {
+    window.localStorage.setItem(MAP_TILE_STYLE_KEY, style)
+  } catch {
+    return
+  }
 }
