@@ -1,5 +1,6 @@
 import type { WeatherMapSample } from '../types/weather'
 import { normalizeLongitude } from '../utils/geo'
+import { openStorage } from './storage'
 
 type WeatherCacheRecord = {
   key: string
@@ -7,15 +8,11 @@ type WeatherCacheRecord = {
   sample: WeatherMapSample
 }
 
-const DATABASE_NAME = 'aether-weather'
-const DATABASE_VERSION = 1
 const STORE_NAME = 'weather-samples'
 const MAX_CACHE_AGE = 6 * 60 * 60 * 1000
 
-let databasePromise: Promise<IDBDatabase | null> | null = null
-
 export async function loadPersistedWeatherSamples() {
-  const database = await openDatabase()
+  const database = await openStorage()
 
   if (!database) {
     return []
@@ -41,7 +38,7 @@ export async function loadPersistedWeatherSamples() {
 }
 
 export async function persistWeatherSamples(samples: WeatherMapSample[]) {
-  const database = await openDatabase()
+  const database = await openStorage()
 
   if (!database || samples.length === 0) {
     return
@@ -73,32 +70,3 @@ export async function persistWeatherSamples(samples: WeatherMapSample[]) {
 export function getWeatherCacheKey(latitude: number, longitude: number) {
   return `${latitude.toFixed(3)}:${normalizeLongitude(longitude).toFixed(3)}`
 }
-
-function openDatabase() {
-  if (databasePromise) {
-    return databasePromise
-  }
-
-  databasePromise = new Promise(resolve => {
-    if (!('indexedDB' in window)) {
-      resolve(null)
-      return
-    }
-
-    const request = window.indexedDB.open(DATABASE_NAME, DATABASE_VERSION)
-
-    request.onupgradeneeded = () => {
-      const database = request.result
-
-      if (!database.objectStoreNames.contains(STORE_NAME)) {
-        database.createObjectStore(STORE_NAME, { keyPath: 'key' })
-      }
-    }
-    request.onsuccess = () => resolve(request.result)
-    request.onerror = () => resolve(null)
-    request.onblocked = () => resolve(null)
-  })
-
-  return databasePromise
-}
-

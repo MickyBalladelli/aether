@@ -3,15 +3,7 @@
 > Priorities: P0 = quick wins, P1 = high value, P2 = polish, P3 = future
 
 ---
-
-## P0 — Bugs & Quick Fixes
-
-
-- [ ] **Air quality storage → IndexedDB.** `airQuality.ts` persists to `localStorage` (5 MB limit) while `weatherCache.ts` uses IndexedDB. IndexedDB is better for growing spatial data. Unify on IndexedDB.
-- [x] **Add a `.gitignore` entry for Vercel `.vercel` folder if not already present.**
--  **Pin `leaflet` CSS in `index.html`** — it is currently loaded via CDN; bundle it or add SRI hash for security.
-
----
+ 
 
 ## P1 — UI/UX Improvements
 

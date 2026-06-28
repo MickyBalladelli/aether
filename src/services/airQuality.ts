@@ -7,7 +7,8 @@ import type {
 } from '../types/weather'
 import { getVisibleWeatherGrid } from './weatherGrid'
 import { getWeatherCacheKey } from './weatherCache'
-import { degreesToRadians, distanceInKilometers, inverseDistanceWeight } from '../utils/geo'
+import { openStorage } from './storage'
+import { distanceInKilometers, inverseDistanceWeight } from '../utils/geo'
 
 const AIR_QUALITY_ENDPOINT = '/api/air-quality'
 const CURRENT_FIELDS = [
@@ -20,14 +21,16 @@ const CURRENT_FIELDS = [
 const FRESHNESS = 60 * 60 * 1000
 const MAX_CACHE_AGE = 24 * 60 * 60 * 1000
 const BATCH_SIZE = 32
-const STORAGE_KEY = 'aether-air-quality-v1'
+const STORE_NAME = 'air-quality-samples'
+const MAX_STORED_SAMPLES = 1000
 const sampleCache = new Map<string, AirQualityMapSample>()
+let persistTimer = 0
 let cacheLoaded = false
 
 export const AIR_QUALITY_REFRESH_INTERVAL = FRESHNESS
 
 export async function fetchAirQualityMapSamples(viewport: WeatherViewport) {
-  loadCache()
+  await loadCache()
 
   const points = getVisibleWeatherGrid(viewport)
   const refreshPoints = points.filter(point => {
@@ -51,7 +54,7 @@ export async function fetchAirQualityMapSamples(viewport: WeatherViewport) {
 }
 
 export function getCachedAirQualityMapSamples(viewport: WeatherViewport) {
-  loadCache()
+  void loadCache()
 
   return getSamplesForPoints(getVisibleWeatherGrid(viewport))
 }
@@ -169,10 +172,10 @@ function rememberSamples(samples: AirQualityMapSample[]) {
     sampleCache.set(getWeatherCacheKey(sample.latitude, sample.longitude), sample)
   }
 
-  persistCache()
+  schedulePersist()
 }
 
-function loadCache() {
+async function loadCache() {
   if (cacheLoaded) {
     return
   }
@@ -180,16 +183,23 @@ function loadCache() {
   cacheLoaded = true
 
   try {
-    const stored = window.localStorage.getItem(STORAGE_KEY)
+    const database = await openStorage()
 
-    if (!stored) {
+    if (!database) {
       return
     }
 
-    const now = Date.now()
-    const samples = JSON.parse(stored) as AirQualityMapSample[]
+    const records = await new Promise<AirQualityMapSample[]>(resolve => {
+      const transaction = database.transaction(STORE_NAME, 'readonly')
+      const request = transaction.objectStore(STORE_NAME).getAll()
 
-    for (const sample of samples) {
+      request.onsuccess = () => resolve(request.result as AirQualityMapSample[])
+      request.onerror = () => resolve([])
+    })
+
+    const now = Date.now()
+
+    for (const sample of records) {
       if (now - sample.updatedAt <= MAX_CACHE_AGE) {
         sampleCache.set(getWeatherCacheKey(sample.latitude, sample.longitude), sample)
       }
@@ -199,13 +209,40 @@ function loadCache() {
   }
 }
 
-function persistCache() {
+function schedulePersist() {
+  window.clearTimeout(persistTimer)
+  persistTimer = window.setTimeout(() => {
+    void persistCache()
+  }, 800)
+}
+
+async function persistCache() {
   try {
+    const database = await openStorage()
+
+    if (!database) {
+      return
+    }
+
     const samples = Array.from(sampleCache.values())
       .sort((first, second) => second.updatedAt - first.updatedAt)
-      .slice(0, 1000)
+      .slice(0, MAX_STORED_SAMPLES)
 
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(samples))
+    await new Promise<void>(resolve => {
+      const transaction = database.transaction(STORE_NAME, 'readwrite')
+      const store = transaction.objectStore(STORE_NAME)
+
+      for (const sample of samples) {
+        store.put({
+          key: getWeatherCacheKey(sample.latitude, sample.longitude),
+          ...sample
+        })
+      }
+
+      transaction.oncomplete = () => resolve()
+      transaction.onerror = () => resolve()
+      transaction.onabort = () => resolve()
+    })
   } catch {
     return
   }
