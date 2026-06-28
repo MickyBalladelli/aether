@@ -17,7 +17,6 @@ export type WeatherViewport = {
 export type OpenMeteoCurrent = {
   temperature_2m: number
   relative_humidity_2m: number
-  precipitation: number
   rain: number
   showers: number
   snowfall: number

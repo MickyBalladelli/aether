@@ -8,7 +8,7 @@
 
 
 - [ ] **Air quality storage → IndexedDB.** `airQuality.ts` persists to `localStorage` (5 MB limit) while `weatherCache.ts` uses IndexedDB. IndexedDB is better for growing spatial data. Unify on IndexedDB.
-- [ ] **Remove `current.precipitation` from the `OpenMeteoCurrent` type** — it is no longer used after our fix and could confuse future readers.
+- [x] **Remove `current.precipitation` from the `OpenMeteoCurrent` type** — it is no longer used after our fix and could confuse future readers.
 - [ ] **Add a `.gitignore` entry for Vercel `.vercel` folder if not already present.**
 - [ ] **Pin `leaflet` CSS in `index.html`** — it is currently loaded via CDN; bundle it or add SRI hash for security.
 
