@@ -5,7 +5,7 @@
 - [x] Validate and canonicalize all API parameters to prevent cache-busting requests.
 - [x] Warm the Vercel cache for popular locations after deployment.
 - [x] Prioritize selected-location forecasts over background map-grid refreshes.
-- [ ] Show clear `Live`, `Cached`, `Stale`, and `Unavailable` states in the UI.
+- [x] Show clear `Live`, `Cached`, `Stale`, and `Unavailable` states in the UI.
 
 ## P1 — Cache and monitoring
 

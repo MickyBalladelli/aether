@@ -2,15 +2,16 @@ import SearchIcon from '@mui/icons-material/Search'
 import { Box, IconButton, Stack, TextField, Typography } from '@mui/material'
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import type { WeatherLocation } from '../types/weather'
+import type { WeatherDataState, WeatherLocation } from '../types/weather'
 
 type AetherHeaderProps = {
   location: WeatherLocation
   status: string
+  dataState: WeatherDataState
   onSearch: (query: string) => void
 }
 
-export function AetherHeader({ location, status, onSearch }: AetherHeaderProps) {
+export function AetherHeader({ location, status, dataState, onSearch }: AetherHeaderProps) {
   const [query, setQuery] = useState('')
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -45,7 +46,11 @@ export function AetherHeader({ location, status, onSearch }: AetherHeaderProps) 
         <IconButton type="submit" aria-label="Search" className="city-search-button">
           <SearchIcon fontSize="small" />
         </IconButton>
-        <Typography variant="caption" className="search-status">
+        <Typography
+          variant="caption"
+          role="status"
+          className={`search-status search-status-${dataState}`}
+        >
           {status}
         </Typography>
       </Box>

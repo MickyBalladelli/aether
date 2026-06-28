@@ -25,6 +25,7 @@ import { translateWeather } from './weather/translateWeather'
 import type {
   MapWeatherPointer,
   WeatherConfig,
+  WeatherDataState,
   AirQualityMapSample,
   WeatherLocation,
   WeatherMapSample,
@@ -96,6 +97,7 @@ export default function App() {
   const [weather, setWeather] = useState<WeatherConfig | null>(null)
   const lastWeatherRef = useRef<WeatherConfig | null>(null)
   const [status, setStatus] = useState('Reading sky')
+  const [weatherDataState, setWeatherDataState] = useState<WeatherDataState>('loading')
   const [selectedLocation, setSelectedLocation] = useState<WeatherLocation>(
     loadStoredLocation() ?? defaultCity
   )
@@ -140,17 +142,19 @@ export default function App() {
 
     async function loadWeather() {
       setSelectedForecastReady(false)
+      setWeatherDataState('loading')
 
       try {
         setStatus('Reading sky')
         const forecast = await fetchOpenMeteoForecast(selectedLocation)
-        const nextWeather = translateWeather(forecast, selectedLocation)
+        const nextWeather = translateWeather(forecast.payload, selectedLocation)
         cacheWeatherSample(selectedLocation, nextWeather)
 
         if (!cancelled) {
           lastWeatherRef.current = nextWeather
           setWeather(nextWeather)
-          setStatus('Live')
+          setWeatherDataState(forecast.source)
+          setStatus(formatDataState(forecast.source))
         }
       } catch (error) {
         const cachedWeather = await getCachedWeatherForLocation(selectedLocation)
@@ -160,9 +164,11 @@ export default function App() {
 
           if (fallback) {
             setWeather(fallback)
-            setStatus('Cached')
+            setWeatherDataState('stale')
+            setStatus('Stale')
           } else {
-            setStatus(error instanceof Error ? error.message : 'Weather fetch failed')
+            setWeatherDataState('unavailable')
+            setStatus('Unavailable')
           }
         }
       } finally {
@@ -350,16 +356,20 @@ export default function App() {
         <AetherHeader
           location={selectedLocation}
           status={status}
+          dataState={weatherDataState}
           onSearch={handleCitySearch}
         />
         <WeatherDashboard
           weather={weather}
           airQuality={selectedAirQuality}
-          status={status}
           mode={weatherMode}
           onModeChange={setWeatherMode}
         />
       </main>
     </ThemeProvider>
   )
+}
+
+function formatDataState(state: Exclude<WeatherDataState, 'loading' | 'unavailable'>) {
+  return state.charAt(0).toUpperCase() + state.slice(1)
 }

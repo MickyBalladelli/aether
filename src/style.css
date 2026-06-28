@@ -275,7 +275,15 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
-  color: rgba(230, 247, 255, 0.68);
+  min-height: 28px;
+  padding: 4px 9px;
+  border: 1px solid rgba(190, 237, 255, 0.3);
+  border-radius: 999px;
+  background: rgba(230, 247, 255, 0.1);
+  color: #f4fbff;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.02em;
   white-space: nowrap;
 }
 
@@ -286,6 +294,50 @@ body {
   background: #8ce9aa;
   box-shadow: 0 0 10px rgba(140, 233, 170, 0.72);
   content: "";
+}
+
+.search-status-live {
+  border-color: rgba(140, 233, 170, 0.5);
+  background: rgba(140, 233, 170, 0.16);
+  color: #dcffe8;
+}
+
+.search-status-cached {
+  border-color: rgba(143, 229, 255, 0.5);
+  background: rgba(143, 229, 255, 0.16);
+  color: #dff8ff;
+}
+
+.search-status-stale {
+  border-color: rgba(255, 196, 112, 0.55);
+  background: rgba(255, 196, 112, 0.16);
+  color: #ffe8c2;
+}
+
+.search-status-unavailable {
+  border-color: rgba(255, 118, 118, 0.55);
+  background: rgba(255, 118, 118, 0.16);
+  color: #ffd6d6;
+}
+
+.search-status-stale::before {
+  background: #ffc470;
+  box-shadow: 0 0 10px rgba(255, 196, 112, 0.72);
+}
+
+.search-status-unavailable::before {
+  background: #ff7676;
+  box-shadow: 0 0 10px rgba(255, 118, 118, 0.72);
+}
+
+.search-status-cached::before {
+  background: #8fe5ff;
+  box-shadow: 0 0 10px rgba(143, 229, 255, 0.72);
+}
+
+.search-status-loading::before {
+  background: #f4fbff;
+  box-shadow: 0 0 10px rgba(244, 251, 255, 0.58);
 }
 
 .weather-panel {
@@ -303,14 +355,6 @@ body {
   box-shadow: 14px 16px 44px rgba(0, 0, 0, 0.26);
   backdrop-filter: blur(20px) saturate(140%);
   z-index: 2;
-}
-
-.status-chip {
-  height: 22px;
-  border: 1px solid rgba(180, 245, 199, 0.3);
-  background: rgba(183, 245, 199, 0.12);
-  color: #dcffe8;
-  font-size: 10px;
 }
 
 .panel-title {
@@ -443,6 +487,10 @@ body {
 }
 
 @media (max-width: 560px) {
+  :root {
+    --header-height: 84px;
+  }
+
   .app-shell {
     min-height: 100dvh;
   }
@@ -467,7 +515,10 @@ body {
   }
 
   .search-status {
-    display: none;
+    grid-column: 1 / -1;
+    min-height: 24px;
+    padding: 3px 8px;
+    justify-self: end;
   }
 
   .brand-place,

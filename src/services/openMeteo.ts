@@ -1,4 +1,5 @@
 import type { OpenMeteoResponse, WeatherLocation } from '../types/weather'
+import type { WeatherDataState } from '../types/weather'
 
 const OPEN_METEO_ENDPOINT = '/api/weather'
 const FORECAST_CACHE_KEY = 'aether:forecast-cache'
@@ -25,12 +26,17 @@ const HOURLY_FIELDS = [
   'wind_direction_10m'
 ]
 
-export async function fetchOpenMeteoForecast(location: WeatherLocation): Promise<OpenMeteoResponse> {
+export async function fetchOpenMeteoForecast(
+  location: WeatherLocation
+): Promise<ForecastResult> {
   const cacheKey = getLocationCacheKey(location)
   const cachedForecast = readCachedForecast(cacheKey)
 
   if (cachedForecast && Date.now() - cachedForecast.updatedAt < FORECAST_FRESHNESS) {
-    return cachedForecast.payload
+    return {
+      payload: cachedForecast.payload,
+      source: 'cached'
+    }
   }
 
   const params = new URLSearchParams({
@@ -45,7 +51,10 @@ export async function fetchOpenMeteoForecast(location: WeatherLocation): Promise
 
   if (!response.ok) {
     if (cachedForecast && Date.now() - cachedForecast.updatedAt < FORECAST_STALE_AGE) {
-      return cachedForecast.payload
+      return {
+        payload: cachedForecast.payload,
+        source: 'stale'
+      }
     }
 
     throw new Error(`Open-Meteo error ${response.status}`)
@@ -55,12 +64,43 @@ export async function fetchOpenMeteoForecast(location: WeatherLocation): Promise
 
   writeCachedForecast(cacheKey, payload)
 
-  return payload
+  return {
+    payload,
+    source: getResponseSource(response)
+  }
+}
+
+type ForecastResult = {
+  payload: OpenMeteoResponse
+  source: Exclude<WeatherDataState, 'loading' | 'unavailable'>
 }
 
 type ForecastCacheRecord = {
   updatedAt: number
   payload: OpenMeteoResponse
+}
+
+function getResponseSource(
+  response: Response
+): ForecastResult['source'] {
+  const vercelCache = response.headers.get('x-vercel-cache')?.toLowerCase()
+  const aetherCache = response.headers.get('x-aether-cache')?.toLowerCase()
+  const age = Number(response.headers.get('age') ?? 0)
+
+  if (vercelCache === 'stale' || aetherCache === 'stale') {
+    return 'stale'
+  }
+
+  if (
+    vercelCache === 'hit' ||
+    aetherCache === 'runtime' ||
+    aetherCache === 'cached' ||
+    age > 0
+  ) {
+    return 'cached'
+  }
+
+  return 'live'
 }
 
 function getLocationCacheKey(location: WeatherLocation) {

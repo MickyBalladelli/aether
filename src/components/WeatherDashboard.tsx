@@ -10,7 +10,6 @@ import type { AirQualityReading, WeatherConfig, WeatherEvolutionFrame, WeatherMo
 type WeatherDashboardProps = {
   weather: WeatherConfig | null
   airQuality: AirQualityReading | null
-  status: string
   mode: WeatherMode
   onModeChange: (mode: WeatherMode) => void
 }
@@ -18,7 +17,6 @@ type WeatherDashboardProps = {
 export function WeatherDashboard({
   weather,
   airQuality,
-  status,
   mode,
   onModeChange
 }: WeatherDashboardProps) {

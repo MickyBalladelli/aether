@@ -61,6 +61,8 @@ export type OpenMeteoAirQualityResponse = {
 
 export type WeatherMode = 'temperature' | 'wind' | 'precipitation' | 'storm' | 'air-quality'
 
+export type WeatherDataState = 'loading' | 'live' | 'cached' | 'stale' | 'unavailable'
+
 export type WeatherEvolutionFrame = {
   time: string
   temperature: number

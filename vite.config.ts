@@ -171,7 +171,7 @@ function localWeatherApi(): Plugin {
     const now = Date.now()
 
     if (cached && cached.expiresAt > now) {
-      sendCachedWeather(response, cached)
+      sendCachedWeather(response, cached, 'cached')
       return
     }
 
@@ -190,12 +190,12 @@ function localWeatherApi(): Plugin {
         }
 
         cache.set(cacheKey, record)
-        sendCachedWeather(response, record)
+        sendCachedWeather(response, record, 'live')
         return
       }
 
       if (cached && cached.staleUntil > now) {
-        sendCachedWeather(response, cached)
+        sendCachedWeather(response, cached, 'stale')
         return
       }
 
@@ -209,7 +209,7 @@ function localWeatherApi(): Plugin {
       response.end(result.body)
     } catch (error) {
       if (cached && cached.staleUntil > now) {
-        sendCachedWeather(response, cached)
+        sendCachedWeather(response, cached, 'stale')
         return
       }
 
@@ -228,9 +228,14 @@ function localWeatherApi(): Plugin {
   }
 }
 
-function sendCachedWeather(response: ServerResponse, record: WeatherCacheRecord) {
+function sendCachedWeather(
+  response: ServerResponse,
+  record: WeatherCacheRecord,
+  cacheStatus: 'live' | 'cached' | 'stale'
+) {
   response.statusCode = 200
   response.setHeader('Content-Type', record.contentType)
   response.setHeader('Cache-Control', 'public, max-age=60')
+  response.setHeader('X-Aether-Cache', cacheStatus)
   response.end(record.body)
 }
