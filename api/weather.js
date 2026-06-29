@@ -26,6 +26,7 @@ import {
 } from '../server/cachePolicy.js'
 import { getCacheNamespace } from '../shared/cacheVersion.js'
 import {
+  isJetStreamResponse,
   isWeatherResponse,
   parseProviderBody
 } from '../shared/providerValidation.js'
@@ -83,10 +84,11 @@ export default async function handler(request, response) {
       'Aether Weather Map'
     )
 
-    if (
-      upstream.ok &&
-      parseProviderBody(upstream.body, isWeatherResponse)
-    ) {
+    const validateProviderBody = isJetStreamRequest(params)
+      ? isJetStreamResponse
+      : isWeatherResponse
+
+    if (upstream.ok && parseProviderBody(upstream.body, validateProviderBody)) {
       const record = {
         body: upstream.body,
         contentType: upstream.contentType,
@@ -148,6 +150,17 @@ export default async function handler(request, response) {
 
     response.status(502).json({ error: 'Weather provider unavailable' })
   }
+}
+
+function isJetStreamRequest(params) {
+  const current = params.get('current')?.split(',') ?? []
+
+  return (
+    current.length === 2 &&
+    current.includes('wind_speed_250hPa') &&
+    current.includes('wind_direction_250hPa') &&
+    !params.has('hourly')
+  )
 }
 
 function sendWeather(response, record, cacheStatus) {

@@ -76,6 +76,30 @@ describe('weather API handler', () => {
     expect(response.statusCode).toBe(502)
     expect(runtime.entries.has(`fresh:${weatherCacheKey}`)).toBe(false)
   })
+
+  test('accepts Jet Stream only provider data', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => (
+      new Response(JSON.stringify([{
+        current: {
+          wind_speed_250hPa: 145,
+          wind_direction_250hPa: 275
+        }
+      }]), { status: 200 })
+    )))
+    const response = createResponse()
+
+    await weatherHandler({
+      method: 'GET',
+      query: {
+        latitude: '48',
+        longitude: '2',
+        current: 'wind_speed_250hPa,wind_direction_250hPa'
+      }
+    }, response)
+
+    expect(response.statusCode).toBe(200)
+    expect(response.headers['X-Aether-Cache']).toBe('upstream')
+  })
 })
 
 describe('air-quality API handler', () => {

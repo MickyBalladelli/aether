@@ -9,11 +9,13 @@ import { describeWeatherCode } from '../weather/weatherCode'
 type EcmwfForecastTimelineProps = {
   forecast: EcmwfForecast | null
   loading: boolean
+  onFrameChange?: (frame: EcmwfForecast['frames'][number] | null) => void
 }
 
 export function EcmwfForecastTimeline({
   forecast,
-  loading
+  loading,
+  onFrameChange
 }: EcmwfForecastTimelineProps) {
   const [frameIndex, setFrameIndex] = useState(0)
   const [playing, setPlaying] = useState(false)
@@ -31,6 +33,10 @@ export function EcmwfForecastTimeline({
     setFrameIndex(Math.max(0, currentIndex))
     setPlaying(false)
   }, [forecast])
+
+  useEffect(() => {
+    onFrameChange?.(selected ?? null)
+  }, [onFrameChange, selected])
 
   useEffect(() => {
     if (!playing || frames.length < 2 || prefersReducedMotion()) {

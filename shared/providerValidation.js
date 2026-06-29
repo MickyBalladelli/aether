@@ -31,6 +31,17 @@ export function isWeatherResponse(value) {
   ))
 }
 
+export function isJetStreamResponse(value) {
+  const payloads = Array.isArray(value) ? value : [value]
+
+  return payloads.length > 0 && payloads.every(payload => (
+    isRecord(payload) &&
+    isRecord(payload.current) &&
+    Number.isFinite(payload.current.wind_speed_250hPa) &&
+    Number.isFinite(payload.current.wind_direction_250hPa)
+  ))
+}
+
 export function isAirQualityResponse(value) {
   const payloads = Array.isArray(value) ? value : [value]
 

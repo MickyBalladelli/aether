@@ -36,6 +36,7 @@ import {
   hydrateWeatherMapCache
 } from './services/weatherGrid'
 import { translateWeather } from './weather/translateWeather'
+import { describeWeatherCode } from './weather/weatherCode'
 import type {
   EcmwfForecast,
   MapWeatherPointer,
@@ -44,6 +45,7 @@ import type {
   WeatherDataState,
   AirQualityMapSample,
   JetStreamSample,
+  WeatherEvolutionFrame,
   WeatherLocation,
   WeatherMapSample,
   WeatherMode,
@@ -90,6 +92,7 @@ export default function App() {
   const [officialHeatAlerts, setOfficialHeatAlerts] = useState<HeatAlert[]>([])
   const [ecmwfForecast, setEcmwfForecast] = useState<EcmwfForecast | null>(null)
   const [ecmwfLoading, setEcmwfLoading] = useState(true)
+  const [ecmwfFrame, setEcmwfFrame] = useState<WeatherEvolutionFrame | null>(null)
   const [selectedLocation, setSelectedLocation] = useState<WeatherLocation>(
     loadInitialLocation
   )
@@ -116,8 +119,42 @@ export default function App() {
     ),
     [airQualitySamples, selectedLocation]
   )
+  const displayedWeather = useMemo(() => {
+    if (
+      !weather ||
+      !ecmwfFrame ||
+      weatherMode === 'jet-stream' ||
+      weatherMode === 'air-quality'
+    ) {
+      return weather
+    }
+
+    return weatherFromEvolutionFrame(weather, ecmwfFrame)
+  }, [ecmwfFrame, weather, weatherMode])
   const displayedSamples = useMemo(() => {
-    if (mapSamples.length > 0 || !weather) {
+    if (
+      displayedWeather &&
+      ecmwfFrame &&
+      weatherMode !== 'jet-stream' &&
+      weatherMode !== 'air-quality'
+    ) {
+      return [{
+        label: selectedLocation.label,
+        latitude: selectedLocation.latitude,
+        longitude: selectedLocation.longitude,
+        temperature: displayedWeather.temperature,
+        precipitation: displayedWeather.precipitation,
+        snowfall: displayedWeather.snowfall,
+        weatherCode: displayedWeather.weatherCode,
+        windSpeed: displayedWeather.windSpeed,
+        rawWindSpeed: displayedWeather.rawWindSpeed,
+        windAngle: displayedWeather.windAngle,
+        cloudOpacity: displayedWeather.cloudOpacity,
+        isThunderstorm: displayedWeather.isThunderstorm
+      }]
+    }
+
+    if (mapSamples.length > 0 || !displayedWeather) {
       return mapSamples
     }
 
@@ -125,17 +162,17 @@ export default function App() {
       label: selectedLocation.label,
       latitude: selectedLocation.latitude,
       longitude: selectedLocation.longitude,
-      temperature: weather.temperature,
-      precipitation: weather.precipitation,
-      snowfall: weather.snowfall,
-      weatherCode: weather.weatherCode,
-      windSpeed: weather.windSpeed,
-      rawWindSpeed: weather.rawWindSpeed,
-      windAngle: weather.windAngle,
-      cloudOpacity: weather.cloudOpacity,
-      isThunderstorm: weather.isThunderstorm
+      temperature: displayedWeather.temperature,
+      precipitation: displayedWeather.precipitation,
+      snowfall: displayedWeather.snowfall,
+      weatherCode: displayedWeather.weatherCode,
+      windSpeed: displayedWeather.windSpeed,
+      rawWindSpeed: displayedWeather.rawWindSpeed,
+      windAngle: displayedWeather.windAngle,
+      cloudOpacity: displayedWeather.cloudOpacity,
+      isThunderstorm: displayedWeather.isThunderstorm
     }]
-  }, [mapSamples, selectedLocation, weather])
+  }, [displayedWeather, ecmwfFrame, mapSamples, selectedLocation, weatherMode])
 
   useEffect(() => () => {
     window.clearTimeout(reverseGeocodeTimeoutRef.current)
@@ -201,6 +238,7 @@ export default function App() {
     const controller = new AbortController()
 
     setEcmwfLoading(true)
+    setEcmwfFrame(null)
 
     void fetchEcmwfLocationForecast(
       selectedLocation,
@@ -545,9 +583,14 @@ export default function App() {
         >
           <Suspense fallback={<div className="weather-panel">Loading forecast</div>}>
             <WeatherDashboard
-              weather={weather}
+              weather={displayedWeather}
               ecmwfForecast={ecmwfForecast}
               ecmwfLoading={ecmwfLoading}
+              onEcmwfFrameChange={
+                weatherMode === 'jet-stream' || weatherMode === 'air-quality'
+                  ? null
+                  : setEcmwfFrame
+              }
               airQuality={selectedAirQuality}
               officialHeatAlerts={officialHeatAlerts}
               mode={weatherMode}
@@ -562,4 +605,24 @@ export default function App() {
 
 function formatDataState(state: Exclude<WeatherDataState, 'loading' | 'unavailable'>) {
   return state.charAt(0).toUpperCase() + state.slice(1)
+}
+
+function weatherFromEvolutionFrame(
+  weather: WeatherConfig,
+  frame: WeatherEvolutionFrame
+): WeatherConfig {
+  return {
+    ...weather,
+    temperature: frame.temperature,
+    precipitation: frame.precipitation,
+    snowfall: frame.snowfall,
+    weatherCode: frame.weatherCode,
+    description: describeWeatherCode(frame.weatherCode),
+    windSpeed: frame.windSpeed,
+    rawWindSpeed: frame.rawWindSpeed,
+    windAngle: frame.windAngle,
+    rainDensity: Math.round(Math.min(12, Math.max(0, frame.precipitation)) * 42),
+    isThunderstorm: frame.isThunderstorm,
+    cloudOpacity: frame.cloudOpacity
+  }
 }
