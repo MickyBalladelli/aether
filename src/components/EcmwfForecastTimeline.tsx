@@ -1,9 +1,10 @@
 import PauseIcon from '@mui/icons-material/Pause'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import { Box, IconButton, Typography } from '@mui/material'
-import { useEffect, useMemo, useState } from 'react'
+import { type CSSProperties, useEffect, useMemo, useState } from 'react'
 import type { EcmwfForecast } from '../types/weather'
 import { prefersReducedMotion } from '../utils/motion'
+import { describeWeatherCode } from '../weather/weatherCode'
 
 type EcmwfForecastTimelineProps = {
   forecast: EcmwfForecast | null
@@ -19,6 +20,7 @@ export function EcmwfForecastTimeline({
   const frames = forecast?.frames ?? []
   const selected = frames[frameIndex]
   const points = useMemo(() => buildTemperaturePoints(frames), [frames])
+  const temperatureRange = useMemo(() => getTemperatureRange(frames), [frames])
   const isEcmwf = forecast?.model.includes('ECMWF') ?? false
 
   useEffect(() => {
@@ -86,6 +88,25 @@ export function EcmwfForecastTimeline({
         <span>{Math.round(selected.rawWindSpeed)} km/h</span>
       </Box>
 
+      <Box
+        className="ecmwf-visual-preview"
+        style={buildForecastStyle(selected, temperatureRange)}
+        aria-label="ECMWF animated weather preview"
+      >
+        <Box className="ecmwf-visual-sky" />
+        <Box className="ecmwf-visual-clouds" />
+        <Box className="ecmwf-visual-rain" />
+        <Box className="ecmwf-visual-snow" />
+        {selected.isThunderstorm && <Box className="ecmwf-visual-storm" />}
+        <Box className="ecmwf-visual-ground" />
+        <Box className="ecmwf-visual-wind">
+          <span>➤</span>
+        </Box>
+        <Box className="ecmwf-visual-caption">
+          {describeWeatherCode(selected.weatherCode)}
+        </Box>
+      </Box>
+
       <svg
         className="ecmwf-temperature-chart"
         viewBox="0 0 240 42"
@@ -134,6 +155,51 @@ function buildTemperaturePoints(frames: EcmwfForecast['frames']) {
 
     return `${x.toFixed(1)},${y.toFixed(1)}`
   }).join(' ')
+}
+
+function getTemperatureRange(frames: EcmwfForecast['frames']) {
+  if (frames.length === 0) {
+    return { minimum: 0, range: 1 }
+  }
+
+  const temperatures = frames.map(frame => frame.temperature)
+  const minimum = Math.min(...temperatures)
+  const range = Math.max(...temperatures) - minimum || 1
+
+  return { minimum, range }
+}
+
+function buildForecastStyle(
+  frame: EcmwfForecast['frames'][number],
+  temperatureRange: { minimum: number, range: number }
+) {
+  const warmth = clamp(
+    (frame.temperature - temperatureRange.minimum) / temperatureRange.range,
+    0,
+    1
+  )
+  const rain = clamp(frame.precipitation / 3, 0, 1)
+  const snow = clamp(frame.snowfall / 2, 0, 1)
+  const cloud = clamp(frame.cloudOpacity, 0, 1)
+  const wind = clamp(frame.rawWindSpeed / 70, 0, 1)
+  const coldHue = 205
+  const warmHue = 26
+  const hue = coldHue + (warmHue - coldHue) * warmth
+
+  return {
+    '--ecmwf-sky-hue': hue.toFixed(0),
+    '--ecmwf-warmth': warmth.toFixed(3),
+    '--ecmwf-cloud': cloud.toFixed(3),
+    '--ecmwf-rain': rain.toFixed(3),
+    '--ecmwf-snow': snow.toFixed(3),
+    '--ecmwf-wind': wind.toFixed(3),
+    '--ecmwf-wind-angle': `${frame.windAngle}rad`,
+    '--ecmwf-storm': frame.isThunderstorm ? '1' : '0'
+  } as CSSProperties
+}
+
+function clamp(value: number, minimum: number, maximum: number) {
+  return Math.min(maximum, Math.max(minimum, value))
 }
 
 function formatForecastTime(value: string) {
