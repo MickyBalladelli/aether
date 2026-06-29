@@ -1,6 +1,14 @@
 import L from 'leaflet'
 import { geographicDistanceSquared } from '../services/jetStream'
 import { REDUCED_MOTION_QUERY } from '../utils/motion'
+import {
+  JET_STREAM_COLORS,
+  JET_STREAM_NAMES,
+  JET_STREAM_OUTLINE_COLORS,
+  WIND_COLORS,
+  airQualityColor,
+  temperatureColor
+} from './weatherPalette'
 import type {
   AirQualityMapSample,
   JetStreamSample,
@@ -38,36 +46,6 @@ type LightningSegment = {
 }
 
 const PARTICLE_COUNT = 560
-const WIND_COLORS = [
-  '#70d6ff',
-  '#4ee0bd',
-  '#9be564',
-  '#f4e65e',
-  '#ffb347',
-  '#ff6b5e',
-  '#d967ff'
-]
-const JET_STREAM_COLORS = [
-  '#6ce5ff',
-  '#62b8ff',
-  '#7785ff',
-  '#a46cff',
-  '#e66cff',
-  '#ff83c8',
-  '#fff4ff'
-]
-const JET_STREAM_OUTLINE_COLORS = [
-  '#39d5ff',
-  '#85f08f',
-  '#ffb454',
-  '#ff62c7'
-]
-const JET_STREAM_NAMES = [
-  'N polar',
-  'N subtropical',
-  'S subtropical',
-  'S polar'
-]
 
 export class WeatherMapAnimation {
   private map: L.Map
@@ -325,6 +303,7 @@ export class WeatherMapAnimation {
   }
 
   private renderTemperatureTexture(samples: ProjectedSample[]) {
+    const startedAt = performance.now()
     const scale = 8
     const width = Math.max(1, Math.ceil(this.width / scale))
     const height = Math.max(1, Math.ceil(this.height / scale))
@@ -352,6 +331,9 @@ export class WeatherMapAnimation {
 
     this.temperatureContext.putImageData(image, 0, 0)
     this.temperatureTextureDirty = false
+    this.canvas.dataset.temperatureTextureMs = (
+      performance.now() - startedAt
+    ).toFixed(1)
   }
 
   private drawTemperatureLegend(samples: ProjectedSample[]) {
@@ -398,6 +380,7 @@ export class WeatherMapAnimation {
   }
 
   private renderAirQualityTexture(samples: ProjectedAirQualitySample[]) {
+    const startedAt = performance.now()
     const scale = 8
     const width = Math.max(1, Math.ceil(this.width / scale))
     const height = Math.max(1, Math.ceil(this.height / scale))
@@ -425,6 +408,9 @@ export class WeatherMapAnimation {
 
     this.airQualityContext.putImageData(image, 0, 0)
     this.airQualityTextureDirty = false
+    this.canvas.dataset.airQualityTextureMs = (
+      performance.now() - startedAt
+    ).toFixed(1)
   }
 
   private drawAirQualityLegend(samples: ProjectedAirQualitySample[]) {
@@ -1024,47 +1010,4 @@ function interpolateAirQuality(
     value2 * weight2 +
     value3 * weight3
   ) / totalWeight
-}
-
-function airQualityColor(airQuality: number) {
-  const stops = [
-    { value: 0, r: 50, g: 205, b: 115 },
-    { value: 20, r: 105, g: 220, b: 105 },
-    { value: 40, r: 245, g: 220, b: 70 },
-    { value: 60, r: 255, g: 155, b: 55 },
-    { value: 80, r: 245, g: 75, b: 70 },
-    { value: 100, r: 150, g: 45, b: 155 }
-  ]
-  const upperIndex = stops.findIndex(stop => stop.value >= airQuality)
-  const upper = stops[upperIndex === -1 ? stops.length - 1 : Math.max(upperIndex, 1)]
-  const lower = stops[upperIndex === -1 ? stops.length - 2 : Math.max(upperIndex - 1, 0)]
-  const amount = Math.min(1, Math.max(0, (airQuality - lower.value) / (upper.value - lower.value)))
-
-  return {
-    r: Math.round(lower.r + (upper.r - lower.r) * amount),
-    g: Math.round(lower.g + (upper.g - lower.g) * amount),
-    b: Math.round(lower.b + (upper.b - lower.b) * amount)
-  }
-}
-
-function temperatureColor(temperature: number) {
-  const stops = [
-    { value: -15, r: 82, g: 35, b: 150 },
-    { value: -5, r: 25, g: 85, b: 220 },
-    { value: 5, r: 30, g: 205, b: 245 },
-    { value: 15, r: 75, g: 225, b: 125 },
-    { value: 25, r: 255, g: 220, b: 55 },
-    { value: 35, r: 255, g: 100, b: 35 },
-    { value: 45, r: 220, g: 20, b: 100 }
-  ]
-  const upperIndex = stops.findIndex(stop => stop.value >= temperature)
-  const upper = stops[upperIndex === -1 ? stops.length - 1 : Math.max(upperIndex, 1)]
-  const lower = stops[upperIndex === -1 ? stops.length - 2 : Math.max(upperIndex - 1, 0)]
-  const amount = Math.min(1, Math.max(0, (temperature - lower.value) / (upper.value - lower.value)))
-
-  return {
-    r: Math.round(lower.r + (upper.r - lower.r) * amount),
-    g: Math.round(lower.g + (upper.g - lower.g) * amount),
-    b: Math.round(lower.b + (upper.b - lower.b) * amount)
-  }
 }

@@ -1,4 +1,5 @@
 import { logCacheMetric } from './cacheMetrics.js'
+import { fetchWithTimeout } from '../shared/fetchTimeout.js'
 
 const pendingRequests = new Map()
 
@@ -17,7 +18,7 @@ export function fetchCoalesced(
 
   logCacheMetric(metricsRoute, 'upstream')
 
-  const request = fetch(url, {
+  const request = fetchWithTimeout(url, {
     headers: {
       Accept: 'application/json',
       'User-Agent': userAgent,

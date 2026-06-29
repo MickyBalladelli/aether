@@ -1,6 +1,7 @@
 import L from 'leaflet'
 import type { WeatherMode } from '../types/weather'
 import { REDUCED_MOTION_QUERY } from '../utils/motion'
+import { fetchWithTimeout } from '../../shared/fetchTimeout.js'
 
 type RadarFrame = {
   time: number
@@ -97,7 +98,7 @@ export class WeatherRadarLayer {
 
   private async refreshMetadata() {
     try {
-      const response = await fetch(METADATA_URL)
+      const response = await fetchWithTimeout(METADATA_URL)
 
       if (!response.ok) {
         return

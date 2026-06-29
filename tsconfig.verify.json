@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "moduleResolution": "Bundler",
+    "types": ["node", "vite/client", "vitest/globals"]
+  },
+  "include": [
+    "src",
+    "tests/**/*.ts",
+    "tests/**/*.tsx",
+    "e2e/**/*.ts",
+    "playwright.config.ts",
+    "vite.config.ts"
+  ],
+  "references": []
+}

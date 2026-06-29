@@ -10,6 +10,7 @@ import {
   REDUCED_MOTION_QUERY,
   prefersReducedMotion
 } from '../utils/motion'
+import { renderWeatherBadge } from '../map/weatherBadge'
 import type {
   AirQualityMapSample,
   JetStreamSample,
@@ -268,7 +269,7 @@ export function AetherMap({
       }
     }
     map.on('moveend zoomend resize', scheduleViewport)
-    map.on('move zoom resize', animation.invalidate, animation)
+    map.on('moveend zoomend resize', animation.invalidate, animation)
     map.on('mousemove', handleMouseMove)
     map.on('click', handleMapClick)
     map.on('movestart zoomstart', clearPointerWeather)
@@ -284,7 +285,7 @@ export function AetherMap({
       window.removeEventListener('resize', handleWindowResize)
       motionQuery.removeEventListener('change', handleMotionPreferenceChange)
       map.off('moveend zoomend resize', scheduleViewport)
-      map.off('move zoom resize', animation.invalidate, animation)
+      map.off('moveend zoomend resize', animation.invalidate, animation)
       map.off('mousemove', handleMouseMove)
       map.off('click', handleMapClick)
       map.off('baselayerchange', handleTileStyleChange)
@@ -356,7 +357,7 @@ export function AetherMap({
         interactive: false,
         icon: L.divIcon({
           className: 'weather-badge-marker',
-          html: renderBadge(sample, mode),
+          html: renderWeatherBadge(sample, mode),
           iconSize: [112, 46],
           iconAnchor: [-8, 36]
         })
@@ -426,47 +427,6 @@ export function AetherMap({
       </p>
     </>
   )
-}
-
-function renderBadge(sample: WeatherMapSample, mode: WeatherMode) {
-  const metric = formatMetric(sample, mode)
-  const estimate = sample.estimated ? '~' : ''
-
-  return `
-    <div class="weather-map-badge">
-      <span class="weather-map-badge-place">${escapeHtml(sample.label)}</span>
-      <span class="weather-map-badge-value">${estimate}${escapeHtml(metric)}</span>
-    </div>
-  `
-}
-
-function formatMetric(sample: WeatherMapSample, mode: WeatherMode) {
-  if (mode === 'temperature') {
-    return `${Math.round(sample.temperature)}°C`
-  }
-
-  if (mode === 'wind') {
-    return `${Math.round(sample.rawWindSpeed)} km/h`
-  }
-
-  if (mode === 'jet-stream') {
-    return '--'
-  }
-
-  if (mode === 'precipitation') {
-    return `${sample.precipitation.toFixed(1)} mm`
-  }
-
-  return sample.isThunderstorm ? 'Storm' : 'No storm'
-}
-
-function escapeHtml(value: string) {
-  return value
-    .replace(/&/g, '&')
-    .replace(/</g, '<')
-    .replace(/>/g, '>')
-    .replace(/"/g, '"')
-    .replace(/'/g, '&#039;')
 }
 
 function loadMapTileStyle(): MapTileStyle {

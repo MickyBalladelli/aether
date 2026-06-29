@@ -8,7 +8,11 @@ import type {
 } from '../types/weather'
 import { getWeatherCacheKey, loadPersistedWeatherSamples, persistWeatherSamples } from './weatherCache'
 import { getMapSampleLimit, observeUpstreamBudget } from './upstreamBudget'
-import { clamp, degreesToRadians, distanceInKilometers, inverseDistanceWeight, normalizeAngle, normalizeLongitude, radiansToDegrees } from '../utils/geo'
+import { clamp, degreesToRadians, distanceInKilometers, interpolateWindVectors, inverseDistanceWeight, normalizeLongitude, radiansToDegrees } from '../utils/geo'
+import { fetchWithTimeout } from '../../shared/fetchTimeout.js'
+import { isWeatherResponse } from '../../shared/providerValidation.js'
+import { mapCurrentWeather } from '../weather/mapCurrentWeather'
+import { describeWeatherCode } from '../weather/weatherCode'
 
 type GridPoint = WeatherLocation & {
   showBadge: false
@@ -29,12 +33,12 @@ const CURRENT_FIELDS = [
 const HOURLY_FIELDS = [
   'precipitation'
 ]
-const THUNDERSTORM_CODES = new Set([95, 96, 99])
 const FRESHNESS = 5 * 60 * 1000
 const BATCH_SIZE = 32
 const BATCH_DELAY_MS = 250
 const BASE_SPACING = 260
 const NORMAL_GRID_POINTS = 48
+const MAX_MEMORY_SAMPLES = 1000
 const sampleCache = new Map<string, WeatherMapSample>()
 let persistentCachePromise: Promise<void> | null = null
 let lastBatchFetchTime = 0
@@ -197,8 +201,11 @@ export function interpolateWeatherAt(
       0
     ) / totalWeight
   )
-  const eastwardWind = weighted(sample => -sample.rawWindSpeed * Math.sin(sample.windAngle))
-  const northwardWind = weighted(sample => -sample.rawWindSpeed * Math.cos(sample.windAngle))
+  const wind = interpolateWindVectors(nearbySamples.map(item => ({
+    angle: item.sample.windAngle,
+    distance: item.distance,
+    speed: item.sample.rawWindSpeed
+  })))
   const nearest = nearbySamples[0].sample
 
   return {
@@ -206,8 +213,8 @@ export function interpolateWeatherAt(
     longitude,
     temperature: weighted(sample => sample.temperature),
     precipitation: weighted(sample => sample.precipitation),
-    rawWindSpeed: Math.hypot(eastwardWind, northwardWind),
-    windAngle: normalizeAngle(Math.atan2(-eastwardWind, -northwardWind)),
+    rawWindSpeed: wind.speed,
+    windAngle: wind.angle,
     cloudOpacity: weighted(sample => sample.cloudOpacity),
     isThunderstorm: nearest.isThunderstorm
   }
@@ -228,7 +235,7 @@ async function fetchWeatherBatch(
     hourly: HOURLY_FIELDS.join(','),
     forecast_days: '1'
   })
-  const response = await fetch(`${OPEN_METEO_ENDPOINT}?${params.toString()}`, {
+  const response = await fetchWithTimeout(`${OPEN_METEO_ENDPOINT}?${params.toString()}`, {
     signal
   })
 
@@ -239,6 +246,11 @@ async function fetchWeatherBatch(
   }
 
   const body = (await response.json()) as OpenMeteoResponse | OpenMeteoResponse[]
+
+  if (!isWeatherResponse(body)) {
+    throw new Error('Invalid weather grid response')
+  }
+
   const payloads = Array.isArray(body) ? body : [body]
   const updatedAt = Date.now()
 
@@ -252,10 +264,10 @@ function mapWeatherSample(point: GridPoint | undefined, payload: OpenMeteoRespon
     return null
   }
 
-  const current = payload.current
-  const hourlyPrecip = payload.hourly?.precipitation?.[0] ?? 0
-  const precipitation = Math.max(hourlyPrecip, current.rain ?? 0, current.showers ?? 0, current.snowfall ?? 0)
-  const rawWindSpeed = current.wind_speed_10m
+  const mapped = mapCurrentWeather(
+    payload.current,
+    payload.hourly?.precipitation?.[0] ?? 0
+  )
 
   return {
     label: point.label,
@@ -263,15 +275,7 @@ function mapWeatherSample(point: GridPoint | undefined, payload: OpenMeteoRespon
     longitude: point.longitude,
     updatedAt,
     showBadge: false,
-    temperature: current.temperature_2m,
-    precipitation,
-    snowfall: current.snowfall,
-    weatherCode: current.weather_code,
-    windSpeed: clamp(rawWindSpeed / 80, 0, 1),
-    rawWindSpeed,
-    windAngle: degreesToRadians(current.wind_direction_10m),
-    cloudOpacity: clamp(current.cloud_cover / 100, 0, 1),
-    isThunderstorm: THUNDERSTORM_CODES.has(current.weather_code)
+    ...mapped
   }
 }
 
@@ -390,10 +394,11 @@ function estimateSample(point: GridPoint): WeatherMapSample | null {
       0
     ) / totalWeight
   )
-  const eastwardWind = weighted(sample => -sample.rawWindSpeed * Math.sin(sample.windAngle))
-  const northwardWind = weighted(sample => -sample.rawWindSpeed * Math.cos(sample.windAngle))
-  const rawWindSpeed = Math.hypot(eastwardWind, northwardWind)
-  const windAngle = normalizeAngle(Math.atan2(-eastwardWind, -northwardWind))
+  const wind = interpolateWindVectors(nearbySamples.map(item => ({
+    angle: item.sample.windAngle,
+    distance: item.distance,
+    speed: item.sample.rawWindSpeed
+  })))
   const nearest = nearbySamples[0].sample
 
   return {
@@ -406,9 +411,9 @@ function estimateSample(point: GridPoint): WeatherMapSample | null {
     precipitation: weighted(sample => sample.precipitation),
     snowfall: weighted(sample => sample.snowfall),
     weatherCode: nearest.weatherCode,
-    windSpeed: clamp(rawWindSpeed / 80, 0, 1),
-    rawWindSpeed,
-    windAngle,
+    windSpeed: clamp(wind.speed / 80, 0, 1),
+    rawWindSpeed: wind.speed,
+    windAngle: wind.angle,
     cloudOpacity: weighted(sample => sample.cloudOpacity),
     isThunderstorm: nearest.isThunderstorm
   }
@@ -416,7 +421,20 @@ function estimateSample(point: GridPoint): WeatherMapSample | null {
 
 function rememberSamples(samples: WeatherMapSample[]) {
   for (const sample of samples) {
-    sampleCache.set(getWeatherCacheKey(sample.latitude, sample.longitude), sample)
+    const key = getWeatherCacheKey(sample.latitude, sample.longitude)
+
+    sampleCache.delete(key)
+    sampleCache.set(key, sample)
+  }
+
+  while (sampleCache.size > MAX_MEMORY_SAMPLES) {
+    const oldestKey = sampleCache.keys().next().value
+
+    if (typeof oldestKey !== 'string') {
+      break
+    }
+
+    sampleCache.delete(oldestKey)
   }
 }
 
@@ -478,28 +496,4 @@ async function throttleBatchDelay() {
   }
 
   lastBatchFetchTime = Date.now()
-}
-
-function describeWeatherCode(code: number) {
-  if (THUNDERSTORM_CODES.has(code)) {
-    return 'Thunderstorm'
-  }
-
-  if ([71, 73, 75, 77, 85, 86].includes(code)) {
-    return 'Snow'
-  }
-
-  if ([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82].includes(code)) {
-    return 'Rain'
-  }
-
-  if ([45, 48].includes(code)) {
-    return 'Fog'
-  }
-
-  if ([1, 2, 3].includes(code)) {
-    return 'Cloud drift'
-  }
-
-  return 'Clear air'
 }

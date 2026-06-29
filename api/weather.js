@@ -5,6 +5,12 @@ import {
 } from '../server/sharedCache.js'
 import { logCacheMetric } from '../server/cacheMetrics.js'
 import {
+  getRequestParams,
+  sendBudgetHeaders,
+  sendProviderRateLimit,
+  sendProviderRecord
+} from '../server/providerResponse.js'
+import {
   UPSTREAM_BLOCK_KEY,
   blockUpstream,
   getRemainingBlockSeconds
@@ -19,6 +25,10 @@ import {
   WEATHER_FRESH_CACHE_TTL
 } from '../server/cachePolicy.js'
 import { getCacheNamespace } from '../shared/cacheVersion.js'
+import {
+  isWeatherResponse,
+  parseProviderBody
+} from '../shared/providerValidation.js'
 
 const OPEN_METEO_ENDPOINT = 'https://api.open-meteo.com/v1/forecast'
 
@@ -73,7 +83,10 @@ export default async function handler(request, response) {
       'Aether Weather Map'
     )
 
-    if (upstream.ok) {
+    if (
+      upstream.ok &&
+      parseProviderBody(upstream.body, isWeatherResponse)
+    ) {
       const record = {
         body: upstream.body,
         contentType: upstream.contentType,
@@ -110,7 +123,12 @@ export default async function handler(request, response) {
       return
     }
 
-    response.status(upstream.status)
+    const status = upstream.ok ? 502 : upstream.status
+    const body = upstream.ok
+      ? JSON.stringify({ error: 'Invalid weather provider response' })
+      : upstream.body
+
+    response.status(status)
     response.setHeader('Content-Type', 'application/json')
     response.setHeader('Cache-Control', 'no-store')
 
@@ -119,7 +137,7 @@ export default async function handler(request, response) {
     }
 
     sendBudgetHeaders(response, upstream)
-    response.send(upstream.body)
+    response.send(body)
   } catch {
     const stale = await readSharedCache(sharedCache, `stale:${cacheKey}`)
 
@@ -133,69 +151,13 @@ export default async function handler(request, response) {
 }
 
 function sendWeather(response, record, cacheStatus) {
-  if (cacheStatus === 'runtime') {
-    logCacheMetric('weather', 'hit')
-  } else if (cacheStatus === 'stale') {
-    logCacheMetric('weather', 'stale')
-  }
-
-  response.status(200)
-  response.setHeader('Content-Type', record.contentType)
-  response.setHeader('Cache-Control', 'public, max-age=60')
-  response.setHeader(
-    'Vercel-CDN-Cache-Control',
-    'public, s-maxage=600, stale-while-revalidate=86400'
-  )
-  response.setHeader('X-Aether-Cache', cacheStatus)
-  sendBudgetHeaders(response, record)
-
-  if (cacheStatus === 'stale') {
-    response.setHeader('X-Aether-Upstream-Budget', 'low')
-  }
-
-  response.send(record.body)
-}
-
-function sendRateLimited(response, retryAfter) {
-  response.status(429)
-  response.setHeader('Content-Type', 'application/json')
-  response.setHeader('Cache-Control', 'no-store')
-  response.setHeader('Retry-After', String(retryAfter))
-  response.setHeader('X-Aether-Upstream-Budget', 'critical')
-  response.json({
-    error: 'Weather provider rate limited',
-    retryAfter
+  sendProviderRecord(response, record, cacheStatus, {
+    route: 'weather',
+    maxAge: 60,
+    sharedMaxAge: 600
   })
 }
 
-function sendBudgetHeaders(response, record) {
-  if (record.rateLimitLimit !== null && record.rateLimitLimit !== undefined) {
-    response.setHeader('X-Aether-RateLimit-Limit', record.rateLimitLimit)
-  }
-
-  if (
-    record.rateLimitRemaining !== null &&
-    record.rateLimitRemaining !== undefined
-  ) {
-    response.setHeader(
-      'X-Aether-RateLimit-Remaining',
-      record.rateLimitRemaining
-    )
-  }
-}
-
-function getRequestParams(query) {
-  const params = new URLSearchParams()
-
-  for (const [key, value] of Object.entries(query)) {
-    const values = Array.isArray(value) ? value : [value]
-
-    for (const item of values) {
-      if (typeof item === 'string') {
-        params.append(key, item)
-      }
-    }
-  }
-
-  return params
+function sendRateLimited(response, retryAfter) {
+  sendProviderRateLimit(response, retryAfter, 'Weather')
 }

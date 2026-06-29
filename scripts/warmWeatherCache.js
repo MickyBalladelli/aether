@@ -7,6 +7,7 @@ import {
   buildCanonicalOpenMeteoParams
 } from '../server/openMeteoParams.js'
 import { getCacheNamespace } from '../shared/cacheVersion.js'
+import { fetchWithTimeout } from '../shared/fetchTimeout.js'
 import {
   getSharedCache,
   readSharedCache,
@@ -79,7 +80,7 @@ async function warmWeatherCache() {
     }
 
     try {
-      const response = await fetch(`${OPEN_METEO_ENDPOINT}?${cacheKey}`, {
+      const response = await fetchWithTimeout(`${OPEN_METEO_ENDPOINT}?${cacheKey}`, {
         headers: {
           Accept: 'application/json',
           'User-Agent': 'Aether Deployment Cache Warmer'

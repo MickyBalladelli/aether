@@ -10,6 +10,8 @@ import { getWeatherCacheKey } from './weatherCache'
 import { getMapSampleLimit, observeUpstreamBudget } from './upstreamBudget'
 import { openStorage } from './storage'
 import { distanceInKilometers, inverseDistanceWeight } from '../utils/geo'
+import { fetchWithTimeout } from '../../shared/fetchTimeout.js'
+import { isAirQualityResponse } from '../../shared/providerValidation.js'
 
 const AIR_QUALITY_ENDPOINT = '/api/air-quality'
 const CURRENT_FIELDS = [
@@ -124,7 +126,9 @@ async function fetchAirQualityBatch(points: WeatherLocation[]) {
     longitude: points.map(point => point.longitude.toFixed(5)).join(','),
     current: CURRENT_FIELDS.join(',')
   })
-  const response = await fetch(`${AIR_QUALITY_ENDPOINT}?${params.toString()}`)
+  const response = await fetchWithTimeout(
+    `${AIR_QUALITY_ENDPOINT}?${params.toString()}`
+  )
 
   observeUpstreamBudget(response)
 
@@ -133,6 +137,10 @@ async function fetchAirQualityBatch(points: WeatherLocation[]) {
   }
 
   const body = (await response.json()) as OpenMeteoAirQualityResponse | OpenMeteoAirQualityResponse[]
+
+  if (!isAirQualityResponse(body)) {
+    throw new Error('Invalid air-quality response')
+  }
   const payloads = Array.isArray(body) ? body : [body]
   const updatedAt = Date.now()
 
@@ -187,7 +195,20 @@ function rememberSamples(samples: AirQualityMapSample[]) {
   }
 
   for (const sample of samples) {
-    sampleCache.set(getWeatherCacheKey(sample.latitude, sample.longitude), sample)
+    const key = getWeatherCacheKey(sample.latitude, sample.longitude)
+
+    sampleCache.delete(key)
+    sampleCache.set(key, sample)
+  }
+
+  while (sampleCache.size > MAX_STORED_SAMPLES) {
+    const oldestKey = sampleCache.keys().next().value
+
+    if (typeof oldestKey !== 'string') {
+      break
+    }
+
+    sampleCache.delete(oldestKey)
   }
 
   schedulePersist()
@@ -249,6 +270,8 @@ async function persistCache() {
     await new Promise<void>(resolve => {
       const transaction = database.transaction(STORE_NAME, 'readwrite')
       const store = transaction.objectStore(STORE_NAME)
+
+      store.clear()
 
       for (const sample of samples) {
         store.put({

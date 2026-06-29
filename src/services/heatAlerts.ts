@@ -1,4 +1,5 @@
 import type { HeatAlert, WeatherLocation } from '../types/weather'
+import { fetchWithTimeout } from '../../shared/fetchTimeout.js'
 
 export async function fetchOfficialHeatAlerts(
   location: WeatherLocation
@@ -7,7 +8,7 @@ export async function fetchOfficialHeatAlerts(
     latitude: String(location.latitude),
     longitude: String(location.longitude)
   })
-  const response = await fetch(`/api/heat-alerts?${params.toString()}`)
+  const response = await fetchWithTimeout(`/api/heat-alerts?${params.toString()}`)
 
   if (!response.ok) {
     return []

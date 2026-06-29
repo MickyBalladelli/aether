@@ -1,20 +1,20 @@
 import { afterEach, describe, expect, test, vi } from 'vitest'
-import { reverseGeocode } from '../src/services/geocoding'
+import { reverseGeocode, searchCity } from '../src/services/geocoding'
 
-describe('Nominatim rate limit', () => {
+describe('geocoding client', () => {
   afterEach(() => {
-    vi.useRealTimers()
     vi.unstubAllGlobals()
   })
 
-  test('starts no more than one reverse-geocoding request per second', async () => {
-    vi.useFakeTimers()
-    vi.setSystemTime(new Date('2026-06-29T10:00:00Z'))
-
-    const fetchMock = vi.fn(async () => new Response(JSON.stringify({
-      address: {
-        city: 'Test City',
-        country: 'Test Country'
+  test('searches through the local geocoding endpoint', async () => {
+    const fetchMock = vi.fn(async (
+      _input: RequestInfo | URL,
+      _init?: RequestInit
+    ) => new Response(JSON.stringify({
+      location: {
+        label: 'Lyon, France',
+        latitude: 45.764,
+        longitude: 4.8357
       }
     }), {
       status: 200,
@@ -25,29 +25,18 @@ describe('Nominatim rate limit', () => {
 
     vi.stubGlobal('fetch', fetchMock)
 
-    const first = reverseGeocode(48, 2)
-    const second = reverseGeocode(49, 3)
-
-    await vi.advanceTimersByTimeAsync(0)
-    expect(fetchMock).toHaveBeenCalledTimes(1)
-
-    await vi.advanceTimersByTimeAsync(999)
-    expect(fetchMock).toHaveBeenCalledTimes(1)
-
-    await vi.advanceTimersByTimeAsync(1)
-    expect(fetchMock).toHaveBeenCalledTimes(2)
-    await expect(Promise.all([first, second])).resolves.toEqual([
-      'Test City, Test Country',
-      'Test City, Test Country'
-    ])
+    await expect(searchCity(' Lyon ')).resolves.toEqual({
+      label: 'Lyon, France',
+      latitude: 45.764,
+      longitude: 4.8357
+    })
+    expect(String(fetchMock.mock.calls[0][0])).toContain('/api/geocode?')
+    expect(String(fetchMock.mock.calls[0][0])).toContain('type=search')
   })
 
   test('cancels an outdated reverse-geocoding request', async () => {
-    vi.useFakeTimers()
-    vi.setSystemTime(new Date('2026-06-29T11:00:00Z'))
-
     const fetchMock = vi.fn((
-      _url: string,
+      _url: RequestInfo | URL,
       init?: RequestInit
     ) => new Promise<Response>((_resolve, reject) => {
       init?.signal?.addEventListener('abort', () => {
@@ -60,13 +49,25 @@ describe('Nominatim rate limit', () => {
     const controller = new AbortController()
     const request = reverseGeocode(48, 2, controller.signal)
 
-    await vi.advanceTimersByTimeAsync(0)
-    expect(fetchMock).toHaveBeenCalledTimes(1)
-
+    await Promise.resolve()
     controller.abort()
 
-    await expect(request).rejects.toMatchObject({
-      name: 'AbortError'
-    })
+    await expect(request).rejects.toMatchObject({ name: 'AbortError' })
+  })
+
+  test('reports a useful error when the server returns HTML', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(
+      '<!doctype html><title>Error</title>',
+      {
+        status: 502,
+        headers: {
+          'Content-Type': 'text/html'
+        }
+      }
+    )))
+
+    await expect(searchCity('not-a-city')).rejects.toThrow(
+      'City search error 502'
+    )
   })
 })

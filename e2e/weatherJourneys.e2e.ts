@@ -46,6 +46,27 @@ test.beforeEach(async ({ page }) => {
       body: JSON.stringify({ alerts: [] })
     })
   ))
+  await page.route('**/api/geocode?**', route => {
+    const url = new URL(route.request().url())
+
+    if (url.searchParams.get('type') === 'search') {
+      return route.fulfill({
+        contentType: 'application/json',
+        body: JSON.stringify({
+          location: {
+            label: 'Lyon, Auvergne-Rhône-Alpes, France',
+            latitude: 45.764,
+            longitude: 4.8357
+          }
+        })
+      })
+    }
+
+    return route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({ label: 'Map Pick, Test State' })
+    })
+  })
   await page.route('https://api.rainviewer.com/**', route => (
     route.fulfill({
       contentType: 'application/json',
@@ -77,21 +98,19 @@ test('loads the selected location forecast', async ({ page }) => {
   ).toBeVisible()
 })
 
+test('shows saved-data status when the browser goes offline', async ({
+  context,
+  page
+}) => {
+  await page.goto('/')
+  await expect(page.getByRole('status')).toHaveText('Live')
+
+  await context.setOffline(true)
+
+  await expect(page.getByText('Offline · showing saved weather')).toBeVisible()
+})
+
 test('searches for a location and loads its forecast', async ({ page }) => {
-  await page.route('https://geocoding-api.open-meteo.com/**', route => (
-    route.fulfill({
-      contentType: 'application/json',
-      body: JSON.stringify({
-        results: [{
-          name: 'Lyon',
-          admin1: 'Auvergne-Rhône-Alpes',
-          country: 'France',
-          latitude: 45.764,
-          longitude: 4.8357
-        }]
-      })
-    })
-  ))
   await page.goto('/')
 
   await page.getByLabel('Search city').fill('Lyon')
@@ -106,20 +125,29 @@ test('searches for a location and loads its forecast', async ({ page }) => {
   await expect(page.getByRole('status')).toHaveText(/^(Live|Cached)$/)
 })
 
+test('shows a useful error for an unknown city', async ({ page }) => {
+  await page.route('**/api/geocode?**', route => route.fulfill({
+    status: 502,
+    contentType: 'application/json',
+    body: JSON.stringify({ error: 'City not found' })
+  }))
+  await page.goto('/')
+
+  await page.getByLabel('Search city').fill('not-a-city')
+  await page.getByRole('button', { name: 'Search' }).click()
+
+  await expect(page.getByRole('status')).toHaveText('City not found')
+})
+
 test('selects a location from the map', async ({ page }) => {
   let reverseGeocodeRequests = 0
 
-  await page.route('https://nominatim.openstreetmap.org/**', route => {
+  await page.route('**/api/geocode?**', route => {
     reverseGeocodeRequests += 1
 
     return route.fulfill({
       contentType: 'application/json',
-      body: JSON.stringify({
-        address: {
-          city: 'Map Pick',
-          state: 'Test State'
-        }
-      })
+      body: JSON.stringify({ label: 'Map Pick, Test State' })
     })
   })
   await page.goto('/')

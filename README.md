@@ -100,6 +100,8 @@ Run the unit tests with `npm test`.
 
 Run browser journeys against the existing Vite server with `npm run test:e2e`. Set `E2E_BASE_URL` when the server uses another URL.
 
+Run the full local verification pipeline with `npm run verify`. Cache and rendering alert guidance lives in [`docs/monitoring.md`](docs/monitoring.md).
+
 To inspect the production build locally:
 
 ```bash

@@ -1,30 +1,19 @@
 import type { OpenMeteoResponse, WeatherConfig, WeatherLocation } from '../types/weather'
 import { clamp, degreesToRadians } from '../utils/geo'
-
-const THUNDERSTORM_CODES = new Set([95, 96, 99])
+import { mapCurrentWeather } from './mapCurrentWeather'
+import { describeWeatherCode, THUNDERSTORM_CODES } from './weatherCode'
 
 export function translateWeather(payload: OpenMeteoResponse, location: WeatherLocation): WeatherConfig {
   const current = payload.current
   const hourlyPrecip = payload.hourly?.precipitation?.[0] ?? 0
-  const precipitation = Math.max(hourlyPrecip, current.rain ?? 0, current.showers ?? 0, current.snowfall ?? 0)
-  const rawWindSpeed = current.wind_speed_10m
-  const cloudOpacity = clamp(current.cloud_cover / 100, 0, 1)
-  const windSpeed = clamp(rawWindSpeed / 80, 0, 1)
+  const mapped = mapCurrentWeather(current, hourlyPrecip)
 
   return {
     zone: location.label || payload.timezone,
-    temperature: current.temperature_2m,
+    ...mapped,
     humidity: current.relative_humidity_2m,
-    weatherCode: current.weather_code,
-    description: describeWeather(current.weather_code),
-    precipitation,
-    snowfall: current.snowfall,
-    windSpeed,
-    rawWindSpeed,
-    windAngle: degreesToRadians(current.wind_direction_10m),
-    rainDensity: Math.round(clamp(precipitation, 0, 12) * 42),
-    isThunderstorm: THUNDERSTORM_CODES.has(current.weather_code),
-    cloudOpacity,
+    description: describeWeatherCode(current.weather_code),
+    rainDensity: Math.round(clamp(mapped.precipitation, 0, 12) * 42),
     evolution: buildEvolution(payload),
     sunrise: payload.daily?.sunrise?.[0] ?? null,
     sunset: payload.daily?.sunset?.[0] ?? null,
@@ -126,28 +115,4 @@ function buildEvolution(payload: OpenMeteoResponse) {
       isThunderstorm: THUNDERSTORM_CODES.has(weatherCode)
     }
   })
-}
-
-function describeWeather(code: number) {
-  if (THUNDERSTORM_CODES.has(code)) {
-    return 'Thunderstorm'
-  }
-
-  if ([71, 73, 75, 77, 85, 86].includes(code)) {
-    return 'Snow'
-  }
-
-  if ([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82].includes(code)) {
-    return 'Rain'
-  }
-
-  if ([45, 48].includes(code)) {
-    return 'Fog'
-  }
-
-  if ([1, 2, 3].includes(code)) {
-    return 'Cloud drift'
-  }
-
-  return 'Clear air'
 }

@@ -12,6 +12,7 @@ import {
   getJetStreamGridSize,
   observeUpstreamBudget
 } from './upstreamBudget'
+import { fetchWithTimeout } from '../../shared/fetchTimeout.js'
 
 type JetStreamResponse = {
   current: {
@@ -61,7 +62,7 @@ export async function fetchJetStreamSamples(
       longitude: batch.map(point => point.longitude.toFixed(5)).join(','),
       current: CURRENT_FIELDS
     })
-    const response = await fetch(`${OPEN_METEO_ENDPOINT}?${params}`, {
+    const response = await fetchWithTimeout(`${OPEN_METEO_ENDPOINT}?${params}`, {
       signal
     })
 

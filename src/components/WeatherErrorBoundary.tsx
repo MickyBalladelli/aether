@@ -31,6 +31,17 @@ export class WeatherErrorBoundary extends Component<
       error,
       componentStack: info.componentStack
     })
+    void fetch('/api/client-error', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        area: this.props.area,
+        message: error.message
+      }),
+      keepalive: true
+    }).catch(() => undefined)
   }
 
   componentDidUpdate(previousProps: WeatherErrorBoundaryProps) {

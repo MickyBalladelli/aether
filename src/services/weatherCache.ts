@@ -10,6 +10,7 @@ type WeatherCacheRecord = {
 
 const STORE_NAME = 'weather-samples'
 const MAX_CACHE_AGE = 6 * 60 * 60 * 1000
+const MAX_STORED_SAMPLES = 1000
 
 export async function loadPersistedWeatherSamples() {
   const database = await openStorage()
@@ -48,17 +49,36 @@ export async function persistWeatherSamples(samples: WeatherMapSample[]) {
     const transaction = database.transaction(STORE_NAME, 'readwrite')
     const store = transaction.objectStore(STORE_NAME)
 
-    for (const sample of samples) {
-      const updatedAt = sample.updatedAt ?? Date.now()
+    const request = store.getAll()
 
-      store.put({
-        key: getWeatherCacheKey(sample.latitude, sample.longitude),
-        updatedAt,
-        sample: {
-          ...sample,
-          updatedAt
-        }
-      } satisfies WeatherCacheRecord)
+    request.onsuccess = () => {
+      const records = new Map(
+        (request.result as WeatherCacheRecord[])
+          .filter(record => Date.now() - record.updatedAt <= MAX_CACHE_AGE)
+          .map(record => [record.key, record])
+      )
+
+      for (const sample of samples) {
+        const updatedAt = sample.updatedAt ?? Date.now()
+        const key = getWeatherCacheKey(sample.latitude, sample.longitude)
+
+        records.set(key, {
+          key,
+          updatedAt,
+          sample: {
+            ...sample,
+            updatedAt
+          }
+        })
+      }
+
+      store.clear()
+
+      for (const record of [...records.values()]
+        .sort((first, second) => second.updatedAt - first.updatedAt)
+        .slice(0, MAX_STORED_SAMPLES)) {
+        store.put(record)
+      }
     }
 
     transaction.oncomplete = () => resolve()

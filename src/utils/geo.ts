@@ -25,6 +25,38 @@ export function inverseDistanceWeight(distance: number) {
   return 1 / Math.max(distance * distance, 0.01)
 }
 
+export function interpolateWindVectors(
+  items: Array<{ angle: number, distance: number, speed: number }>
+) {
+  const totalWeight = items.reduce(
+    (sum, item) => sum + inverseDistanceWeight(item.distance),
+    0
+  )
+  const eastward = items.reduce(
+    (sum, item) => (
+      sum -
+      item.speed *
+      Math.sin(item.angle) *
+      inverseDistanceWeight(item.distance)
+    ),
+    0
+  ) / totalWeight
+  const northward = items.reduce(
+    (sum, item) => (
+      sum -
+      item.speed *
+      Math.cos(item.angle) *
+      inverseDistanceWeight(item.distance)
+    ),
+    0
+  ) / totalWeight
+
+  return {
+    angle: normalizeAngle(Math.atan2(-eastward, -northward)),
+    speed: Math.hypot(eastward, northward)
+  }
+}
+
 export function normalizeLongitude(longitude: number) {
   return ((((longitude + 180) % 360) + 360) % 360) - 180
 }

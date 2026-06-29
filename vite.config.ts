@@ -16,6 +16,11 @@ import {
   getOfficialHeatAlerts,
   parseHeatAlertCoordinates
 } from './server/heatAlerts.js'
+import {
+  fetchGeocode,
+  parseGeocodeRequest
+} from './server/geocodingProvider.js'
+import { fetchWithTimeout } from './shared/fetchTimeout.js'
 
 type WeatherCacheRecord = {
   body: string
@@ -93,7 +98,7 @@ function scheduleUpstream(url: string): Promise<UpstreamResult> {
 async function fetchUpstream(url: string): Promise<UpstreamResult> {
   await ensureSpacing()
 
-  const response = await fetch(url, {
+  const response = await fetchWithTimeout(url, {
     headers: {
       Accept: 'application/json',
       'User-Agent': 'Aether Local Development'
@@ -244,6 +249,7 @@ function localWeatherApi(): Plugin {
   ) => {
     const requestUrl = new URL(request.url ?? '/', 'http://localhost')
     const isHeatAlertsRequest = requestUrl.pathname === '/api/heat-alerts'
+    const isGeocodeRequest = requestUrl.pathname === '/api/geocode'
 
     const upstreamEndpoint = requestUrl.pathname === '/api/weather'
       ? 'https://api.open-meteo.com/v1/forecast'
@@ -251,7 +257,7 @@ function localWeatherApi(): Plugin {
         ? 'https://air-quality-api.open-meteo.com/v1/air-quality'
         : null
 
-    if (!upstreamEndpoint && !isHeatAlertsRequest) {
+    if (!upstreamEndpoint && !isHeatAlertsRequest && !isGeocodeRequest) {
       next()
       return
     }
@@ -259,6 +265,53 @@ function localWeatherApi(): Plugin {
     if (request.method !== 'GET') {
       response.statusCode = 405
       response.end(JSON.stringify({ error: 'Method not allowed' }))
+      return
+    }
+
+    if (isGeocodeRequest) {
+      const parsed = parseGeocodeRequest(requestUrl.searchParams)
+
+      if (!parsed) {
+        response.statusCode = 400
+        response.setHeader('Content-Type', 'application/json')
+        response.end(JSON.stringify({ error: 'Invalid geocoding request' }))
+        return
+      }
+
+      const cacheKey = `${requestUrl.pathname}?${parsed.cacheKey}`
+      const cached = cache.get(cacheKey)
+      const now = Date.now()
+
+      if (cached && cached.expiresAt > now) {
+        sendCachedWeather(response, cached, 'cached')
+        return
+      }
+
+      try {
+        const record = {
+          body: JSON.stringify(await fetchGeocode(parsed)),
+          contentType: 'application/json',
+          expiresAt: now + 24 * 60 * 60 * 1000,
+          staleUntil: now + 7 * 24 * 60 * 60 * 1000
+        }
+
+        cache.set(cacheKey, record)
+        sendCachedWeather(response, record, 'live')
+      } catch (error) {
+        if (cached && cached.staleUntil > now) {
+          sendCachedWeather(response, cached, 'stale')
+          return
+        }
+
+        response.statusCode = 502
+        response.setHeader('Content-Type', 'application/json')
+        response.end(JSON.stringify({
+          error: error instanceof Error
+            ? error.message
+            : 'Geocoding unavailable'
+        }))
+      }
+
       return
     }
 

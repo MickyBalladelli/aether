@@ -1,7 +1,7 @@
 {
   "name": "aether",
   "private": true,
-  "version": "0.1.29",
+  "version": "0.1.31",
   "type": "module",
   "engines": {
     "node": ">=20.19.0"
@@ -13,7 +13,8 @@
     "postbuild": "node scripts/warmWeatherCache.js",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "verify": "tsc -p tsconfig.verify.json && tsc -p tsconfig.server.json && npm test && vite build && node scripts/verifyPwa.js"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -31,6 +32,7 @@
   "devDependencies": {
     "@playwright/test": "^1.61.1",
     "@types/leaflet": "^1.9.21",
+    "@types/node": "^26.0.1",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "nodemon": "^3.1.14",
