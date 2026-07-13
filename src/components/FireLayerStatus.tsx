@@ -14,6 +14,9 @@ const STATE_LABELS: Record<FireLayerStatusValue['state'], string> = {
 
 export function FireLayerStatus({ statuses }: FireLayerStatusProps) {
   const enabledStatuses = statuses.filter(status => status.enabled)
+  const effisStatus = enabledStatuses.find(
+    status => status.id === 'europe-detections'
+  )
 
   if (enabledStatuses.length === 0) {
     return null
@@ -45,6 +48,29 @@ export function FireLayerStatus({ statuses }: FireLayerStatusProps) {
           )}
         </div>
       ))}
+      {effisStatus && (
+        <section
+          className="effis-fire-legend"
+          aria-label="EFFIS detection age legend"
+        >
+          <strong>EFFIS VIIRS detection age</strong>
+          <div className="effis-fire-legend-ages">
+            <span><i className="is-six-hours" />≤ 6 hours</span>
+            <span><i className="is-twelve-hours" />6–12 hours</span>
+            <span><i className="is-day" />12–24 hours</span>
+            <span><i className="is-older" />24–48 hours</span>
+          </div>
+          <span className="effis-fire-legend-satellites">
+            ■ Suomi · ● NOAA-20 · ◆ NOAA-21
+          </span>
+          <span className="effis-fire-legend-time">
+            Source window UTC: {formatEffisWindow()}
+            {effisStatus.lastUpdated
+              ? ` · Tiles loaded ${formatTime(effisStatus.lastUpdated)}`
+              : ''}
+          </span>
+        </section>
+      )}
     </aside>
   )
 }
@@ -54,4 +80,17 @@ function formatTime(timestamp: number) {
     hour: '2-digit',
     minute: '2-digit'
   }).format(timestamp)
+}
+
+function formatEffisWindow() {
+  const today = new Date()
+  const yesterday = new Date(today)
+
+  yesterday.setUTCDate(yesterday.getUTCDate() - 1)
+
+  return `${formatUtcDate(yesterday)}–${formatUtcDate(today)}`
+}
+
+function formatUtcDate(date: Date) {
+  return date.toISOString().slice(0, 10)
 }

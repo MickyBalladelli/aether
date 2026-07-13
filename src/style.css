@@ -382,6 +382,59 @@ body {
   font-weight: 650;
 }
 
+.effis-fire-legend {
+  display: grid;
+  gap: 6px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 10px;
+}
+
+.effis-fire-legend > strong {
+  color: #fff4ee;
+  font-size: 11px;
+}
+
+.effis-fire-legend-ages {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px 10px;
+}
+
+.effis-fire-legend-ages span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: rgba(244, 251, 255, 0.76);
+}
+
+.effis-fire-legend-ages i {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 2px;
+  background: #d100d9;
+  box-shadow: 0 0 5px currentColor;
+}
+
+.effis-fire-legend-ages .is-twelve-hours {
+  background: #ff91ae;
+}
+
+.effis-fire-legend-ages .is-day {
+  background: #ff2417;
+}
+
+.effis-fire-legend-ages .is-older {
+  background: #ff8a18;
+}
+
+.effis-fire-legend-satellites,
+.effis-fire-legend-time {
+  color: rgba(224, 245, 255, 0.56);
+  line-height: 1.35;
+}
+
 .map-weather-tooltip-coordinates {
   color: rgba(224, 245, 255, 0.62);
   font-size: 11px;
