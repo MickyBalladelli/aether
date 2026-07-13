@@ -232,8 +232,8 @@ export function AetherMap({
       },
       {
         'Heat detections · 24h': fireTiles,
-        'Reported open wildfires': reportedFires.getLeafletLayer(),
-        'Europe fire detections · Today + yesterday': effisFireTiles
+        'Europe fire detections · Today + yesterday': effisFireTiles,
+        'Reported open wildfires': reportedFires.getLeafletLayer()
       },
       {
         collapsed: true,
@@ -241,13 +241,16 @@ export function AetherMap({
       }
     ).addTo(map)
     const overlayInputs = Array.from(
-      tileControl.getContainer()?.querySelectorAll(
+      tileControl.getContainer()?.querySelectorAll<HTMLInputElement>(
         'input.leaflet-control-layers-selector[type="checkbox"]'
       ) ?? []
     )
     const heatLayerInput = overlayInputs[0]
-    const reportedFireInput = overlayInputs[1]
-    const effisFireInput = overlayInputs[2]
+    const effisFireInput = overlayInputs[1]
+    const reportedFireInput = overlayInputs[2]
+
+    addLayerControlHeading(heatLayerInput, 'Satellite detections')
+    addLayerControlHeading(reportedFireInput, 'Reported incidents')
 
     heatLayerInput?.closest('label')?.setAttribute(
       'title',
@@ -723,6 +726,25 @@ function getFireLayerId(
   }
 
   return layer === effisLayer ? 'europe-detections' : null
+}
+
+function addLayerControlHeading(
+  input: HTMLInputElement | undefined,
+  text: string
+) {
+  const label = input?.closest('label')
+
+  if (!label) {
+    return
+  }
+
+  const heading = document.createElement('div')
+
+  heading.className = 'leaflet-control-layers-section-title'
+  heading.setAttribute('role', 'heading')
+  heading.setAttribute('aria-level', '3')
+  heading.textContent = text
+  label.before(heading)
 }
 
 function loadMapTileStyle(): MapTileStyle {

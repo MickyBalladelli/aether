@@ -180,6 +180,23 @@ body {
   accent-color: #8fe5ff;
 }
 
+.leaflet-control-layers-section-title {
+  margin: 7px 0 3px;
+  padding-top: 7px;
+  border-top: 1px solid rgba(190, 237, 255, 0.14);
+  color: rgba(189, 239, 255, 0.62);
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.leaflet-control-layers-section-title:first-child {
+  margin-top: 1px;
+  padding-top: 0;
+  border-top: 0;
+}
+
 .data-source-carousel {
   position: fixed;
   right: 0;

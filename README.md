@@ -81,6 +81,8 @@ When the EFFIS layer is enabled, its visible legend explains the detection-age c
 
 When any fire layer is enabled, a map status card shows whether it is loading, ready, unavailable, or missing the NASA FIRMS key. It also shows when successful data last loaded and the number of reported incidents when available.
 
+The map layer control separates satellite heat detections from reported wildfire incidents so the two data types are not confused.
+
 ## Requirements
 
 - Node.js 20.19 or newer
