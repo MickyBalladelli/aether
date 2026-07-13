@@ -58,7 +58,7 @@ export function FireLayerStatus({ statuses }: FireLayerStatusProps) {
             <span><i className="is-six-hours" />≤ 6 hours</span>
             <span><i className="is-twelve-hours" />6–12 hours</span>
             <span><i className="is-day" />12–24 hours</span>
-            <span><i className="is-older" />24–48 hours</span>
+            <span><i className="is-older" />Older · yesterday</span>
           </div>
           <span className="effis-fire-legend-satellites">
             ■ Suomi · ● NOAA-20 · ◆ NOAA-21

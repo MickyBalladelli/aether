@@ -40,7 +40,7 @@ export const INITIAL_FIRE_LAYER_STATUSES: FireLayerStatus[] = [
   },
   {
     id: 'europe-detections',
-    label: 'Europe fire detections · 48h',
+    label: 'Europe fire detections · Today + yesterday',
     enabled: false,
     state: 'idle',
     lastUpdated: null

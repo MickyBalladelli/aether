@@ -73,7 +73,7 @@ These points are recent satellite hotspots, not confirmed fire perimeters or a g
 
 The separate reported open-wildfire overlay uses recent NASA EONET events that remain marked open. Prescribed burns are removed. These reports are more meaningful than raw heat detections, but global coverage is incomplete and closure updates can lag. The United States, Canada, and Europe have stronger regional agency feeds; there is no single authoritative worldwide live incident feed.
 
-The Europe fire-detection overlay uses the Copernicus European Forest Fire Information System (EFFIS) VIIRS layer for the last 48 hours. EFFIS filters likely agricultural burns and false alarms using land cover, distance from artificial surfaces, and hotspot confidence. It covers Europe and the Mediterranean region and normally updates several times per day. These remain satellite detections, not firefighter-confirmed incidents, and can be hidden by cloud, smoke, satellite timing, or sensor limits.
+The Europe fire-detection overlay uses the Copernicus European Forest Fire Information System (EFFIS) VIIRS layer for today and yesterday in UTC. This is a calendar-date window, not an exact rolling 48-hour period. EFFIS filters likely agricultural burns and false alarms using land cover, distance from artificial surfaces, and hotspot confidence. It covers Europe and the Mediterranean region and normally updates several times per day. These remain satellite detections, not firefighter-confirmed incidents, and can be hidden by cloud, smoke, satellite timing, or sensor limits.
 
 When the EFFIS layer is enabled, its visible legend explains the detection-age colors and satellite marker shapes. It also shows the requested UTC source window and the latest successful tile-load time.
 

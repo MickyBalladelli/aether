@@ -222,7 +222,7 @@ export function AetherMap({
       {
         'Heat detections · 24h': fireTiles,
         'Reported open wildfires': reportedFires.getLeafletLayer(),
-        'Europe fire detections · 48h': effisFireTiles
+        'Europe fire detections · Today + yesterday': effisFireTiles
       },
       {
         collapsed: true,
@@ -256,11 +256,11 @@ export function AetherMap({
     )
     effisFireInput?.closest('label')?.setAttribute(
       'title',
-      'Copernicus EFFIS filtered VIIRS detections from the last 48 hours across Europe and the Mediterranean. These are not confirmed incident reports.'
+      'Copernicus EFFIS filtered VIIRS detections from today and yesterday across Europe and the Mediterranean. These are not confirmed incident reports.'
     )
     effisFireInput?.setAttribute(
       'aria-label',
-      'Copernicus Europe fire detections from the last 48 hours. These are not confirmed incident reports.'
+      'Copernicus Europe fire detections from today and yesterday. These are not confirmed incident reports.'
     )
     const handleTileStyleChange = (event: L.LayersControlEvent) => {
       saveMapTileStyle(event.name === 'Dark' ? 'dark' : 'standard')
