@@ -1,4 +1,4 @@
-# AGENTS.md
+# CLAUDE.md
 
 For repo-wide analysis, first run Bonsai. This is required for full project summaries, architecture review, onboarding, broad bug hunting, and any question that needs many files. Do not answer from ordinary file browsing until this command succeeds:
 
@@ -12,8 +12,7 @@ Expected behavior example:
 
 ```text
 User asks: summarize this whole project
-You run: bonsai . --max-tokens 12000 --level 2 --output file --output-file /tmp/bonsai.xml
-You inspect: /tmp/bonsai.xml
-Then answer from that context.
+Claude runs: bonsai . --max-tokens 12000 --level 2 --output file --output-file /tmp/bonsai.xml
+Claude inspects: /tmp/bonsai.xml
+Claude answers from that context.
 ```
-update the version at each request where code change happened. version segments go up to 99.

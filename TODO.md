@@ -1,29 +1,34 @@
-# Aether Improvements
+# Aether improvements
 
-## P0 — Reliability and provider safety
+## Priority 1 — Fire-layer trust and reliability
 
-- [x] Move search and reverse geocoding behind a cached server endpoint so rate limits apply across all users and tabs.
-- [x] Add explicit timeouts to every upstream weather, air-quality, alert, radar, and geocoding request.
-- [x] Validate upstream JSON before storing or rendering it, and reject malformed or incomplete payloads safely.
-- [x] Cap and prune in-memory and IndexedDB sample caches by age and entry count.
+- [ ] Show loading, unavailable, missing-key, and last-updated states for every fire layer.
+- [ ] Protect the NASA FIRMS proxy with rate limits, request coalescing, and stronger CDN caching.
+- [ ] Put fire tiles in a separate short-lived PWA cache so they cannot evict weather responses.
+- [ ] Add a visible legend explaining EFFIS detection-age colors and source timestamps.
+- [ ] Replace the EFFIS `48h` label with `Today + yesterday`, or use exact rolling timestamps if supported.
 
-## P1 — Test and data quality
+## Priority 2 — Better fire data and controls
 
-- [x] Add handler-level tests for weather and air-quality cache hits, stale fallback, backoff, metrics, and malformed provider responses.
-- [x] Consolidate duplicated weather mapping, weather-code descriptions, vector interpolation, and cache-status handling.
-- [x] Add tests for error-boundary fallbacks, offline startup, service-worker updates, and aborted map selections.
-- [x] Type-check unit tests, end-to-end tests, server files, and configuration files in one verification command.
+- [ ] Add stronger regional incident feeds: NIFC for the USA and CWFIS for Canada.
+- [ ] Deduplicate reported fires using source incident IDs instead of rounded coordinates.
+- [ ] Save enabled map overlays between sessions.
+- [ ] Separate reported incidents from satellite detections in the layer control.
+- [ ] Replace native `title` tooltips with keyboard- and touch-friendly information popovers.
+- [ ] Add shared stale caching, cache metrics, provider failure counts, and quota alerts for fire routes.
 
-## P2 — Performance and maintainability
+## Priority 3 — Architecture and performance
 
-- [x] Remove the unused `WeatherCanvas` and `WeatherSimulation` rendering path after confirming no planned consumer needs it.
-- [x] Split `App`, `AetherMap`, and `WeatherMapAnimation` into smaller state, data-loading, map-control, and renderer modules.
-- [x] Profile canvas redraws during pan and zoom, then avoid rebuilding unchanged textures and particle fields.
-- [x] Measure the production bundle and lazy-load heavy map or interface code to remove the current large-chunk warning.
+- [ ] Share API handlers between local Vite development and Vercel production to prevent behavior drift.
+- [x] Split `WeatherMapAnimation.ts` into smaller rendering and particle modules.
+- [ ] Split `style.css` into component or feature styles.
+- [ ] Extract polling and data-loading hooks from `App.tsx`.
+- [ ] Extract map-layer setup and controls from `AetherMap.tsx`.
+- [ ] Pause canvas animation, radar refresh, and unnecessary data fetching while the page is hidden.
+- [ ] Add shared runtime schemas and types for server responses consumed by the browser.
 
-## P3 — Delivery and operations
+## Priority 4 — Documentation and focused verification
 
-- [x] Add CI for type checks, unit tests, production build, and Playwright journeys.
-- [x] Make Playwright self-contained in CI with a managed preview server, while reusing an existing local server during development.
-- [x] Add security headers in `vercel.json`, including CSP, clickjacking protection, referrer policy, and MIME sniffing protection.
-- [x] Turn cache metrics and client rendering errors into dashboards or alerts with documented thresholds.
+- [ ] Document `FIRMS_MAP_KEY` in the Vercel deployment section.
+- [ ] Document licenses and production usage limits for every fire-data provider.
+- [ ] Add focused checks for tile-coordinate conversion, EFFIS date windows, EONET filtering, deduplication, and overlay lifecycle.

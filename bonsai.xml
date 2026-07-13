@@ -1,0 +1,2105 @@
+<repository_context>
+<metadata generated_at="1783970631" repo_root="/Users/micky/dev/aether" max_tokens="4000" compression_level="2" file_count="104" />
+<project_map>
+<entry path="AGENTS.md" level="3" tokens="19" />
+<entry path="README.md" level="3" tokens="60" />
+<entry path="TODO.md" level="3" tokens="45" />
+<entry path="api/air-quality.js" level="3" tokens="272" />
+<entry path="api/client-error.js" level="3" tokens="40" />
+<entry path="api/ecmwf.js" level="3" tokens="161" />
+<entry path="api/effis-fire-tile.js" level="3" tokens="81" />
+<entry path="api/fire-tile.js" level="3" tokens="101" />
+<entry path="api/geocode.js" level="3" tokens="154" />
+<entry path="api/heat-alerts.js" level="3" tokens="157" />
+<entry path="api/reported-fires.js" level="3" tokens="45" />
+<entry path="api/weather.js" level="3" tokens="299" />
+<entry path="docs/monitoring.md" level="3" tokens="2" />
+<entry path="e2e/weatherJourneys.e2e.ts" level="3" tokens="177" />
+<entry path="index.html" level="3" tokens="171" />
+<entry path="nodemon.json" level="3" tokens="26" />
+<entry path="package-lock.json" level="3" tokens="1040" />
+<entry path="package.json" level="3" tokens="373" />
+<entry path="playwright.config.ts" level="3" tokens="16" />
+<entry path="scripts/verifyPwa.js" level="3" tokens="25" />
+<entry path="scripts/warmWeatherCache.js" level="3" tokens="204" />
+<entry path="server/cacheMetrics.js" level="3" tokens="19" />
+<entry path="server/cachePolicy.js" level="3" tokens="96" />
+<entry path="server/cachedResource.js" level="3" tokens="66" />
+<entry path="server/coalescedFetch.js" level="3" tokens="96" />
+<entry path="server/ecmwfProvider.d.ts" level="3" tokens="52" />
+<entry path="server/ecmwfProvider.js" level="3" tokens="249" />
+<entry path="server/effisTile.js" level="3" tokens="246" />
+<entry path="server/fireTile.js" level="3" tokens="204" />
+<entry path="server/geocodingProvider.d.ts" level="3" tokens="24" />
+<entry path="server/geocodingProvider.js" level="3" tokens="312" />
+<entry path="server/heatAlerts.d.ts" level="3" tokens="28" />
+<entry path="server/heatAlerts.js" level="3" tokens="498" />
+<entry path="server/openMeteoParams.d.ts" level="3" tokens="85" />
+<entry path="server/openMeteoParams.js" level="3" tokens="301" />
+<entry path="server/providerResponse.js" level="3" tokens="104" />
+<entry path="server/reportedFires.js" level="3" tokens="216" />
+<entry path="server/sharedCache.js" level="3" tokens="76" />
+<entry path="server/upstreamBackoff.js" level="3" tokens="174" />
+<entry path="shared/cacheVersion.d.ts" level="3" tokens="34" />
+<entry path="shared/cacheVersion.js" level="3" tokens="45" />
+<entry path="shared/fetchTimeout.d.ts" level="3" tokens="25" />
+<entry path="shared/fetchTimeout.js" level="3" tokens="63" />
+<entry path="shared/providerValidation.d.ts" level="3" tokens="41" />
+<entry path="shared/providerValidation.js" level="3" tokens="144" />
+<entry path="src/App.tsx" level="3" tokens="1085" />
+<entry path="src/components/AetherHeader.tsx" level="3" tokens="113" />
+<entry path="src/components/AetherMap.tsx" level="3" tokens="807" />
+<entry path="src/components/EcmwfForecastTimeline.tsx" level="3" tokens="460" />
+<entry path="src/components/ForecastDateLabel.tsx" level="3" tokens="43" />
+<entry path="src/components/LocationBookmarks.tsx" level="3" tokens="225" />
+<entry path="src/components/MapWeatherTooltip.tsx" level="3" tokens="130" />
+<entry path="src/components/OfflineStatus.tsx" level="3" tokens="72" />
+<entry path="src/components/RadarOpacityControl.tsx" level="3" tokens="43" />
+<entry path="src/components/SevereWeatherAlerts.tsx" level="3" tokens="243" />
+<entry path="src/components/SunTimes.tsx" level="3" tokens="112" />
+<entry path="src/components/WeatherDashboard.tsx" level="3" tokens="378" />
+<entry path="src/components/WeatherErrorBoundary.tsx" level="3" tokens="101" />
+<entry path="src/components/WeatherRetryButton.tsx" level="3" tokens="40" />
+<entry path="src/data/cityCatalog.ts" level="3" tokens="86" />
+<entry path="src/main.ts" level="3" tokens="33" />
+<entry path="src/map/ReportedFireLayer.ts" level="3" tokens="190" />
+<entry path="src/map/WeatherFieldRenderer.ts" level="3" tokens="801" />
+<entry path="src/map/WeatherParticleRenderer.ts" level="3" tokens="842" />
+<entry path="src/map/WeatherRadarLayer.ts" level="3" tokens="281" />
+<entry path="src/map/weatherAnimationTypes.ts" level="3" tokens="53" />
+<entry path="src/map/weatherBadge.ts" level="3" tokens="60" />
+<entry path="src/map/weatherPalette.ts" level="3" tokens="151" />
+<entry path="src/map/weatherVectorFields.ts" level="3" tokens="311" />
+<entry path="src/services/airQuality.ts" level="3" tokens="639" />
+<entry path="src/services/appState.ts" level="3" tokens="293" />
+<entry path="src/services/ecmwf.ts" level="3" tokens="111" />
+<entry path="src/services/geocoding.ts" level="3" tokens="194" />
+<entry path="src/services/heatAlerts.ts" level="3" tokens="86" />
+<entry path="src/services/jetStream.ts" level="3" tokens="615" />
+<entry path="src/services/location.ts" level="3" tokens="45" />
+<entry path="src/services/openMeteo.ts" level="3" tokens="343" />
+<entry path="src/services/storage.ts" level="3" tokens="109" />
+<entry path="src/services/upstreamBudget.ts" level="3" tokens="256" />
+<entry path="src/services/weatherCache.ts" level="3" tokens="262" />
+<entry path="src/services/weatherGrid.ts" level="3" tokens="1506" />
+<entry path="src/types/weather.ts" level="3" tokens="400" />
+<entry path="src/utils/geo.ts" level="3" tokens="238" />
+<entry path="src/utils/motion.ts" level="3" tokens="50" />
+<entry path="src/vite-env.d.ts" level="3" tokens="5" />
+<entry path="src/weather/mapCurrentWeather.ts" level="3" tokens="69" />
+<entry path="src/weather/translateWeather.ts" level="3" tokens="325" />
+<entry path="src/weather/weatherCode.ts" level="3" tokens="56" />
+<entry path="tests/apiHandlers.test.js" level="3" tokens="115" />
+<entry path="tests/ecmwf.test.ts" level="3" tokens="51" />
+<entry path="tests/ecmwfProvider.test.js" level="3" tokens="162" />
+<entry path="tests/errorBoundary.test.tsx" level="3" tokens="66" />
+<entry path="tests/geo.test.ts" level="3" tokens="24" />
+<entry path="tests/geocoding.test.ts" level="3" tokens="71" />
+<entry path="tests/runtimeCache.test.js" level="3" tokens="177" />
+<entry path="tests/translateWeather.test.ts" level="3" tokens="60" />
+<entry path="tests/upstreamBackoff.test.js" level="3" tokens="27" />
+<entry path="tests/weatherInterpolation.test.ts" level="3" tokens="137" />
+<entry path="tsconfig.json" level="3" tokens="25" />
+<entry path="tsconfig.node.json" level="3" tokens="14" />
+<entry path="tsconfig.server.json" level="3" tokens="10" />
+<entry path="tsconfig.verify.json" level="3" tokens="22" />
+<entry path="vercel.json" level="3" tokens="43" />
+<entry path="vite.config.ts" level="3" tokens="896" />
+</project_map>
+<files>
+<file path="AGENTS.md" level="3" tokens="19">update the version at each request where code change happened. version segments go up to 99.</file>
+<file path="README.md" level="3" tokens="60"># Aether
+## Features
+## Data sources
+## Jet Stream layer
+## Heat-detection layer
+## Requirements
+## Local development
+## Cache version and invalidation
+## Cache monitoring
+## Production build
+## Deploy to Vercel
+## Main structure
+## Accuracy
+## License</file>
+<file path="TODO.md" level="3" tokens="45"># Aether improvements
+## Priority 1 — Fire-layer trust and reliability
+## Priority 2 — Better fire data and controls
+## Priority 3 — Architecture and performance
+## Priority 4 — Documentation and focused verification</file>
+<file path="api/air-quality.js" level="3" tokens="272">import {
+import { logCacheMetric } from &apos;../server/cacheMetrics.js&apos;
+import {
+import { fetchCoalesced } from &apos;../server/coalescedFetch.js&apos;
+import {
+... 2 more imports
+const OPEN_METEO_ENDPOINT = &apos;https://air-quality-api.open-meteo.com/v1/air-quality&apos;
+export default async function handler(request, response) {
+async function handler(request, response) {
+const canonical = buildCanonicalOpenMeteoParams(
+const params = canonical.params
+const cacheKey = params.toString()
+const sharedCache = getSharedCache(getCacheNamespace(&apos;air-quality&apos;))
+const cached = await readSharedCache(sharedCache, `fresh:${cacheKey}`)
+const blockedUntil = await readSharedCache(sharedCache, UPSTREAM_BLOCK_KEY)
+const blockedFor = getRemainingBlockSeconds(blockedUntil)
+const stale = await readSharedCache(sharedCache, `stale:${cacheKey}`)
+const upstream = await fetchCoalesced(
+const record = {
+let retryAfter
+const stale = await readSharedCache(sharedCache, `stale:${cacheKey}`)
+const status = upstream.ok ? 502 : upstream.status
+const body = upstream.ok
+const stale = await readSharedCache(sharedCache, `stale:${cacheKey}`)
+function sendAirQuality(response, record, cacheStatus) {
+function sendRateLimited(response, retryAfter) {</file>
+<file path="api/client-error.js" level="3" tokens="40">export default function handler(request, response) {
+function handler(request, response) {
+const area = typeof request.body?.area === &apos;string&apos;
+const message = typeof request.body?.message === &apos;string&apos;</file>
+<file path="api/ecmwf.js" level="3" tokens="161">import { getCacheNamespace } from &apos;../shared/cacheVersion.js&apos;
+import { logCacheMetric } from &apos;../server/cacheMetrics.js&apos;
+import { loadCachedResource } from &apos;../server/cachedResource.js&apos;
+import { fetchEcmwfForecast } from &apos;../server/ecmwfProvider.js&apos;
+import { getSharedCache } from &apos;../server/sharedCache.js&apos;
+const FRESH_TTL = 3 * 60 * 60
+const STALE_TTL = 24 * 60 * 60
+export default async function handler(request, response) {
+async function handler(request, response) {
+const latitude = Number(first(request.query.latitude))
+const longitude = Number(first(request.query.longitude))
+const forecastHours = Math.min(
+const cacheKey = [
+const result = await loadCachedResource({
+function first(value) {</file>
+<file path="api/effis-fire-tile.js" level="3" tokens="81">import {
+import { fetchWithTimeout } from &apos;../shared/fetchTimeout.js&apos;
+const EFFIS_TILE_TIMEOUT_MS = 12000
+export default async function handler(request, response) {
+async function handler(request, response) {
+const tile = parseEffisTileCoordinates(
+const upstream = await fetchWithTimeout(
+const contentType = upstream.headers.get(&apos;content-type&apos;) ?? &apos;&apos;
+function getQueryValue(value) {</file>
+<file path="api/fire-tile.js" level="3" tokens="101">import {
+import { fetchWithTimeout } from &apos;../shared/fetchTimeout.js&apos;
+const FIRE_TILE_TIMEOUT_MS = 8000
+export default async function handler(request, response) {
+async function handler(request, response) {
+const tile = parseFireTileCoordinates(
+const mapKey = process.env.FIRMS_MAP_KEY
+const upstream = await fetchWithTimeout(
+const contentType = upstream.headers.get(&apos;content-type&apos;) ?? &apos;&apos;
+const image = Buffer.from(await upstream.arrayBuffer())
+function getQueryValue(value) {</file>
+<file path="api/geocode.js" level="3" tokens="154">import { getCacheNamespace } from &apos;../shared/cacheVersion.js&apos;
+import { logCacheMetric } from &apos;../server/cacheMetrics.js&apos;
+import { loadCachedResource } from &apos;../server/cachedResource.js&apos;
+import {
+import { getSharedCache } from &apos;../server/sharedCache.js&apos;
+const FRESH_TTL = 24 * 60 * 60
+const STALE_TTL = 7 * 24 * 60 * 60
+export default async function handler(request, response) {
+async function handler(request, response) {
+const parsed = parseGeocodeRequest(getRequestParams(request.query))
+const result = await loadCachedResource({
+function getRequestParams(query) {
+const params = new URLSearchParams()
+const item = Array.isArray(value) ? value[0] : value</file>
+<file path="api/heat-alerts.js" level="3" tokens="157">import {
+import { logCacheMetric } from &apos;../server/cacheMetrics.js&apos;
+import { loadCachedResource } from &apos;../server/cachedResource.js&apos;
+import { getCacheNamespace } from &apos;../shared/cacheVersion.js&apos;
+const FRESH_CACHE_TTL = 10 * 60
+const STALE_CACHE_TTL = 24 * 60 * 60
+export default async function handler(request, response) {
+async function handler(request, response) {
+const coordinates = parseHeatAlertCoordinates(
+const cacheKey = `${coordinates.latitude.toFixed(3)}:${coordinates.longitude.toFixed(3)}`
+const cache = getSharedCache(getCacheNamespace(&apos;heat-alerts&apos;))
+const result = await loadCachedResource({
+function sendAlerts(response, record, cacheStatus) {
+function getQueryValue(value) {</file>
+<file path="api/reported-fires.js" level="3" tokens="45">import { getReportedFires } from &apos;../server/reportedFires.js&apos;
+export default async function handler(request, response) {
+async function handler(request, response) {
+const fires = await getReportedFires()</file>
+<file path="api/weather.js" level="3" tokens="299">import {
+import { logCacheMetric } from &apos;../server/cacheMetrics.js&apos;
+import {
+import { fetchCoalesced } from &apos;../server/coalescedFetch.js&apos;
+import {
+... 2 more imports
+const OPEN_METEO_ENDPOINT = &apos;https://api.open-meteo.com/v1/forecast&apos;
+export default async function handler(request, response) {
+async function handler(request, response) {
+const canonical = buildCanonicalOpenMeteoParams(
+const params = canonical.params
+const cacheKey = params.toString()
+const sharedCache = getSharedCache(getCacheNamespace(&apos;weather&apos;))
+const cached = await readSharedCache(sharedCache, `fresh:${cacheKey}`)
+const blockedUntil = await readSharedCache(sharedCache, UPSTREAM_BLOCK_KEY)
+const blockedFor = getRemainingBlockSeconds(blockedUntil)
+const stale = await readSharedCache(sharedCache, `stale:${cacheKey}`)
+const upstream = await fetchCoalesced(
+const validateProviderBody = isJetStreamRequest(params)
+const record = {
+let retryAfter
+const stale = await readSharedCache(sharedCache, `stale:${cacheKey}`)
+const status = upstream.ok ? 502 : upstream.status
+const body = upstream.ok
+const stale = await readSharedCache(sharedCache, `stale:${cacheKey}`)
+function isJetStreamRequest(params) {
+const current = params.get(&apos;current&apos;)?.split(&apos;,&apos;) ?? []
+function sendWeather(response, record, cacheStatus) {
+function sendRateLimited(response, retryAfter) {</file>
+<file path="docs/monitoring.md" level="3" tokens="2"># Monitoring</file>
+<file path="e2e/weatherJourneys.e2e.ts" level="3" tokens="177">import { expect, test } from &apos;@playwright/test&apos;
+const url = new URL(route.request().url())
+const latitudes = url.searchParams.get(&apos;latitude&apos;)?.split(&apos;,&apos;) ?? [&apos;0&apos;]
+const longitudes = url.searchParams.get(&apos;longitude&apos;)?.split(&apos;,&apos;) ?? [&apos;0&apos;]
+const payloads = latitudes.map((latitude, index) =&gt; (
+const url = new URL(route.request().url())
+const latitudes = url.searchParams.get(&apos;latitude&apos;)?.split(&apos;,&apos;) ?? [&apos;0&apos;]
+const longitudes = url.searchParams.get(&apos;longitude&apos;)?.split(&apos;,&apos;) ?? [&apos;0&apos;]
+const payloads = latitudes.map((latitude, index) =&gt; ({
+const url = new URL(route.request().url())
+const forecastRequest = page.waitForRequest(request =&gt; (
+let reverseGeocodeRequests = 0
+const bounds = element.getBoundingClientRect()
+function buildForecast(latitude: number, longitude: number) {</file>
+<file path="index.html" level="3" tokens="171">&lt;!doctype html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot; /&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot; /&gt;
+&lt;meta name=&quot;theme-color&quot; content=&quot;#071014&quot; /&gt;
+&lt;meta name=&quot;apple-mobile-web-app-capable&quot; content=&quot;yes&quot; /&gt;
+&lt;meta name=&quot;apple-mobile-web-app-status-bar-style&quot; content=&quot;black-translucent&quot; /&gt;
+&lt;meta name=&quot;apple-mobile-web-app-title&quot; content=&quot;Aether&quot; /&gt;
+&lt;link rel=&quot;icon&quot; type=&quot;image/svg+xml&quot; href=&quot;/aether.svg&quot; /&gt;
+&lt;link rel=&quot;apple-touch-icon&quot; href=&quot;/pwa-192x192.png&quot; /&gt;
+&lt;title&gt;Aether&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div id=&quot;root&quot;&gt;&lt;/div&gt;
+&lt;script type=&quot;module&quot; src=&quot;/src/main.ts&quot;&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</file>
+<file path="nodemon.json" level="3" tokens="26">&quot;watch&quot;: [
+...
+&quot;ext&quot;: &quot;ts,js,json&quot;,
+&quot;ignore&quot;: [
+...
+&quot;exec&quot;: &quot;vite&quot;</file>
+<file path="package-lock.json" level="3" tokens="1040">&quot;name&quot;: &quot;aether&quot;,
+&quot;version&quot;: &quot;0.1.58&quot;,
+&quot;lockfileVersion&quot;: 3,
+&quot;requires&quot;: true,
+&quot;packages&quot;: {
+&quot;name&quot;: &quot;aether&quot;,
+&quot;version&quot;: &quot;0.1.58&quot;,
+&quot;dependencies&quot;: {
+&quot;@emotion/react&quot;: &quot;^11.14.0&quot;,
+&quot;@emotion/styled&quot;: &quot;^11.14.1&quot;,
+&quot;@mui/icons-material&quot;: &quot;^7.1.1&quot;,
+&quot;@mui/material&quot;: &quot;^7.1.1&quot;,
+&quot;@vercel/functions&quot;: &quot;^3.7.4&quot;,
+&quot;@vitejs/plugin-react&quot;: &quot;^5.0.0&quot;,
+&quot;leaflet&quot;: &quot;^1.9.4&quot;,
+&quot;react&quot;: &quot;^19.1.0&quot;,
+&quot;react-dom&quot;: &quot;^19.1.0&quot;,
+&quot;typescript&quot;: &quot;^5.8.3&quot;,
+&quot;vite&quot;: &quot;^7.0.0&quot;
+&quot;devDependencies&quot;: {
+&quot;@playwright/test&quot;: &quot;^1.61.1&quot;,
+&quot;@types/leaflet&quot;: &quot;^1.9.21&quot;,
+&quot;@types/node&quot;: &quot;^26.0.1&quot;,
+&quot;@types/react&quot;: &quot;^19.2.17&quot;,
+&quot;@types/react-dom&quot;: &quot;^19.2.3&quot;,
+&quot;nodemon&quot;: &quot;^3.1.14&quot;,
+&quot;vite-plugin-pwa&quot;: &quot;^1.3.0&quot;,
+&quot;vitest&quot;: &quot;^4.1.9&quot;
+&quot;version&quot;: &quot;0.3.7&quot;,
+&quot;dependencies&quot;: {
+&quot;jsonpointer&quot;: &quot;^5.0.1&quot;,
+&quot;leven&quot;: &quot;^3.1.0&quot;
+&quot;peerDependencies&quot;: {
+&quot;ajv&quot;: &quot;&gt;=8&quot;
+&quot;version&quot;: &quot;7.29.7&quot;,
+&quot;dependencies&quot;: {
+&quot;@babel/helper-validator-identifier&quot;: &quot;^7.29.7&quot;,
+&quot;js-tokens&quot;: &quot;^4.0.0&quot;,
+&quot;picocolors&quot;: &quot;^1.1.1&quot;
+&quot;version&quot;: &quot;7.29.7&quot;,
+&quot;dependencies&quot;: {
+&quot;@babel/code-frame&quot;: &quot;^7.29.7&quot;,
+&quot;@babel/generator&quot;: &quot;^7.29.7&quot;,
+&quot;@babel/helper-compilation-targets&quot;: &quot;^7.29.7&quot;,
+&quot;@babel/helper-module-transforms&quot;: &quot;^7.29.7&quot;,
+&quot;@babel/helpers&quot;: &quot;^7.29.7&quot;,
+&quot;@babel/parser&quot;: &quot;^7.29.7&quot;,
+&quot;@babel/template&quot;: &quot;^7.29.7&quot;,
+&quot;@babel/traverse&quot;: &quot;^7.29.7&quot;,
+&quot;@babel/types&quot;: &quot;^7.29.7&quot;,
+&quot;@jridgewell/remapping&quot;: &quot;^2.3.5&quot;,
+&quot;convert-source-map&quot;: &quot;^2.0.0&quot;,
+&quot;debug&quot;: &quot;^4.1.0&quot;,
+&quot;gensync&quot;: &quot;^1.0.0-beta.2&quot;,
+&quot;json5&quot;: &quot;^2.2.3&quot;,
+&quot;semver&quot;: &quot;^6.3.1&quot;
+&quot;version&quot;: &quot;2.0.0&quot;,
+&quot;version&quot;: &quot;7.29.7&quot;,
+&quot;dependencies&quot;: {
+&quot;@babel/parser&quot;: &quot;^7.29.7&quot;,
+&quot;@babel/types&quot;: &quot;^7.29.7&quot;,
+&quot;@jridgewell/gen-mapping&quot;: &quot;^0.3.12&quot;,
+&quot;@jridgewell/trace-mapping&quot;: &quot;^0.3.28&quot;,
+&quot;jsesc&quot;: &quot;^3.0.2&quot;
+&quot;version&quot;: &quot;7.29.7&quot;,
+&quot;dependencies&quot;: {
+&quot;@babel/types&quot;: &quot;^7.29.7&quot;
+&quot;version&quot;: &quot;7.29.7&quot;,
+&quot;dependencies&quot;: {
+&quot;@babel/compat-data&quot;: &quot;^7.29.7&quot;,
+&quot;@babel/helper-validator-option&quot;: &quot;^7.29.7&quot;,
+&quot;browserslist&quot;: &quot;^4.24.0&quot;,
+&quot;lru-cache&quot;: &quot;^5.1.1&quot;,
+&quot;semver&quot;: &quot;^6.3.1&quot;
+&quot;version&quot;: &quot;7.29.7&quot;,
+&quot;dependencies&quot;: {
+&quot;@babel/helper-annotate-as-pure&quot;: &quot;^7.29.7&quot;,
+&quot;@babel/helper-member-expression-to-functions&quot;: &quot;^7.29.7&quot;,
+&quot;@babel/helper-optimise-call-expression&quot;: &quot;^7.29.7&quot;,
+&quot;@babel/helper-replace-supers&quot;: &quot;^7.29.7&quot;,
+&quot;@babel/helper-skip-transparent-expression-wrappers&quot;: &quot;^7.29.7&quot;,
+&quot;@babel/traverse&quot;: &quot;^7.29.7&quot;,
+&quot;semver&quot;: &quot;^6.3.1&quot;
+&quot;peerDependencies&quot;: {
+&quot;@babel/core&quot;: &quot;^7.0.0&quot;
+&quot;version&quot;: &quot;7.29.7&quot;,
+&quot;dependencies&quot;: {
+&quot;@babel/helper-annotate-as-pure&quot;: &quot;^7.29.7&quot;,
+&quot;regexpu-core&quot;: &quot;^6.3.1&quot;,
+&quot;semver&quot;: &quot;^6.3.1&quot;
+&quot;peerDependencies&quot;: {
+&quot;@babel/core&quot;: &quot;^7.0.0&quot;
+&quot;version&quot;: &quot;0.6.8&quot;,
+&quot;dependencies&quot;: {
+&quot;@babel/helper-compilation-targets&quot;: &quot;^7.28.6&quot;,
+&quot;@babel/helper-plugin-utils&quot;: &quot;^7.28.6&quot;,
+&quot;debug&quot;: &quot;^4.4.3&quot;,
+&quot;lodash.debounce&quot;: &quot;^4.0.8&quot;,
+&quot;resolve&quot;: &quot;^1.22.11&quot;</file>
+<file path="package.json" level="3" tokens="373">&quot;name&quot;: &quot;aether&quot;,
+&quot;private&quot;: true,
+&quot;version&quot;: &quot;0.1.58&quot;,
+&quot;type&quot;: &quot;module&quot;,
+&quot;engines&quot;: {
+&quot;node&quot;: &quot;&gt;=20.19.0&quot;
+&quot;scripts&quot;: {
+&quot;dev&quot;: &quot;nodemon&quot;,
+&quot;start&quot;: &quot;vite&quot;,
+&quot;build&quot;: &quot;tsc &amp;&amp; vite build&quot;,
+&quot;postbuild&quot;: &quot;node scripts/warmWeatherCache.js&quot;,
+&quot;preview&quot;: &quot;vite preview&quot;,
+&quot;test&quot;: &quot;vitest run&quot;,
+&quot;test:e2e&quot;: &quot;playwright test&quot;,
+&quot;verify&quot;: &quot;tsc -p tsconfig.verify.json &amp;&amp; tsc -p tsconfig.server.json &amp;&amp; npm test &amp;&amp; vite build &amp;&amp; node scripts/verifyPwa.js&quot;
+&quot;dependencies&quot;: {
+&quot;@emotion/react&quot;: &quot;^11.14.0&quot;,
+&quot;@emotion/styled&quot;: &quot;^11.14.1&quot;,
+&quot;@mui/icons-material&quot;: &quot;^7.1.1&quot;,
+&quot;@mui/material&quot;: &quot;^7.1.1&quot;,
+&quot;@vercel/functions&quot;: &quot;^3.7.4&quot;,
+&quot;@vitejs/plugin-react&quot;: &quot;^5.0.0&quot;,
+&quot;leaflet&quot;: &quot;^1.9.4&quot;,
+&quot;react&quot;: &quot;^19.1.0&quot;,
+&quot;react-dom&quot;: &quot;^19.1.0&quot;,
+&quot;typescript&quot;: &quot;^5.8.3&quot;,
+&quot;vite&quot;: &quot;^7.0.0&quot;
+&quot;devDependencies&quot;: {
+&quot;@playwright/test&quot;: &quot;^1.61.1&quot;,
+&quot;@types/leaflet&quot;: &quot;^1.9.21&quot;,
+&quot;@types/node&quot;: &quot;^26.0.1&quot;,
+&quot;@types/react&quot;: &quot;^19.2.17&quot;,
+&quot;@types/react-dom&quot;: &quot;^19.2.3&quot;,
+&quot;nodemon&quot;: &quot;^3.1.14&quot;,
+&quot;vite-plugin-pwa&quot;: &quot;^1.3.0&quot;,
+&quot;vitest&quot;: &quot;^4.1.9&quot;</file>
+<file path="playwright.config.ts" level="3" tokens="16">import { defineConfig } from &apos;@playwright/test&apos;
+export default defineConfig({</file>
+<file path="scripts/verifyPwa.js" level="3" tokens="25">import { readFile } from &apos;node:fs/promises&apos;
+const manifest = JSON.parse(
+const serviceWorker = await readFile(</file>
+<file path="scripts/warmWeatherCache.js" level="3" tokens="204">import {
+import { getCacheNamespace } from &apos;../shared/cacheVersion.js&apos;
+import { fetchWithTimeout } from &apos;../shared/fetchTimeout.js&apos;
+import {
+const OPEN_METEO_ENDPOINT = &apos;https://api.open-meteo.com/v1/forecast&apos;
+const CURRENT_FIELDS = [
+const HOURLY_FIELDS = [
+const DAILY_FIELDS = [
+const POPULAR_LOCATIONS = [
+async function warmWeatherCache() {
+const cache = getSharedCache(getCacheNamespace(&apos;weather&apos;))
+let warmed = 0
+let alreadyFresh = 0
+const params = getLocationParams(location)
+const cacheKey = params.toString()
+const cached = await readSharedCache(cache, `fresh:${cacheKey}`)
+const response = await fetchWithTimeout(`${OPEN_METEO_ENDPOINT}?${cacheKey}`, {
+const record = {
+const writes = await Promise.all([
+const message = error instanceof Error ? error.message : &apos;Unknown error&apos;
+function getLocationParams(location) {
+const input = new URLSearchParams({
+const canonical = buildCanonicalOpenMeteoParams(</file>
+<file path="server/cacheMetrics.js" level="3" tokens="19">export function logCacheMetric(route, metric) {
+function logCacheMetric(route, metric) {</file>
+<file path="server/cachePolicy.js" level="3" tokens="96">export const WEATHER_FRESH_CACHE_TTL = 10 * 60
+const WEATHER_FRESH_CACHE_TTL = 10 * 60
+export const AIR_QUALITY_FRESH_CACHE_TTL = 60 * 60
+const AIR_QUALITY_FRESH_CACHE_TTL = 60 * 60
+export const STALE_CACHE_TTL = 24 * 60 * 60
+const STALE_CACHE_TTL = 24 * 60 * 60</file>
+<file path="server/cachedResource.js" level="3" tokens="66">import {
+export async function loadCachedResource({
+async function loadCachedResource({
+const freshKey = `fresh:${cacheKey}`
+const staleKey = `stale:${cacheKey}`
+const fresh = await readSharedCache(cache, freshKey)
+const record = await load()
+const stale = await readSharedCache(cache, staleKey)</file>
+<file path="server/coalescedFetch.js" level="3" tokens="96">import { logCacheMetric } from &apos;./cacheMetrics.js&apos;
+import { fetchWithTimeout } from &apos;../shared/fetchTimeout.js&apos;
+const pendingRequests = new Map()
+export function fetchCoalesced(
+function fetchCoalesced(
+const existing = pendingRequests.get(key)
+const request = fetchWithTimeout(url, {
+const rateLimit = readRateLimit(response.headers)
+function readRateLimit(headers) {
+function readFirstHeader(headers, names) {
+const value = headers.get(name)</file>
+<file path="server/ecmwfProvider.d.ts" level="3" tokens="52">import type { OpenMeteoResponse } from &apos;../src/types/weather&apos;
+export type EcmwfProviderResponse = OpenMeteoResponse &amp; {
+type EcmwfProviderResponse = OpenMeteoResponse &amp; {
+export function fetchEcmwfForecast(</file>
+<file path="server/ecmwfProvider.js" level="3" tokens="249">import { fetchCoalesced } from &apos;./coalescedFetch.js&apos;
+const OPEN_METEO_ENDPOINT = &apos;https://api.open-meteo.com/v1/forecast&apos;
+const OPEN_METEO_CUSTOMER_ENDPOINT = &apos;https://customer-api.open-meteo.com/v1/forecast&apos;
+const ECMWF_MODEL = &apos;ECMWF IFS 9 km&apos;
+const FALLBACK_MODEL = &apos;Standard forecast&apos;
+const HOURLY_FIELDS = [
+export async function fetchEcmwfForecast(
+async function fetchEcmwfForecast(
+const baseParams = {
+const attempts = buildAttempts(latitude, longitude, forecastHours, baseParams)
+const errors = []
+const upstream = await fetchCoalesced(
+const payload = JSON.parse(upstream.body)
+function buildAttempts(latitude, longitude, forecastHours, baseParams) {
+const coordinateKey = `${latitude.toFixed(3)}:${longitude.toFixed(3)}:${forecastHours}`
+const attempts = []
+const key = process.env.ECMWF_KEY?.trim()
+const params = new URLSearchParams({
+const ecmwfParams = new URLSearchParams({
+const fallbackParams = new URLSearchParams(baseParams)
+function isEcmwfForecast(payload) {
+const hourly = payload?.hourly
+const length = hourly?.time?.length</file>
+<file path="server/effisTile.js" level="3" tokens="246">const TILE_SIZE = 256
+const MAX_TILE_ZOOM = 12
+export function parseEffisTileCoordinates(zValue, xValue, yValue) {
+function parseEffisTileCoordinates(zValue, xValue, yValue) {
+const z = parseInteger(zValue)
+const x = parseInteger(xValue)
+const y = parseInteger(yValue)
+const tileCount = 2 ** z
+export function buildEffisTileUrl(tile, now = new Date()) {
+function buildEffisTileUrl(tile, now = new Date()) {
+const tileCount = 2 ** tile.z
+const west = tile.x / tileCount * 360 - 180
+const east = (tile.x + 1) / tileCount * 360 - 180
+const north = tileLatitude(tile.y, tileCount)
+const south = tileLatitude(tile.y + 1, tileCount)
+const endDate = formatDate(now)
+const start = new Date(now)
+const params = new URLSearchParams({
+function tileLatitude(y, tileCount) {
+const mercatorY = Math.PI * (1 - 2 * y / tileCount)
+function formatDate(date) {
+function parseInteger(value) {
+const parsed = Number(value)</file>
+<file path="server/fireTile.js" level="3" tokens="204">const TILE_SIZE = 256
+const MAX_TILE_ZOOM = 12
+const WEB_MERCATOR_LIMIT = 20037508.342789244
+export function parseFireTileCoordinates(zValue, xValue, yValue) {
+function parseFireTileCoordinates(zValue, xValue, yValue) {
+const z = parseInteger(zValue)
+const x = parseInteger(xValue)
+const y = parseInteger(yValue)
+const tileCount = 2 ** z
+export function buildFireTileUrl(mapKey, tile) {
+function buildFireTileUrl(mapKey, tile) {
+const tileSpan = WEB_MERCATOR_LIMIT * 2 / (2 ** tile.z)
+const west = -WEB_MERCATOR_LIMIT + tile.x * tileSpan
+const east = west + tileSpan
+const north = WEB_MERCATOR_LIMIT - tile.y * tileSpan
+const south = north - tileSpan
+const params = new URLSearchParams({
+function parseInteger(value) {
+const parsed = Number(value)</file>
+<file path="server/geocodingProvider.d.ts" level="3" tokens="24">export type GeocodeRequest =
+type GeocodeRequest =
+export function parseGeocodeRequest(
+export function fetchGeocode(</file>
+<file path="server/geocodingProvider.js" level="3" tokens="312">import { fetchCoalesced } from &apos;./coalescedFetch.js&apos;
+const SEARCH_ENDPOINT = &apos;https://geocoding-api.open-meteo.com/v1/search&apos;
+const REVERSE_ENDPOINT = &apos;https://nominatim.openstreetmap.org/reverse&apos;
+const NOMINATIM_INTERVAL_MS = 1000
+let nextNominatimRequestAt = 0
+let nominatimQueue = Promise.resolve()
+export function parseGeocodeRequest(params) {
+function parseGeocodeRequest(params) {
+const type = params.get(&apos;type&apos;)
+const query = params.get(&apos;query&apos;)?.trim()
+const latitude = Number(params.get(&apos;latitude&apos;))
+const longitude = Number(params.get(&apos;longitude&apos;))
+export async function fetchGeocode(request) {
+async function fetchGeocode(request) {
+async function searchLocation(query) {
+const url = new URL(SEARCH_ENDPOINT)
+const response = await fetchCoalesced(
+const payload = JSON.parse(response.body)
+const result = payload?.results?.[0]
+async function reverseLocation(latitude, longitude) {
+const url = new URL(REVERSE_ENDPOINT)
+const response = await fetchCoalesced(
+const payload = JSON.parse(response.body)
+const address = payload?.address
+const fallback = `${latitude.toFixed(3)}, ${longitude.toFixed(3)}`
+const locality = (
+const region = address.state || address.country
+function reserveNominatimSlot() {
+const reservation = nominatimQueue.then(async () =&gt; {
+const wait = Math.max(0, nextNominatimRequestAt - Date.now())</file>
+<file path="server/heatAlerts.d.ts" level="3" tokens="28">export type OfficialHeatAlert = {
+type OfficialHeatAlert = {
+export function parseHeatAlertCoordinates(
+export function getOfficialHeatAlerts(</file>
+<file path="server/heatAlerts.js" level="3" tokens="498">import { fetchCoalesced } from &apos;./coalescedFetch.js&apos;
+const NWS_ALERTS_ENDPOINT = &apos;https://api.weather.gov/alerts/active&apos;
+const METEOGATE_WARNINGS_ENDPOINT = &apos;https://api.meteogate.eu/warnings/collections/warnings/locations/ALL&apos;
+const HEAT_EVENT_PATTERN = /heat/i
+const METEOGATE_HEAT_TYPE = &apos;5&apos;
+const METEOGATE_INTERVAL_MS = 23 * 60 * 60 * 1000
+const METEOGATE_BUCKET_MS = 10 * 60 * 1000
+export function parseHeatAlertCoordinates(latitudeValue, longitudeValue) {
+function parseHeatAlertCoordinates(latitudeValue, longitudeValue) {
+const latitude = Number(latitudeValue)
+const longitude = Number(longitudeValue)
+export async function getOfficialHeatAlerts(latitude, longitude) {
+async function getOfficialHeatAlerts(latitude, longitude) {
+async function getNwsHeatAlerts(latitude, longitude) {
+const point = `${latitude.toFixed(3)},${longitude.toFixed(3)}`
+const url = new URL(NWS_ALERTS_ENDPOINT)
+const response = await fetchCoalesced(
+const payload = JSON.parse(response.body)
+const features = Array.isArray(payload.features) ? payload.features : []
+async function getMeteoGateHeatAlerts(latitude, longitude) {
+const bucketEnd = Math.floor(Date.now() / METEOGATE_BUCKET_MS) * METEOGATE_BUCKET_MS
+const bucketStart = bucketEnd - METEOGATE_INTERVAL_MS
+const interval = `${new Date(bucketStart).toISOString()}/${new Date(bucketEnd).toISOString()}`
+const url = new URL(METEOGATE_WARNINGS_ENDPOINT)
+const response = await fetchCoalesced(
+const payload = JSON.parse(response.body)
+const features = Array.isArray(payload.features) ? payload.features : []
+const alerts = new Map()
+const properties = feature?.properties
+const alertId = String(properties.alertId ?? feature.id)
+function getAlertMessage(properties) {
+const headline = typeof properties.headline === &apos;string&apos;
+function getAlertSeverity(properties) {
+function isLikelyUnitedStates(latitude, longitude) {
+function isLikelyEurope(latitude, longitude) {
+function geometryContainsPoint(geometry, latitude, longitude) {
+const bounds = {
+function collectBounds(coordinates, bounds) {
+const [longitude, latitude] = coordinates
+function normalizeCoordinate(value) {
+const rounded = Math.round(value * 1000) / 1000</file>
+<file path="server/openMeteoParams.d.ts" level="3" tokens="85">export type OpenMeteoParameterConfig = {
+type OpenMeteoParameterConfig = {
+export const WEATHER_PARAMETER_CONFIG: OpenMeteoParameterConfig
+const WEATHER_PARAMETER_CONFIG: OpenMeteoParameterConfig
+export const AIR_QUALITY_PARAMETER_CONFIG: OpenMeteoParameterConfig
+const AIR_QUALITY_PARAMETER_CONFIG: OpenMeteoParameterConfig
+export function buildCanonicalOpenMeteoParams(</file>
+<file path="server/openMeteoParams.js" level="3" tokens="301">const COORDINATE_PATTERN = /^-?\d+(?:\.\d+)?(?:,-?\d+(?:\.\d+)?)*$/
+const MAX_COORDINATES = 40
+export const WEATHER_PARAMETER_CONFIG = {
+const WEATHER_PARAMETER_CONFIG = {
+export const AIR_QUALITY_PARAMETER_CONFIG = {
+const AIR_QUALITY_PARAMETER_CONFIG = {
+export function buildCanonicalOpenMeteoParams(input, config) {
+function buildCanonicalOpenMeteoParams(input, config) {
+const allowedParameters = new Set([&apos;latitude&apos;, &apos;longitude&apos;, &apos;current&apos;])
+const latitudes = parseCoordinates(input.get(&apos;latitude&apos;), -90, 90)
+const longitudes = parseCoordinates(input.get(&apos;longitude&apos;), -180, 180)
+const current = parseFields(input.get(&apos;current&apos;), config.currentFields)
+const params = new URLSearchParams({
+const hourly = parseFields(input.get(&apos;hourly&apos;), config.hourlyFields)
+const daily = parseFields(input.get(&apos;daily&apos;), config.dailyFields)
+const timezone = input.get(&apos;timezone&apos;)
+const forecastDays = Number(input.get(&apos;forecast_days&apos;))
+function parseCoordinates(value, minimum, maximum) {
+const coordinates = value.split(&apos;,&apos;)
+const normalized = []
+const number = Number(coordinate)
+const rounded = Math.round(number * 1000) / 1000
+const withoutNegativeZero = Object.is(rounded, -0) ? 0 : rounded
+function parseFields(value, allowedFields) {
+const fields = value.split(&apos;,&apos;)
+function invalid(error) {</file>
+<file path="server/providerResponse.js" level="3" tokens="104">import { logCacheMetric } from &apos;./cacheMetrics.js&apos;
+export function sendProviderRecord(
+function sendProviderRecord(
+export function sendProviderRateLimit(response, retryAfter, providerName) {
+function sendProviderRateLimit(response, retryAfter, providerName) {
+export function sendBudgetHeaders(response, record) {
+function sendBudgetHeaders(response, record) {
+export function getRequestParams(query) {
+function getRequestParams(query) {
+const params = new URLSearchParams()
+const values = Array.isArray(value) ? value : [value]</file>
+<file path="server/reportedFires.js" level="3" tokens="216">import { fetchWithTimeout } from &apos;../shared/fetchTimeout.js&apos;
+const EONET_WILDFIRES_URL = [
+const EONET_TIMEOUT_MS = 8000
+export async function getReportedFires() {
+async function getReportedFires() {
+const response = await fetchWithTimeout(
+const payload = await response.json()
+const features = Array.isArray(payload?.features) ? payload.features : []
+function deduplicateFires(fires) {
+const unique = new Map()
+const locationKey = [
+function normalizeReportedFire(feature) {
+const properties = feature?.properties
+const coordinates = feature?.geometry?.coordinates
+const title = readText(properties?.title)
+const longitude = Number(coordinates[0])
+const latitude = Number(coordinates[1])
+const source = Array.isArray(properties.sources)
+function isPrescribedFire(title) {
+function readText(value) {
+function readDate(value) {
+function readMagnitude(value, unit) {
+const amount = Number(value)
+const label = readText(unit)
+function readUrl(value) {
+const url = new URL(value)</file>
+<file path="server/sharedCache.js" level="3" tokens="76">import { getCache } from &apos;@vercel/functions&apos;
+export function getSharedCache(namespace) {
+function getSharedCache(namespace) {
+export async function readSharedCache(cache, key) {
+async function readSharedCache(cache, key) {
+export async function writeSharedCache(cache, key, value, ttl) {
+async function writeSharedCache(cache, key, value, ttl) {</file>
+<file path="server/upstreamBackoff.js" level="3" tokens="174">import { writeSharedCache } from &apos;./sharedCache.js&apos;
+export const UPSTREAM_BLOCK_KEY = &apos;provider-blocked-until&apos;
+const UPSTREAM_BLOCK_KEY = &apos;provider-blocked-until&apos;
+const DEFAULT_RETRY_AFTER_SECONDS = 15 * 60
+const MAX_RETRY_AFTER_SECONDS = 24 * 60 * 60
+export function getRemainingBlockSeconds(blockedUntil) {
+function getRemainingBlockSeconds(blockedUntil) {
+export function parseRetryAfter(value) {
+function parseRetryAfter(value) {
+const seconds = Number(value)
+const retryAt = Date.parse(value)
+export async function blockUpstream(cache, retryAfter) {
+async function blockUpstream(cache, retryAfter) {
+const retryAfterSeconds = parseRetryAfter(retryAfter)
+const blockedUntil = Date.now() + retryAfterSeconds * 1000
+function clampRetryAfter(seconds) {</file>
+<file path="shared/cacheVersion.d.ts" level="3" tokens="34">export const CACHE_VERSION: number
+const CACHE_VERSION: number
+export function getCacheNamespace(name: string): string
+export function getClientCacheKey(name: string): string</file>
+<file path="shared/cacheVersion.js" level="3" tokens="45">export const CACHE_VERSION = 3
+const CACHE_VERSION = 3
+export function getCacheNamespace(name) {
+function getCacheNamespace(name) {
+export function getClientCacheKey(name) {
+function getClientCacheKey(name) {</file>
+<file path="shared/fetchTimeout.d.ts" level="3" tokens="25">export const DEFAULT_UPSTREAM_TIMEOUT_MS: number
+const DEFAULT_UPSTREAM_TIMEOUT_MS: number
+export function fetchWithTimeout(</file>
+<file path="shared/fetchTimeout.js" level="3" tokens="63">export const DEFAULT_UPSTREAM_TIMEOUT_MS = 10000
+const DEFAULT_UPSTREAM_TIMEOUT_MS = 10000
+export async function fetchWithTimeout(
+async function fetchWithTimeout(
+const controller = new AbortController()
+const timeout = setTimeout(() =&gt; {
+const handleAbort = () =&gt; controller.abort(init.signal?.reason)</file>
+<file path="shared/providerValidation.d.ts" level="3" tokens="41">export function isWeatherResponse(value: unknown): boolean
+export function isJetStreamResponse(value: unknown): boolean
+export function isAirQualityResponse(value: unknown): boolean
+export function parseProviderBody(</file>
+<file path="shared/providerValidation.js" level="3" tokens="144">const WEATHER_CURRENT_FIELDS = [
+const WEATHER_HOURLY_FIELDS = [
+const AIR_QUALITY_FIELDS = [
+export function isWeatherResponse(value) {
+function isWeatherResponse(value) {
+const payloads = Array.isArray(value) ? value : [value]
+export function isJetStreamResponse(value) {
+function isJetStreamResponse(value) {
+const payloads = Array.isArray(value) ? value : [value]
+export function isAirQualityResponse(value) {
+function isAirQualityResponse(value) {
+const payloads = Array.isArray(value) ? value : [value]
+export function parseProviderBody(body, validate) {
+function parseProviderBody(body, validate) {
+const value = JSON.parse(body)
+function isRecord(value) {</file>
+<file path="src/App.tsx" level="3" tokens="1085">import { CssBaseline, ThemeProvider, createTheme } from &apos;@mui/material&apos;
+import { Suspense, lazy, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from &apos;react&apos;
+import { AetherHeader } from &apos;./components/AetherHeader&apos;
+import { ForecastDateLabel } from &apos;./components/ForecastDateLabel&apos;
+import { MapWeatherTooltip } from &apos;./components/MapWeatherTooltip&apos;
+... 13 more imports
+const REVERSE_GEOCODE_DEBOUNCE_MS = 350
+const AetherMap = lazy(async () =&gt; ({
+const WeatherDashboard = lazy(async () =&gt; ({
+const theme = createTheme({
+const [weather, setWeather] = useState&lt;WeatherConfig | null&gt;(null)
+const lastWeatherRef = useRef&lt;WeatherConfig | null&gt;(null)
+const [status, setStatus] = useState(&apos;Reading sky&apos;)
+const [weatherDataState, setWeatherDataState] = useState&lt;WeatherDataState&gt;(&apos;loading&apos;)
+const [weatherRequest, setWeatherRequest] = useState(0)
+const forceWeatherRefreshRef = useRef(false)
+const [officialHeatAlerts, setOfficialHeatAlerts] = useState&lt;HeatAlert[]&gt;([])
+const [ecmwfForecast, setEcmwfForecast] = useState&lt;EcmwfForecast | null&gt;(null)
+const [ecmwfLoading, setEcmwfLoading] = useState(true)
+const [ecmwfFrame, setEcmwfFrame] = useState&lt;WeatherEvolutionFrame | null&gt;(null)
+const [ecmwfPlaybackTime, setEcmwfPlaybackTime] = useState&lt;string | null&gt;(null)
+const [selectedLocation, setSelectedLocation] = useState&lt;WeatherLocation&gt;(
+const [selectedForecastReady, setSelectedForecastReady] = useState(false)
+const [weatherMode, setWeatherMode] = useState&lt;WeatherMode&gt;(readUrlMode)
+const mapWeatherMode = useDeferredValue(weatherMode)
+const [viewport, setViewport] = useState&lt;WeatherViewport | null&gt;(null)
+const previousJetStreamViewportRef = useRef&lt;WeatherViewport | null&gt;(null)
+const jetStreamViewportRef = useRef&lt;WeatherViewport | null&gt;(null)
+const jetStreamLocationRef = useRef(&apos;&apos;)
+const [mapSamples, setMapSamples] = useState&lt;WeatherMapSample[]&gt;([])
+const [jetStreamSamples, setJetStreamSamples] = useState&lt;JetStreamSample[]&gt;([])
+const [airQualitySamples, setAirQualitySamples] = useState&lt;AirQualityMapSample[]&gt;([])
+const [pointerWeather, setPointerWeather] = useState&lt;MapWeatherPointer | null&gt;(null)
+const [radarOpacity, setRadarOpacity] = useState(loadRadarOpacity)
+const reverseGeocodeAbortRef = useRef&lt;AbortController | null&gt;(null)
+const reverseGeocodeTimeoutRef = useRef(0)
+const reverseGeocodeRequestRef = useRef(0)
+const selectedAirQuality = useMemo(
+const displayedWeather = useMemo(() =&gt; {
+const displayedSamples = useMemo(
+let cancelled = false
+async function loadWeather() {
+const forceRefresh = forceWeatherRefreshRef.current
+const forecast = await fetchOpenMeteoForecast(
+const nextWeather = translateWeather(forecast.payload, selectedLocation)
+const cachedWeather = await getCachedWeatherForLocation(selectedLocation)
+const fallback = cachedWeather ?? lastWeatherRef.current
+const controller = new AbortController()
+let cancelled = false
+const handleViewportChange = useCallback((nextViewport: WeatherViewport) =&gt; {
+const handlePointerWeatherChange = useCallback((reading: MapWeatherPointer | null) =&gt; {
+let cancelled = false
+let loading = false
+const cachedSamples = getCachedWeatherMapSamples(viewport)
+const applyPersistentCache = async () =&gt; {
+const samples = await hydrateWeatherMapCache(viewport)
+const controller = new AbortController()
+const refreshVisibleWeather = async () =&gt; {
+const samples = await fetchWeatherMapSamples(viewport, controller.signal)
+const refreshWhenVisible = () =&gt; {
+const timeout = window.setTimeout(refreshVisibleWeather, 120)
+const interval = window.setInterval(refreshVisibleWeather, WEATHER_REFRESH_INTERVAL)
+const locationKey = `${selectedLocation.latitude}:${selectedLocation.longitude}`
+const locationChanged = jetStreamLocationRef.current !== locationKey
+const previousViewport = previousJetStreamViewportRef.current
+const zoomChanged = previousViewport !== null &amp;&amp;
+const samplingViewport = jetStreamViewportRef.current
+const controller = new AbortController()
+let cancelled = false
+let loading = false
+const refreshJetStream = async () =&gt; {
+const samples = await fetchJetStreamSamples(
+const timeout = window.setTimeout(refreshJetStream, 120)
+const interval = window.setInterval(
+let cancelled = false
+let loading = false
+const refreshAirQuality = async () =&gt; {
+const samples = await fetchAirQualityMapSamples(viewport)
+const refreshWhenVisible = () =&gt; {
+const timeout = window.setTimeout(refreshAirQuality, 180)
+const interval = window.setInterval(refreshAirQuality, AIR_QUALITY_REFRESH_INTERVAL)
+function handleMapClick(location: WeatherLocation) {
+const requestId = reverseGeocodeRequestRef.current
+const controller = new AbortController()
+const label = await reverseGeocode(
+async function handleCitySearch(query: string) {
+const nextLocation = await searchCity(query)
+function handleSavedLocationSelect(location: WeatherLocation) {
+function handleRadarOpacityChange(opacity: number) {
+function handleWeatherRetry() {
+function cancelPendingReverseGeocode() {</file>
+<file path="src/components/AetherHeader.tsx" level="3" tokens="113">import SearchIcon from &apos;@mui/icons-material/Search&apos;
+import { Box, IconButton, Stack, TextField, Tooltip, Typography } from &apos;@mui/material&apos;
+import { useState } from &apos;react&apos;
+import type { FormEvent } from &apos;react&apos;
+import type { WeatherDataState, WeatherLocation } from &apos;../types/weather&apos;
+... 2 more imports
+type AetherHeaderProps = {
+export function AetherHeader({
+function AetherHeader({
+const [query, setQuery] = useState(&apos;&apos;)
+function handleSubmit(event: FormEvent&lt;HTMLFormElement&gt;) {
+const DATA_STATE_TOOLTIP = (</file>
+<file path="src/components/AetherMap.tsx" level="3" tokens="807">import L from &apos;leaflet&apos;
+import { useEffect, useRef } from &apos;react&apos;
+import type { KeyboardEvent } from &apos;react&apos;
+import { WeatherMapAnimation } from &apos;../map/WeatherMapAnimation&apos;
+import { WeatherRadarLayer } from &apos;../map/WeatherRadarLayer&apos;
+... 7 more imports
+const WORLD_BOUNDS = L.latLngBounds(
+const MAP_TILE_STYLE_KEY = &apos;aether:map-tile-style&apos;
+const FIRE_LAYER_DESCRIPTION = [
+type MapTileStyle = &apos;standard&apos; | &apos;dark&apos;
+type AetherMapProps = {
+export function AetherMap({
+function AetherMap({
+const elementRef = useRef&lt;HTMLDivElement | null&gt;(null)
+const initialLocationRef = useRef(location)
+const locationRef = useRef(location)
+const mapRef = useRef&lt;L.Map | null&gt;(null)
+const badgeLayerRef = useRef&lt;L.LayerGroup | null&gt;(null)
+const animationRef = useRef&lt;WeatherMapAnimation | null&gt;(null)
+const radarRef = useRef&lt;WeatherRadarLayer | null&gt;(null)
+const samplesRef = useRef(samples)
+const jetStreamSamplesRef = useRef(jetStreamSamples)
+const airQualitySamplesRef = useRef(airQualitySamples)
+const pointerCallbackRef = useRef(onPointerWeatherChange)
+const clickCallbackRef = useRef(onMapClick)
+const clickedLatRef = useRef(0)
+const clickedLngRef = useRef(0)
+const pointerRefreshRef = useRef&lt;() =&gt; void&gt;(() =&gt; {})
+const lastPointerRef = useRef&lt;{
+const frameRef = useRef(0)
+const pointerFrameRef = useRef(0)
+const initialLocation = initialLocationRef.current
+const reducedMotion = prefersReducedMotion()
+const motionQuery = window.matchMedia(REDUCED_MOTION_QUERY)
+const map = L.map(elementRef.current, {
+const standardTiles = L.tileLayer(
+const darkTiles = L.tileLayer(
+const tileStyle = loadMapTileStyle()
+const initialTiles = tileStyle === &apos;dark&apos; ? darkTiles : standardTiles
+const reportedFires = new ReportedFireLayer(map)
+const fireTiles = L.tileLayer(
+const effisFireTiles = L.tileLayer(
+const tileControl = L.control.layers(
+const overlayInputs = Array.from(
+const heatLayerInput = overlayInputs[0]
+const reportedFireInput = overlayInputs[1]
+const effisFireInput = overlayInputs[2]
+const handleTileStyleChange = (event: L.LayersControlEvent) =&gt; {
+const animation = new WeatherMapAnimation(map, elementRef.current)
+const radar = new WeatherRadarLayer(map)
+const emitViewport = () =&gt; {
+const bounds = map.getBounds()
+const scheduleViewport = () =&gt; {
+let pointerWeatherBlocked = false
+const emitPointerWeather = () =&gt; {
+const pointer = lastPointerRef.current
+const reading = interpolateWeatherAt(
+const size = map.getSize()
+const airQuality = interpolateAirQualityAt(
+const jetStream = interpolateJetStreamAt(
+const handleMouseMove = (event: L.LeafletMouseEvent) =&gt; {
+const clearPointerWeather = () =&gt; {
+const pointerBlockingControls = [
+const blockPointerWeather = () =&gt; {
+const unblockPointerWeather = () =&gt; {
+const handleMapClick = (event: L.LeafletMouseEvent) =&gt; {
+const handleWindowResize = () =&gt; {
+const handleMotionPreferenceChange = (event: MediaQueryListEvent) =&gt; {
+const map = mapRef.current
+const nextCenter: L.LatLngExpression = [location.latitude, location.longitude]
+const currentCenter = map.getCenter()
+const latDelta = Math.abs(currentCenter.lat - location.latitude)
+const lngDelta = Math.abs(currentCenter.lng - location.longitude)
+const nextZoom = Math.max(map.getZoom(), 10)
+const badgeLayer = badgeLayerRef.current
+const marker = L.marker([sample.latitude, sample.longitude], {
+function handleMapKeyDown(event: KeyboardEvent&lt;HTMLDivElement&gt;) {
+const map = mapRef.current
+const center = map.getCenter()
+const selectedLocation = locationRef.current
+function saveMapTileStyle(style: MapTileStyle) {</file>
+<file path="src/components/EcmwfForecastTimeline.tsx" level="3" tokens="460">import PauseIcon from &apos;@mui/icons-material/Pause&apos;
+import PlayArrowIcon from &apos;@mui/icons-material/PlayArrow&apos;
+import { Box, IconButton, Typography } from &apos;@mui/material&apos;
+import { type CSSProperties, useEffect, useMemo, useState } from &apos;react&apos;
+import type { EcmwfForecast } from &apos;../types/weather&apos;
+... 2 more imports
+type EcmwfForecastTimelineProps = {
+export function EcmwfForecastTimeline({
+function EcmwfForecastTimeline({
+const [frameIndex, setFrameIndex] = useState(0)
+const [playing, setPlaying] = useState(false)
+const [hasPlayed, setHasPlayed] = useState(false)
+const frames = forecast?.frames ?? []
+const selected = frames[frameIndex]
+const points = useMemo(() =&gt; buildTemperaturePoints(frames), [frames])
+const temperatureRange = useMemo(() =&gt; getTemperatureRange(frames), [frames])
+const isEcmwf = forecast?.model.includes(&apos;ECMWF&apos;) ?? false
+const currentIndex = frames.findIndex(frame =&gt; (
+const interval = window.setInterval(() =&gt; {
+const temperatures = frames.map(frame =&gt; frame.temperature)
+const minimum = Math.min(...temperatures)
+const range = Math.max(...temperatures) - minimum || 1
+const x = index / Math.max(1, frames.length - 1) * 240
+const y = 38 - (frame.temperature - minimum) / range * 34
+const temperatures = frames.map(frame =&gt; frame.temperature)
+const minimum = Math.min(...temperatures)
+const range = Math.max(...temperatures) - minimum || 1
+function buildForecastStyle(
+const warmth = clamp(
+const rain = clamp(frame.precipitation / 3, 0, 1)
+const snow = clamp(frame.snowfall / 2, 0, 1)
+const cloud = clamp(frame.cloudOpacity, 0, 1)
+const wind = clamp(frame.rawWindSpeed / 70, 0, 1)
+const coldHue = 205
+const warmHue = 26
+const hue = coldHue + (warmHue - coldHue) * warmth
+function clamp(value: number, minimum: number, maximum: number) {
+function formatForecastTime(value: string) {</file>
+<file path="src/components/ForecastDateLabel.tsx" level="3" tokens="43">import { Typography } from &apos;@mui/material&apos;
+type ForecastDateLabelProps = {
+export function ForecastDateLabel({ time }: ForecastDateLabelProps) {
+function ForecastDateLabel({ time }: ForecastDateLabelProps) {</file>
+<file path="src/components/LocationBookmarks.tsx" level="3" tokens="225">import BookmarkBorderIcon from &apos;@mui/icons-material/BookmarkBorder&apos;
+import BookmarkIcon from &apos;@mui/icons-material/Bookmark&apos;
+import HistoryIcon from &apos;@mui/icons-material/History&apos;
+import StarBorderIcon from &apos;@mui/icons-material/StarBorder&apos;
+import StarIcon from &apos;@mui/icons-material/Star&apos;
+... 4 more imports
+type LocationBookmarksProps = {
+const FAVORITES_KEY = &apos;aether:favorite-locations&apos;
+const RECENTS_KEY = &apos;aether:recent-locations&apos;
+const MAX_RECENTS = 5
+export function LocationBookmarks({
+function LocationBookmarks({
+const [anchorElement, setAnchorElement] = useState&lt;HTMLElement | null&gt;(null)
+const [favorites, setFavorites] = useState&lt;WeatherLocation[]&gt;(
+const [recents, setRecents] = useState&lt;WeatherLocation[]&gt;(
+const isFavorite = useMemo(
+const next = [
+function openMenu(event: MouseEvent&lt;HTMLElement&gt;) {
+function closeMenu() {
+function toggleFavorite() {
+const next = isFavorite
+function selectLocation(nextLocation: WeatherLocation) {
+if (!value || typeof value !== &apos;object&apos;) {</file>
+<file path="src/components/MapWeatherTooltip.tsx" level="3" tokens="130">import AirIcon from &apos;@mui/icons-material/Air&apos;
+import BlurOnIcon from &apos;@mui/icons-material/BlurOn&apos;
+import DeviceThermostatIcon from &apos;@mui/icons-material/DeviceThermostat&apos;
+import FlightIcon from &apos;@mui/icons-material/Flight&apos;
+import WaterDropIcon from &apos;@mui/icons-material/WaterDrop&apos;
+... 1 more imports
+type MapWeatherTooltipProps = {
+const directions = [&apos;N&apos;, &apos;NE&apos;, &apos;E&apos;, &apos;SE&apos;, &apos;S&apos;, &apos;SW&apos;, &apos;W&apos;, &apos;NW&apos;]
+const degrees = angle * 180 / Math.PI
+const index = Math.round(degrees / 45) % directions.length</file>
+<file path="src/components/OfflineStatus.tsx" level="3" tokens="72">import CloudOffOutlinedIcon from &apos;@mui/icons-material/CloudOffOutlined&apos;
+import { useEffect, useState } from &apos;react&apos;
+export function OfflineStatus() {
+function OfflineStatus() {
+const [isOnline, setIsOnline] = useState(() =&gt; navigator.onLine)
+const handleOnline = () =&gt; setIsOnline(true)
+const handleOffline = () =&gt; setIsOnline(false)</file>
+<file path="src/components/RadarOpacityControl.tsx" level="3" tokens="43">import OpacityIcon from &apos;@mui/icons-material/Opacity&apos;
+import { Box, Slider, Typography } from &apos;@mui/material&apos;
+import type { WeatherMode } from &apos;../types/weather&apos;
+type RadarOpacityControlProps = {</file>
+<file path="src/components/SevereWeatherAlerts.tsx" level="3" tokens="243">import { Alert, AlertTitle, Stack } from &apos;@mui/material&apos;
+import { useState } from &apos;react&apos;
+import type { HeatAlert, WeatherConfig } from &apos;../types/weather&apos;
+const THUNDERSTORM_CODES = new Set([95, 96, 99])
+const HEAVY_RAIN_CODES = new Set([65, 67, 82])
+const SNOW_CODES = new Set([71, 73, 75, 77, 85, 86])
+const HEAVY_RAIN_THRESHOLD = 7.5
+const SNOW_THRESHOLD = 0.5
+type SevereAlert = {
+const alerts = getSevereWeatherAlerts(weather, officialHeatAlerts)
+const signature = [
+const [dismissed, setDismissed] = useState&lt;{
+const dismissedIds = dismissed.signature === signature ? dismissed.ids : []
+const visibleAlerts = alerts.filter(alert =&gt; !dismissedIds.includes(alert.id))
+function dismiss(alertId: string) {
+const alerts: SevereAlert[] = []
+const heatRisk = weather.heatRisk
+const isHeatWave = heatRisk.kind === &apos;heat-wave&apos;
+const isExtremeHeat = heatRisk.kind === &apos;extreme-heat&apos;</file>
+<file path="src/components/SunTimes.tsx" level="3" tokens="112">import DarkModeIcon from &apos;@mui/icons-material/DarkMode&apos;
+import LightModeIcon from &apos;@mui/icons-material/LightMode&apos;
+import { Box, Typography } from &apos;@mui/material&apos;
+type SunTimesProps = {
+export function SunTimes({ sunrise, sunset }: SunTimesProps) {
+function SunTimes({ sunrise, sunset }: SunTimesProps) {
+type SunTimeProps = {
+function SunTime({ icon, label, value }: SunTimeProps) {
+function formatSunTime(value: string | null) {
+const time = value.split(&apos;T&apos;)[1]</file>
+<file path="src/components/WeatherDashboard.tsx" level="3" tokens="378">import AirIcon from &apos;@mui/icons-material/Air&apos;
+import BlurOnIcon from &apos;@mui/icons-material/BlurOn&apos;
+import DeviceThermostatIcon from &apos;@mui/icons-material/DeviceThermostat&apos;
+import FlightIcon from &apos;@mui/icons-material/Flight&apos;
+import ThunderstormIcon from &apos;@mui/icons-material/Thunderstorm&apos;
+... 7 more imports
+type WeatherDashboardProps = {
+const visualForecast = useMemo(() =&gt; {
+const visibleFrames = frames.slice(0, 12)
+const chartHeight = 52
+const chartWidth = visibleFrames.length * 24
+const temperatures = visibleFrames.map(f =&gt; f.temperature)
+const minTemp = Math.min(...temperatures)
+const maxTemp = Math.max(...temperatures)
+const tempRange = maxTemp - minTemp || 1
+const precipitations = visibleFrames.map(f =&gt; f.precipitation)
+const maxPrecip = Math.max(...precipitations, 0.5)
+const tempPoints = visibleFrames
+const x = index * 24 + 12
+const y = 8 + (1 - (frame.temperature - minTemp) / tempRange) * (chartHeight - 24)
+const precipBars = visibleFrames
+const barHeight = Math.max(0, (frame.precipitation / maxPrecip) * (chartHeight - 16))
+const x = index * 24
+const timeLabels = visibleFrames
+const hour = new Date(frame.time).getHours()
+const x = index * 24 + 12
+const y = 8 + (1 - (frame.temperature - minTemp) / tempRange) * (chartHeight - 24)
+function formatWind(weather: WeatherConfig | null) {
+function formatPrecipitation(weather: WeatherConfig | null) {
+function formatAirQuality(airQuality: AirQualityReading | null) {</file>
+<file path="src/components/WeatherErrorBoundary.tsx" level="3" tokens="101">import { Component } from &apos;react&apos;
+import type { ErrorInfo, ReactNode } from &apos;react&apos;
+type WeatherErrorBoundaryProps = {
+type WeatherErrorBoundaryState = {
+export class WeatherErrorBoundary extends Component&lt;
+class WeatherErrorBoundary extends Component&lt;
+static getDerivedStateFromError(): WeatherErrorBoundaryState {
+componentDidCatch(error: Error, info: ErrorInfo) {
+componentDidUpdate(previousProps: WeatherErrorBoundaryProps) {
+render() {
+const isMap = this.props.area === &apos;map&apos;</file>
+<file path="src/components/WeatherRetryButton.tsx" level="3" tokens="40">import RefreshIcon from &apos;@mui/icons-material/Refresh&apos;
+import { IconButton, Tooltip } from &apos;@mui/material&apos;
+type WeatherRetryButtonProps = {
+export function WeatherRetryButton({
+function WeatherRetryButton({</file>
+<file path="src/data/cityCatalog.ts" level="3" tokens="86">import type { WeatherLocation } from &apos;../types/weather&apos;
+export type CityOption = WeatherLocation &amp; {
+type CityOption = WeatherLocation &amp; {
+export type RegionOption = {
+type RegionOption = {
+export type CountryOption = {
+type CountryOption = {
+export const cityCatalog: CountryOption[] = [
+const cityCatalog: CountryOption[] = [
+export const defaultCity: WeatherLocation = {
+const defaultCity: WeatherLocation = {</file>
+<file path="src/main.ts" level="3" tokens="33">import React from &apos;react&apos;
+import ReactDOM from &apos;react-dom/client&apos;
+import App from &apos;./App&apos;
+import &apos;leaflet/dist/leaflet.css&apos;
+import &apos;./style.css&apos;</file>
+<file path="src/map/ReportedFireLayer.ts" level="3" tokens="190">import L from &apos;leaflet&apos;
+import { fetchWithTimeout } from &apos;../../shared/fetchTimeout.js&apos;
+type ReportedFire = {
+const REFRESH_INTERVAL_MS = 15 * 60 * 1000
+const REQUEST_TIMEOUT_MS = 8000
+export class ReportedFireLayer {
+class ReportedFireLayer {
+constructor(map: L.Map) {
+getLeafletLayer() {
+start() {
+destroy() {
+private async load() {
+const response = await fetchWithTimeout(
+const payload = await response.json() as { fires?: ReportedFire[] }
+private render(fires: ReportedFire[]) {
+const marker = L.circleMarker([fire.latitude, fire.longitude], {
+private stopRefresh() {
+function buildPopup(fire: ReportedFire) {
+const container = document.createElement(&apos;div&apos;)
+const title = document.createElement(&apos;strong&apos;)
+const description = document.createElement(&apos;p&apos;)
+const details = [
+const metadata = document.createElement(&apos;p&apos;)
+const source = document.createElement(&apos;a&apos;)</file>
+<file path="src/map/WeatherFieldRenderer.ts" level="3" tokens="801">import {
+import type {
+export class WeatherFieldRenderer {
+class WeatherFieldRenderer {
+constructor(
+const temperatureContext = this.temperatureCanvas.getContext(&apos;2d&apos;)
+const airQualityContext = this.airQualityCanvas.getContext(&apos;2d&apos;)
+setViewport(width: number, height: number, reducedMotion: boolean) {
+markDataChanged(temperatureChanged: boolean, airQualityChanged: boolean) {
+invalidate() {
+drawTemperature(samples: ProjectedSample[], time: number) {
+const pulse = this.reducedMotion ? 0 : Math.sin(time * 0.4) * 0.025
+drawAirQuality(samples: ProjectedAirQualitySample[], time: number) {
+const pulse = this.reducedMotion ? 0 : Math.sin(time * 0.35) * 0.02
+private renderTemperatureTexture(samples: ProjectedSample[]) {
+const startedAt = performance.now()
+const scale = 8
+const width = Math.max(1, Math.ceil(this.width / scale))
+const height = Math.max(1, Math.ceil(this.height / scale))
+const image = this.temperatureContext.createImageData(width, height)
+let row = 0;
+const screenY = (row + 0.5) * this.height / height
+let column = 0;
+const screenX = (column + 0.5) * this.width / width
+const temperature = interpolateTemperature(screenX, screenY, samples)
+const color = temperatureColor(temperature)
+const offset = (row * width + column) * 4
+private renderAirQualityTexture(samples: ProjectedAirQualitySample[]) {
+const startedAt = performance.now()
+const scale = 8
+const width = Math.max(1, Math.ceil(this.width / scale))
+const height = Math.max(1, Math.ceil(this.height / scale))
+const image = this.airQualityContext.createImageData(width, height)
+let row = 0;
+const screenY = (row + 0.5) * this.height / height
+let column = 0;
+const screenX = (column + 0.5) * this.width / width
+const airQuality = interpolateAirQuality(screenX, screenY, samples)
+const color = airQualityColor(airQuality)
+const offset = (row * width + column) * 4
+private drawTemperatureLegend(samples: ProjectedSample[]) {
+const temperatures = samples.map(({ sample }) =&gt; sample.temperature)
+const minimum = Math.min(...temperatures)
+const maximum = Math.max(...temperatures)
+const legendWidth = Math.min(440, this.width - 48)
+const x = (this.width - legendWidth) / 2
+const y = this.height - 34
+const gradient = this.context.createLinearGradient(x, 0, x + legendWidth, 0)
+let step = 0;
+const color = temperatureColor(-15 + step * 5)
+private drawAirQualityLegend(samples: ProjectedAirQualitySample[]) {
+const values = samples.map(({ sample }) =&gt; sample.europeanAqi)
+const minimum = Math.min(...values)
+const maximum = Math.max(...values)
+const legendWidth = Math.min(440, this.width - 48)
+const x = (this.width - legendWidth) / 2
+const y = this.height - 34
+const gradient = this.context.createLinearGradient(x, 0, x + legendWidth, 0)
+let step = 0;
+const color = airQualityColor(step * 10)
+private drawLegendFrame(
+function interpolateTemperature(
+function interpolateAirQuality(
+function interpolateNearestFour(
+const nearest = [
+const deltaX = sample.x - x
+const deltaY = sample.y - y
+const distance = deltaX * deltaX + deltaY * deltaY
+let index = 0;
+let shift = nearest.length - 1;
+let weightedValue = 0
+let totalWeight = 0
+const weight = 1 / (sample.distance + 400)</file>
+<file path="src/map/WeatherParticleRenderer.ts" level="3" tokens="842">import L from &apos;leaflet&apos;
+import type { JetStreamSample } from &apos;../types/weather&apos;
+import {
+import type {
+import {
+const PARTICLE_COUNT = 560
+export class WeatherParticleRenderer {
+class WeatherParticleRenderer {
+constructor(map: L.Map, context: CanvasRenderingContext2D) {
+setViewport(width: number, height: number, reducedMotion: boolean) {
+reset() {
+drawWind(samples: ProjectedSample[], deltaTime: number) {
+const averageWind = samples.reduce(
+const activeCount = Math.min(
+const paths = WIND_COLORS.map(() =&gt; new Path2D())
+const usedBuckets = new Set&lt;number&gt;()
+let index = 0;
+const particle = this.particles[index]
+const field = windFieldAt(particle.x, particle.y, samples)
+const speed = 25 + field.speed * 2.5
+const tail = 5 + Math.min(field.speed, 80) * 0.28
+const bucket = Math.min(
+const path = paths[bucket]
+drawJetStream(samples: JetStreamSample[], deltaTime: number) {
+const averageSpeed = samples.reduce(
+const activeCount = Math.min(
+const paths = JET_STREAM_OUTLINE_COLORS.map(() =&gt; (
+const usedPaths: Array&lt;{ stream: number, bucket: number }&gt; = []
+const usedPathKeys = new Set&lt;string&gt;()
+let index = 0;
+const particle = this.particles[index]
+const location = this.map.containerPointToLatLng([
+const field = jetStreamFieldAt(
+const speed = 24 + Math.min(field.speed, 320) * 0.72
+const tail = 12 + Math.min(field.speed, 320) * 0.17
+const bucket = Math.max(
+const stream = jetStreamBandAt(location.lat)
+const path = paths[stream][bucket]
+const pathKey = `${stream}:${bucket}`
+drawPrecipitation(samples: ProjectedSample[], deltaTime: number) {
+const wetSamples = samples.filter(({ sample }) =&gt; (
+const totalStrength = wetSamples.reduce(
+const activeCount = Math.min(
+let index = 0;
+const particle = this.particles[index]
+const field = windFieldAt(particle.x, particle.y, samples)
+const fallSpeed = 130 + particle.strength * 390
+const drift = field.x * (22 + field.speed * 0.45)
+drawStorm(samples: ProjectedSample[], deltaTime: number, time: number) {
+const stormSamples = samples.filter(({ sample }) =&gt; (
+const strength = Math.min(
+const source = stormSamples[
+private drawWindLegend() {
+const legendWidth = Math.min(360, this.width - 48)
+const x = (this.width - legendWidth) / 2
+const y = this.height - 34
+const gradient = this.context.createLinearGradient(x, 0, x + legendWidth, 0)
+let index = 0;
+private drawJetStreamLegend() {
+const legendWidth = Math.min(380, this.width - 48)
+const x = (this.width - legendWidth) / 2
+const y = this.height - 34
+const gradient = this.context.createLinearGradient(x, 0, x + legendWidth, 0)
+let index = 0;
+private updateLightning(deltaTime: number) {
+let flash = 0
+let index = this.lightning.length - 1;
+const segment = this.lightning[index]
+private spawnLightning(startX: number, startY: number) {
+let x = startX
+let y = startY
+let segment = 0;
+const nextX = x + (Math.random() - 0.5) * 48
+const nextY = y + 20 + Math.random() * 22
+private resetWindParticle(particle: Particle) {
+private resetPrecipitationParticle(
+const source = samples[Math.floor(Math.random() * samples.length)]
+const strength = precipitationStrength(source.sample)
+const angle = particle.seed * 7.13
+const distance = Math.sqrt(Math.random()) * (50 + strength * 130)
+private isOutside(x: number, y: number, padding: number) {</file>
+<file path="src/map/WeatherRadarLayer.ts" level="3" tokens="281">import L from &apos;leaflet&apos;
+import type { WeatherMode } from &apos;../types/weather&apos;
+import { REDUCED_MOTION_QUERY } from &apos;../utils/motion&apos;
+import { fetchWithTimeout } from &apos;../../shared/fetchTimeout.js&apos;
+type RadarFrame = {
+type RadarMetadata = {
+const METADATA_URL = &apos;https://api.rainviewer.com/public/weather-maps.json&apos;
+const METADATA_REFRESH = 5 * 60 * 1000
+const FRAME_DURATION = 1100
+const FRAME_COUNT = 6
+const PANE_NAME = &apos;weather-radar-pane&apos;
+export class WeatherRadarLayer {
+class WeatherRadarLayer {
+constructor(map: L.Map) {
+const pane = map.createPane(PANE_NAME)
+start() {
+setMode(mode: WeatherMode) {
+const visible = mode === &apos;precipitation&apos; || mode === &apos;storm&apos;
+setOpacity(opacity: number) {
+destroy() {
+private async refreshMetadata() {
+const response = await fetchWithTimeout(METADATA_URL)
+const metadata = (await response.json()) as RadarMetadata
+private showLatestFrame() {
+private startFrameLoop() {
+private stopFrameLoop() {
+private showFrame(frame: RadarFrame) {
+const url = `${this.host}${frame.path}/256/{z}/{x}/{y}/2/1_1.png`
+const nextLayer = L.tileLayer(url, {
+private removeLayers() {</file>
+<file path="src/map/weatherAnimationTypes.ts" level="3" tokens="53">import type {
+export type Particle = {
+type Particle = {
+export type ProjectedSample = {
+type ProjectedSample = {
+export type ProjectedAirQualitySample = {
+type ProjectedAirQualitySample = {
+export type LightningSegment = {
+type LightningSegment = {</file>
+<file path="src/map/weatherBadge.ts" level="3" tokens="60">import type { WeatherMapSample, WeatherMode } from &apos;../types/weather&apos;
+export function renderWeatherBadge(
+function renderWeatherBadge(
+const estimate = sample.estimated ? &apos;~&apos; : &apos;&apos;
+function formatMetric(sample: WeatherMapSample, mode: WeatherMode) {
+function escapeHtml(value: string) {</file>
+<file path="src/map/weatherPalette.ts" level="3" tokens="151">export const WIND_COLORS = [
+const WIND_COLORS = [
+export const JET_STREAM_COLORS = [
+const JET_STREAM_COLORS = [
+export const JET_STREAM_OUTLINE_COLORS = [
+const JET_STREAM_OUTLINE_COLORS = [
+export const JET_STREAM_NAMES = [
+const JET_STREAM_NAMES = [
+export function airQualityColor(airQuality: number) {
+function airQualityColor(airQuality: number) {
+export function temperatureColor(temperature: number) {
+function temperatureColor(temperature: number) {
+type ColorStop = {
+function interpolateColor(value: number, stops: ColorStop[]) {
+const upperIndex = stops.findIndex(stop =&gt; stop.value &gt;= value)
+const upper = stops[
+const lower = stops[
+const amount = Math.min(</file>
+<file path="src/map/weatherVectorFields.ts" level="3" tokens="311">import { geographicDistanceSquared } from &apos;../services/jetStream&apos;
+import type {
+import type { ProjectedSample } from &apos;./weatherAnimationTypes&apos;
+export function windFieldAt(
+function windFieldAt(
+let vectorX = 0
+let vectorY = 0
+let totalWeight = 0
+const distanceX = projected.x - x
+const distanceY = projected.y - y
+const distanceSquared = distanceX * distanceX + distanceY * distanceY
+const weight = 1 / Math.max(distanceSquared, 64)
+const speed = projected.sample.rawWindSpeed
+const vector = windVector(projected.sample.windAngle)
+const eastwardSpeed = vectorX / (totalWeight || 1)
+const southwardSpeed = vectorY / (totalWeight || 1)
+const speed = Math.hypot(eastwardSpeed, southwardSpeed)
+const length = speed || 1
+export function jetStreamFieldAt(
+function jetStreamFieldAt(
+let eastward = 0
+let northward = 0
+let totalWeight = 0
+const distanceSquared = geographicDistanceSquared(
+const weight = 1 / (distanceSquared + 90000)
+const speed = Math.hypot(eastward, northward)
+const length = speed || 1
+export function jetStreamBandAt(latitude: number) {
+function jetStreamBandAt(latitude: number) {
+export function precipitationStrength(sample: WeatherMapSample) {
+function precipitationStrength(sample: WeatherMapSample) {
+function windVector(angle: number) {</file>
+<file path="src/services/airQuality.ts" level="3" tokens="639">import type {
+import { getVisibleWeatherGrid } from &apos;./weatherGrid&apos;
+import { getWeatherCacheKey } from &apos;./weatherCache&apos;
+import { getMapSampleLimit, observeUpstreamBudget } from &apos;./upstreamBudget&apos;
+import { openStorage } from &apos;./storage&apos;
+... 3 more imports
+const AIR_QUALITY_ENDPOINT = &apos;/api/air-quality&apos;
+const CURRENT_FIELDS = [
+const FRESHNESS = 60 * 60 * 1000
+const MAX_CACHE_AGE = 24 * 60 * 60 * 1000
+const BATCH_SIZE = 32
+const BATCH_DELAY_MS = 250
+const STORE_NAME = &apos;air-quality-samples&apos;
+const MAX_STORED_SAMPLES = 1000
+const sampleCache = new Map&lt;string, AirQualityMapSample&gt;()
+let persistTimer = 0
+let cacheLoaded = false
+let lastBatchFetchTime = 0
+export const AIR_QUALITY_REFRESH_INTERVAL = FRESHNESS
+const AIR_QUALITY_REFRESH_INTERVAL = FRESHNESS
+export async function fetchAirQualityMapSamples(viewport: WeatherViewport) {
+async function fetchAirQualityMapSamples(viewport: WeatherViewport) {
+const points = getVisibleWeatherGrid(viewport)
+const refreshPoints = points.filter(point =&gt; {
+const sample = sampleCache.get(getWeatherCacheKey(point.latitude, point.longitude))
+const freshSamples: AirQualityMapSample[] = []
+let index = 0;
+const remainingBudget = getMapSampleLimit() - index
+const batch = refreshPoints.slice(
+export function getCachedAirQualityMapSamples(viewport: WeatherViewport) {
+function getCachedAirQualityMapSamples(viewport: WeatherViewport) {
+export function interpolateAirQualityAt(
+function interpolateAirQualityAt(
+const nearbySamples = samples
+const totalWeight = nearbySamples.reduce(
+const weighted = (pick: (sample: AirQualityMapSample) =&gt; number) =&gt; (
+async function fetchAirQualityBatch(points: WeatherLocation[]) {
+const params = new URLSearchParams({
+const response = await fetchWithTimeout(
+const body = (await response.json()) as OpenMeteoAirQualityResponse | OpenMeteoAirQualityResponse[]
+const payloads = Array.isArray(body) ? body : [body]
+const updatedAt = Date.now()
+function mapAirQualitySample(
+const current = payload.current
+const values = [
+function getSamplesForPoints(points: WeatherLocation[]) {
+function rememberSamples(samples: AirQualityMapSample[]) {
+const key = getWeatherCacheKey(sample.latitude, sample.longitude)
+const oldestKey = sampleCache.keys().next().value
+async function loadCache() {
+const database = await openStorage()
+const records = await new Promise&lt;AirQualityMapSample[]&gt;(resolve =&gt; {
+const transaction = database.transaction(STORE_NAME, &apos;readonly&apos;)
+const request = transaction.objectStore(STORE_NAME).getAll()
+const now = Date.now()
+function schedulePersist() {
+async function persistCache() {
+const database = await openStorage()
+const samples = Array.from(sampleCache.values())
+const transaction = database.transaction(STORE_NAME, &apos;readwrite&apos;)
+const store = transaction.objectStore(STORE_NAME)
+async function throttleBatchDelay() {
+const elapsed = Date.now() - lastBatchFetchTime</file>
+<file path="src/services/appState.ts" level="3" tokens="293">import { defaultCity } from &apos;../data/cityCatalog&apos;
+import type { WeatherLocation, WeatherMode } from &apos;../types/weather&apos;
+const STORED_LOCATION_KEY = &apos;aether:location&apos;
+const RADAR_OPACITY_KEY = &apos;aether:radar-opacity&apos;
+const WEATHER_MODES: readonly WeatherMode[] = [
+export function loadInitialLocation() {
+function loadInitialLocation() {
+export function readUrlMode(): WeatherMode {
+function readUrlMode(): WeatherMode {
+const raw = new URLSearchParams(window.location.search).get(&apos;mode&apos;)
+export function persistLocation(location: WeatherLocation) {
+function persistLocation(location: WeatherLocation) {
+export function updateUrlLocation(location: WeatherLocation, mode: WeatherMode) {
+function updateUrlLocation(location: WeatherLocation, mode: WeatherMode) {
+const params = new URLSearchParams(window.location.search)
+const coordinates = `${location.latitude.toFixed(5)},${location.longitude.toFixed(5)}`
+export function loadRadarOpacity() {
+function loadRadarOpacity() {
+const opacity = Number(
+export function persistRadarOpacity(opacity: number) {
+function persistRadarOpacity(opacity: number) {
+function loadStoredLocation(): WeatherLocation | null {
+const parsed = JSON.parse(
+function readUrlLocation(): WeatherLocation | null {
+const raw = new URLSearchParams(window.location.search).get(&apos;coords&apos;)
+const parts = raw?.split(&apos;,&apos;)
+const latitude = Number(parts[0])
+const longitude = Number(parts[1])</file>
+<file path="src/services/ecmwf.ts" level="3" tokens="111">import type {
+import { buildWeatherEvolution } from &apos;../weather/translateWeather&apos;
+import { fetchWithTimeout } from &apos;../../shared/fetchTimeout.js&apos;
+type EcmwfResponse = {
+export async function fetchEcmwfLocationForecast(
+async function fetchEcmwfLocationForecast(
+const params = new URLSearchParams({
+const response = await fetchWithTimeout(`/api/ecmwf?${params}`, { signal })
+const payload = await response.json() as EcmwfResponse
+const hourly = payload.hourly
+const frames = buildWeatherEvolution(</file>
+<file path="src/services/geocoding.ts" level="3" tokens="194">import type { WeatherLocation } from &apos;../types/weather&apos;
+import { fetchWithTimeout } from &apos;../../shared/fetchTimeout.js&apos;
+type SearchResponse = {
+type ReverseResponse = {
+export async function reverseGeocode(
+async function reverseGeocode(
+const fallback = `${latitude.toFixed(3)}, ${longitude.toFixed(3)}`
+const params = new URLSearchParams({
+const response = await fetchWithTimeout(`/api/geocode?${params}`, { signal })
+const payload = await response.json() as ReverseResponse
+export async function searchCity(query: string): Promise&lt;WeatherLocation&gt; {
+async function searchCity(query: string): Promise&lt;WeatherLocation&gt; {
+const trimmedQuery = query.trim()
+const params = new URLSearchParams({
+const response = await fetchWithTimeout(`/api/geocode?${params}`)
+const payload = await readSearchResponse(response)
+async function readSearchResponse(response: Response): Promise&lt;SearchResponse&gt; {
+const contentType = response.headers.get(&apos;content-type&apos;) ?? &apos;&apos;</file>
+<file path="src/services/heatAlerts.ts" level="3" tokens="86">import type { HeatAlert, WeatherLocation } from &apos;../types/weather&apos;
+import { fetchWithTimeout } from &apos;../../shared/fetchTimeout.js&apos;
+export async function fetchOfficialHeatAlerts(
+async function fetchOfficialHeatAlerts(
+const params = new URLSearchParams({
+const response = await fetchWithTimeout(`/api/heat-alerts?${params.toString()}`)
+const payload = await response.json() as { alerts?: HeatAlert[] }</file>
+<file path="src/services/jetStream.ts" level="3" tokens="615">import type {
+import {
+import { fetchWithTimeout } from &apos;../../shared/fetchTimeout.js&apos;
+type JetStreamResponse = {
+const OPEN_METEO_ENDPOINT = &apos;/api/weather&apos;
+const CURRENT_FIELDS = &apos;wind_speed_250hPa,wind_direction_250hPa&apos;
+const BATCH_SIZE = 32
+const FRESHNESS = 5 * 60 * 1000
+const MINIMUM_LATITUDE_SPAN = 20
+const MINIMUM_LONGITUDE_SPAN = 30
+const sampleCache = new Map&lt;string, JetStreamSample&gt;()
+export const JET_STREAM_REFRESH_INTERVAL = FRESHNESS
+const JET_STREAM_REFRESH_INTERVAL = FRESHNESS
+export async function fetchJetStreamSamples(
+async function fetchJetStreamSamples(
+const points = buildJetStreamGrid(viewport)
+const now = Date.now()
+const missing = points.filter(point =&gt; {
+const cached = sampleCache.get(getKey(point.latitude, point.longitude))
+let index = 0;
+const gridSize = getJetStreamGridSize()
+const remainingBudget = gridSize.columns * gridSize.rows - index
+const batch = missing.slice(
+const params = new URLSearchParams({
+const response = await fetchWithTimeout(`${OPEN_METEO_ENDPOINT}?${params}`, {
+const body = await response.json() as JetStreamResponse | JetStreamResponse[]
+const payloads = Array.isArray(body) ? body : [body]
+const updatedAt = Date.now()
+let payloadIndex = 0;
+const point = batch[payloadIndex]
+const current = payloads[payloadIndex]?.current
+const speed = current?.wind_speed_250hPa
+const direction = current?.wind_direction_250hPa
+const angle = degreesToRadians(direction)
+const sample: JetStreamSample = {
+export function interpolateJetStreamAt(
+function interpolateJetStreamAt(
+let eastward = 0
+let northward = 0
+let totalWeight = 0
+const distanceSquared = geographicDistanceSquared(
+const weight = 1 / (distanceSquared + 90000)
+export function geographicDistanceSquared(
+function geographicDistanceSquared(
+const latitudeKilometers = (sampleLatitude - latitude) * 111.32
+const longitudeKilometers = (
+function buildJetStreamGrid(viewport: WeatherViewport) {
+const { columns, rows } = getJetStreamGridSize()
+const west = viewport.west
+let east = viewport.east
+const centerLongitude = west + (east - west) / 2
+const centerLatitude = (viewport.north + viewport.south) / 2
+const latitudeSpan = Math.max(
+const longitudeSpan = Math.min(
+const north = clamp(centerLatitude + latitudeSpan / 2, -85, 85)
+const south = clamp(centerLatitude - latitudeSpan / 2, -85, 85)
+const points: Array&lt;{ latitude: number, longitude: number }&gt; = []
+let row = 0;
+const latitude = north + (south - north) * row / (rows - 1)
+let column = 0;
+function getKey(latitude: number, longitude: number) {</file>
+<file path="src/services/location.ts" level="3" tokens="45">import type { WeatherLocation } from &apos;../types/weather&apos;
+const PARIS_LOCATION: WeatherLocation = {
+export async function getBrowserLocation(): Promise&lt;WeatherLocation&gt; {
+async function getBrowserLocation(): Promise&lt;WeatherLocation&gt; {</file>
+<file path="src/services/openMeteo.ts" level="3" tokens="343">import type { OpenMeteoResponse, WeatherLocation } from &apos;../types/weather&apos;
+import type { WeatherDataState } from &apos;../types/weather&apos;
+import { getClientCacheKey } from &apos;../../shared/cacheVersion.js&apos;
+import { fetchWithTimeout } from &apos;../../shared/fetchTimeout.js&apos;
+import { isWeatherResponse } from &apos;../../shared/providerValidation.js&apos;
+const OPEN_METEO_ENDPOINT = &apos;/api/weather&apos;
+const FORECAST_CACHE_KEY = getClientCacheKey(&apos;forecast&apos;)
+const FORECAST_FRESHNESS = 5 * 60 * 1000
+const FORECAST_STALE_AGE = 24 * 60 * 60 * 1000
+const CURRENT_FIELDS = [
+const HOURLY_FIELDS = [
+const DAILY_FIELDS = [
+export async function fetchOpenMeteoForecast(
+async function fetchOpenMeteoForecast(
+const cacheKey = getLocationCacheKey(location)
+const cachedForecast = readCachedForecast(cacheKey)
+const cachedAge = cachedForecast
+const params = new URLSearchParams({
+let response: Response
+const payload = await response.json() as OpenMeteoResponse
+type ForecastResult = {
+type ForecastCacheRecord = {
+function getResponseSource(
+const vercelCache = response.headers.get(&apos;x-vercel-cache&apos;)?.toLowerCase()
+const aetherCache = response.headers.get(&apos;x-aether-cache&apos;)?.toLowerCase()
+const age = Number(response.headers.get(&apos;age&apos;) ?? 0)
+function getLocationCacheKey(location: WeatherLocation) {
+function readCachedForecast(cacheKey: string): ForecastCacheRecord | null {
+const cache = JSON.parse(
+function writeCachedForecast(cacheKey: string, payload: OpenMeteoResponse) {
+const cache = JSON.parse(
+const records = Object.entries({</file>
+<file path="src/services/storage.ts" level="3" tokens="109">import { getCacheNamespace } from &apos;../../shared/cacheVersion.js&apos;
+const DATABASE_NAME = getCacheNamespace(&apos;data&apos;)
+const DATABASE_VERSION = 1
+const STORES = [&apos;weather-samples&apos;, &apos;air-quality-samples&apos;] as const
+let databasePromise: Promise&lt;IDBDatabase | null&gt; | null = null
+export function openStorage(): Promise&lt;IDBDatabase | null&gt; {
+function openStorage(): Promise&lt;IDBDatabase | null&gt; {
+const request = window.indexedDB.open(DATABASE_NAME, DATABASE_VERSION)
+const database = request.result</file>
+<file path="src/services/upstreamBudget.ts" level="3" tokens="256">type BudgetLevel = &apos;normal&apos; | &apos;low&apos; | &apos;critical&apos;
+const LOW_SAMPLE_LIMIT = 24
+const CRITICAL_SAMPLE_LIMIT = 12
+const NORMAL_SAMPLE_LIMIT = 48
+const PRESSURE_WINDOW = 15 * 60 * 1000
+let level: BudgetLevel = &apos;normal&apos;
+let pressuredUntil = 0
+export function observeUpstreamBudget(response: Response) {
+function observeUpstreamBudget(response: Response) {
+const remaining = readNumberHeader(
+const limit = readNumberHeader(response, &apos;x-aether-ratelimit-limit&apos;)
+const budgetStatus = response.headers.get(&apos;x-aether-upstream-budget&apos;)
+const ratio = limit &amp;&amp; limit &gt; 0 ? remaining / limit : null
+export function getMapSampleLimit() {
+function getMapSampleLimit() {
+export function getJetStreamGridSize() {
+function getJetStreamGridSize() {
+const sampleLimit = getMapSampleLimit()
+function setPressure(nextLevel: BudgetLevel, until: number) {
+function clearExpiredPressure() {
+function getRetryUntil(response: Response) {
+const retryAfter = Number(response.headers.get(&apos;retry-after&apos;))
+function readNumberHeader(response: Response, name: string) {
+const value = response.headers.get(name)
+const number = Number(value)</file>
+<file path="src/services/weatherCache.ts" level="3" tokens="262">import type { WeatherMapSample } from &apos;../types/weather&apos;
+import { normalizeLongitude } from &apos;../utils/geo&apos;
+import { openStorage } from &apos;./storage&apos;
+type WeatherCacheRecord = {
+const STORE_NAME = &apos;weather-samples&apos;
+const MAX_CACHE_AGE = 6 * 60 * 60 * 1000
+const MAX_STORED_SAMPLES = 1000
+export async function loadPersistedWeatherSamples() {
+async function loadPersistedWeatherSamples() {
+const database = await openStorage()
+const transaction = database.transaction(STORE_NAME, &apos;readonly&apos;)
+const request = transaction.objectStore(STORE_NAME).getAll()
+const now = Date.now()
+const records = (request.result as WeatherCacheRecord[])
+export async function persistWeatherSamples(samples: WeatherMapSample[]) {
+async function persistWeatherSamples(samples: WeatherMapSample[]) {
+const database = await openStorage()
+const transaction = database.transaction(STORE_NAME, &apos;readwrite&apos;)
+const store = transaction.objectStore(STORE_NAME)
+const request = store.getAll()
+const records = new Map(
+const updatedAt = sample.updatedAt ?? Date.now()
+const key = getWeatherCacheKey(sample.latitude, sample.longitude)
+export function getWeatherCacheKey(latitude: number, longitude: number) {
+function getWeatherCacheKey(latitude: number, longitude: number) {</file>
+<file path="src/services/weatherGrid.ts" level="3" tokens="1506">import type {
+import { getWeatherCacheKey, loadPersistedWeatherSamples, persistWeatherSamples } from &apos;./weatherCache&apos;
+import { getMapSampleLimit, observeUpstreamBudget } from &apos;./upstreamBudget&apos;
+import { clamp, degreesToRadians, distanceInKilometers, interpolateWindVectors, inverseDistanceWeight, normalizeLongitude, radiansToDegrees } from &apos;../utils/geo&apos;
+import { fetchWithTimeout } from &apos;../../shared/fetchTimeout.js&apos;
+... 4 more imports
+type GridPoint = WeatherLocation &amp; {
+const OPEN_METEO_ENDPOINT = &apos;/api/weather&apos;
+const CURRENT_FIELDS = [
+const HOURLY_FIELDS = [
+const FRESHNESS = 5 * 60 * 1000
+const BATCH_SIZE = 32
+const BATCH_DELAY_MS = 250
+const BASE_SPACING = 260
+const NORMAL_GRID_POINTS = 48
+const MAX_MEMORY_SAMPLES = 1000
+const sampleCache = new Map&lt;string, WeatherMapSample&gt;()
+let persistentCachePromise: Promise&lt;void&gt; | null = null
+let lastBatchFetchTime = 0
+export const WEATHER_REFRESH_INTERVAL = FRESHNESS
+const WEATHER_REFRESH_INTERVAL = FRESHNESS
+export function getVisibleWeatherGrid(viewport: WeatherViewport): WeatherLocation[] {
+function getVisibleWeatherGrid(viewport: WeatherViewport): WeatherLocation[] {
+export async function fetchWeatherMapSamples(
+async function fetchWeatherMapSamples(
+const points = buildVisibleGrid(viewport)
+const refreshPoints = points.filter(point =&gt; {
+const sample = sampleCache.get(getWeatherCacheKey(point.latitude, point.longitude))
+const freshSamples: WeatherMapSample[] = []
+let index = 0;
+const remainingBudget = getMapSampleLimit() - index
+const batch = refreshPoints.slice(
+export async function hydrateWeatherMapCache(viewport: WeatherViewport) {
+async function hydrateWeatherMapCache(viewport: WeatherViewport) {
+export function getCachedWeatherMapSamples(viewport: WeatherViewport) {
+function getCachedWeatherMapSamples(viewport: WeatherViewport) {
+export function cacheWeatherSample(location: WeatherLocation, weather: WeatherConfig) {
+function cacheWeatherSample(location: WeatherLocation, weather: WeatherConfig) {
+const sample: WeatherMapSample = {
+export async function getCachedWeatherForLocation(location: WeatherLocation): Promise&lt;WeatherConfig | null&gt; {
+async function getCachedWeatherForLocation(location: WeatherLocation): Promise&lt;WeatherConfig | null&gt; {
+const nearbySample = Array.from(sampleCache.values())
+export function interpolateWeatherAt(
+function interpolateWeatherAt(
+const nearbySamples = samples
+const totalWeight = nearbySamples.reduce((sum, item) =&gt; sum + inverseDistanceWeight(item.distance), 0)
+const weighted = (pick: (sample: WeatherMapSample) =&gt; number) =&gt; (
+const wind = interpolateWindVectors(nearbySamples.map(item =&gt; ({
+const nearest = nearbySamples[0].sample
+export function getWeatherMapSamplesAtTime(
+function getWeatherMapSamplesAtTime(
+const targetTime = Date.parse(time)
+const frame = findNearestEvolutionFrame(sample, targetTime)
+async function fetchWeatherBatch(
+const params = new URLSearchParams({
+const response = await fetchWithTimeout(`${OPEN_METEO_ENDPOINT}?${params.toString()}`, {
+const body = (await response.json()) as OpenMeteoResponse | OpenMeteoResponse[]
+const payloads = Array.isArray(body) ? body : [body]
+const updatedAt = Date.now()
+function mapWeatherSample(point: GridPoint | undefined, payload: OpenMeteoResponse, updatedAt: number): WeatherMapSample | null {
+const mapped = mapCurrentWeather(
+function buildVisibleGrid(viewport: WeatherViewport): GridPoint[] {
+const maxGridPoints = getMapSampleLimit()
+const sampleZoom = clamp(Math.floor(viewport.zoom), 2, 14)
+const worldSize = 256 * 2 ** sampleZoom
+const spacing = getGridSpacing(viewport)
+const west = viewport.west
+let east = viewport.east
+const westX = longitudeToWorldX(west, worldSize)
+const eastX = longitudeToWorldX(east, worldSize)
+const northY = latitudeToWorldY(clamp(viewport.north, -85, 85), worldSize)
+const southY = latitudeToWorldY(clamp(viewport.south, -85, 85), worldSize)
+const firstColumn = Math.floor(westX / spacing) - 1
+const lastColumn = Math.ceil(eastX / spacing) + 1
+const firstRow = Math.floor(northY / spacing) - 1
+const lastRow = Math.ceil(southY / spacing) + 1
+const points = new Map&lt;string, GridPoint&gt;()
+let row = firstRow;
+const latitude = worldYToLatitude(row * spacing, worldSize)
+let column = firstColumn;
+const longitude = normalizeLongitude(worldXToLongitude(column * spacing, worldSize))
+const key = getWeatherCacheKey(latitude, longitude)
+const centerLongitude = normalizeLongitude(west + (east - west) / 2)
+const centerLatitude = (viewport.north + viewport.south) / 2
+const centerKey = getWeatherCacheKey(centerLatitude, centerLongitude)
+const centerPoint: GridPoint = {
+const distributed = distributePoints(
+function getGridSpacing(viewport: WeatherViewport) {
+const estimatedColumns = Math.ceil(viewport.width / BASE_SPACING) + 3
+const estimatedRows = Math.ceil(viewport.height / BASE_SPACING) + 3
+const estimatedPoints = estimatedColumns * estimatedRows
+const scale = estimatedPoints &gt; NORMAL_GRID_POINTS
+function getSamplesForGrid(points: GridPoint[]) {
+const exactSample = sampleCache.get(getWeatherCacheKey(point.latitude, point.longitude))
+function estimateSample(point: GridPoint): WeatherMapSample | null {
+const nearbySamples = Array.from(sampleCache.values())
+const totalWeight = nearbySamples.reduce((sum, item) =&gt; sum + inverseDistanceWeight(item.distance), 0)
+const weighted = (pick: (sample: WeatherMapSample) =&gt; number) =&gt; (
+const wind = interpolateWindVectors(nearbySamples.map(item =&gt; ({
+const nearest = nearbySamples[0].sample
+function rememberSamples(samples: WeatherMapSample[]) {
+const key = getWeatherCacheKey(sample.latitude, sample.longitude)
+const oldestKey = sampleCache.keys().next().value
+function loadPersistentCache() {
+function needsRefresh(sample: WeatherMapSample | undefined) {
+function findNearestEvolutionFrame(
+let nearest = null
+let nearestDistance = Number.POSITIVE_INFINITY
+const frameTime = Date.parse(frame.time)
+const distance = Math.abs(frameTime - targetTime)
+function distributePoints(points: GridPoint[], limit: number) {
+const pointIndex = Math.round(index * (points.length - 1) / (limit - 1))
+function longitudeToWorldX(longitude: number, worldSize: number) {
+function worldXToLongitude(x: number, worldSize: number) {
+function latitudeToWorldY(latitude: number, worldSize: number) {
+const radians = degreesToRadians(latitude)
+const mercator = Math.log(Math.tan(Math.PI / 4 + radians / 2))
+function worldYToLatitude(y: number, worldSize: number) {
+const mercator = Math.PI * (1 - 2 * y / worldSize)
+async function throttleBatchDelay() {
+const elapsed = Date.now() - lastBatchFetchTime</file>
+<file path="src/types/weather.ts" level="3" tokens="400">export type WeatherLocation = {
+type WeatherLocation = {
+export type WeatherViewport = {
+type WeatherViewport = {
+export type OpenMeteoCurrent = {
+type OpenMeteoCurrent = {
+export type OpenMeteoHourly = {
+type OpenMeteoHourly = {
+export type OpenMeteoDaily = {
+type OpenMeteoDaily = {
+export type OpenMeteoResponse = {
+type OpenMeteoResponse = {
+export type OpenMeteoAirQualityCurrent = {
+type OpenMeteoAirQualityCurrent = {
+export type OpenMeteoAirQualityResponse = {
+type OpenMeteoAirQualityResponse = {
+export type WeatherMode = &apos;temperature&apos; | &apos;wind&apos; | &apos;jet-stream&apos; | &apos;precipitation&apos; | &apos;storm&apos; | &apos;air-quality&apos;
+type WeatherMode = &apos;temperature&apos; | &apos;wind&apos; | &apos;jet-stream&apos; | &apos;precipitation&apos; | &apos;storm&apos; | &apos;air-quality&apos;
+export type WeatherDataState = &apos;loading&apos; | &apos;live&apos; | &apos;cached&apos; | &apos;stale&apos; | &apos;unavailable&apos;
+type WeatherDataState = &apos;loading&apos; | &apos;live&apos; | &apos;cached&apos; | &apos;stale&apos; | &apos;unavailable&apos;
+export type HeatRisk = {
+type HeatRisk = {
+export type HeatAlert = {
+type HeatAlert = {
+export type WeatherEvolutionFrame = {
+type WeatherEvolutionFrame = {
+export type EcmwfForecast = {
+type EcmwfForecast = {
+export type WeatherConfig = {
+type WeatherConfig = {
+export type WeatherMapSample = {
+type WeatherMapSample = {
+export type AirQualityMapSample = {
+type AirQualityMapSample = {
+export type JetStreamSample = {
+type JetStreamSample = {
+export type AirQualityReading = Omit&lt;AirQualityMapSample, &apos;updatedAt&apos;&gt;
+type AirQualityReading = Omit&lt;AirQualityMapSample, &apos;updatedAt&apos;&gt;
+export type MapWeatherPointer = {
+type MapWeatherPointer = {</file>
+<file path="src/utils/geo.ts" level="3" tokens="238">export function distanceInKilometers(
+function distanceInKilometers(
+const earthRadius = 6371
+const latitudeDelta = degreesToRadians(second.latitude - first.latitude)
+const longitudeDelta = degreesToRadians(normalizeLongitude(second.longitude - first.longitude))
+const firstLatitude = degreesToRadians(first.latitude)
+const secondLatitude = degreesToRadians(second.latitude)
+const haversine = (
+export function inverseDistanceWeight(distance: number) {
+function inverseDistanceWeight(distance: number) {
+export function interpolateWindVectors(
+function interpolateWindVectors(
+const totalWeight = items.reduce(
+const eastward = items.reduce(
+const northward = items.reduce(
+export function normalizeLongitude(longitude: number) {
+function normalizeLongitude(longitude: number) {
+export function normalizeAngle(angle: number) {
+function normalizeAngle(angle: number) {
+export function degreesToRadians(degrees: number) {
+function degreesToRadians(degrees: number) {
+export function radiansToDegrees(radians: number) {
+function radiansToDegrees(radians: number) {
+export function clamp(value: number, min: number, max: number) {
+function clamp(value: number, min: number, max: number) {</file>
+<file path="src/utils/motion.ts" level="3" tokens="50">export const REDUCED_MOTION_QUERY = &apos;(prefers-reduced-motion: reduce)&apos;
+const REDUCED_MOTION_QUERY = &apos;(prefers-reduced-motion: reduce)&apos;
+export function prefersReducedMotion() {
+function prefersReducedMotion() {</file>
+<file path="src/vite-env.d.ts" level="3" tokens="5">interface ImportMetaEnv {</file>
+<file path="src/weather/mapCurrentWeather.ts" level="3" tokens="69">import type { OpenMeteoCurrent } from &apos;../types/weather&apos;
+import { clamp, degreesToRadians } from &apos;../utils/geo&apos;
+import { THUNDERSTORM_CODES } from &apos;./weatherCode&apos;
+export function mapCurrentWeather(
+function mapCurrentWeather(
+const precipitation = Math.max(
+const rawWindSpeed = current.wind_speed_10m</file>
+<file path="src/weather/translateWeather.ts" level="3" tokens="325">import type { OpenMeteoHourly, OpenMeteoResponse, WeatherConfig, WeatherLocation } from &apos;../types/weather&apos;
+import { clamp, degreesToRadians } from &apos;../utils/geo&apos;
+import { mapCurrentWeather } from &apos;./mapCurrentWeather&apos;
+import { describeWeatherCode, THUNDERSTORM_CODES } from &apos;./weatherCode&apos;
+export function translateWeather(payload: OpenMeteoResponse, location: WeatherLocation): WeatherConfig {
+function translateWeather(payload: OpenMeteoResponse, location: WeatherLocation): WeatherConfig {
+const current = payload.current
+const hourlyPrecip = payload.hourly?.precipitation?.[0] ?? 0
+const mapped = mapCurrentWeather(current, hourlyPrecip)
+function buildHeatRisk(payload: OpenMeteoResponse) {
+const daily = payload.daily
+const maximums = daily.temperature_2m_max ?? []
+const apparentMaximums = daily.apparent_temperature_max ?? []
+const hottestTemperature = Math.max(
+let consecutiveHotDays = 0
+let longestHotRun = 0
+let index = 0;
+const temperature = maximums[index] ?? 0
+const apparentTemperature = apparentMaximums[index] ?? temperature
+export function buildWeatherEvolution(
+function buildWeatherEvolution(
+const count = Math.min(hourly.time.length, maximumFrames)
+const rawWindSpeed = hourly.wind_speed_10m[index] ?? 0
+const weatherCode = hourly.weather_code[index] ?? 0
+function normalizeForecastTime(value: string, utcOffsetSeconds: number) {
+const wallClockTime = Date.parse(`${value}Z`)</file>
+<file path="src/weather/weatherCode.ts" level="3" tokens="56">export const THUNDERSTORM_CODES = new Set([95, 96, 99])
+const THUNDERSTORM_CODES = new Set([95, 96, 99])
+export function describeWeatherCode(code: number) {
+function describeWeatherCode(code: number) {</file>
+<file path="tests/apiHandlers.test.js" level="3" tokens="115">import { beforeEach, describe, expect, test, vi } from &apos;vitest&apos;
+const runtime = vi.hoisted(() =&gt; ({
+import weatherHandler from &apos;../api/weather.js&apos;
+import airQualityHandler from &apos;../api/air-quality.js&apos;
+const weatherQuery = {
+const weatherCacheKey = [
+const log = vi.spyOn(console, &apos;info&apos;).mockImplementation(() =&gt; {})
+const response = createResponse()
+function validWeather() {
+function record(value) {
+function createResponse() {
+setHeader(name, value) {
+status(code) {
+json(value) {
+send(value) {</file>
+<file path="tests/ecmwf.test.ts" level="3" tokens="51">import { afterEach, expect, test, vi } from &apos;vitest&apos;
+import { fetchEcmwfLocationForecast } from &apos;../src/services/ecmwf&apos;
+const fetchMock = vi.fn(async (
+const result = await fetchEcmwfLocationForecast({</file>
+<file path="tests/ecmwfProvider.test.js" level="3" tokens="162">import { afterEach, expect, test, vi } from &apos;vitest&apos;
+import { fetchEcmwfForecast } from &apos;../server/ecmwfProvider.js&apos;
+const originalEcmwfKey = process.env.ECMWF_KEY
+const fetchMock = vi.fn(async () =&gt; new Response(JSON.stringify({
+const url = new URL(String(fetchMock.mock.calls[0][0]))
+const fetchMock = vi.fn(async () =&gt; new Response(JSON.stringify({
+const result = await fetchEcmwfForecast(48, 2, 120)
+const url = new URL(String(fetchMock.mock.calls[0][0]))
+const fetchMock = vi
+const result = await fetchEcmwfForecast(48, 2, 120)
+const fallbackUrl = new URL(String(fetchMock.mock.calls[1][0]))</file>
+<file path="tests/errorBoundary.test.tsx" level="3" tokens="66">import { expect, test, vi } from &apos;vitest&apos;
+import { WeatherErrorBoundary } from &apos;../src/components/WeatherErrorBoundary&apos;
+const boundary = new WeatherErrorBoundary({
+const fallback = boundary.render()
+const error = vi.spyOn(console, &apos;error&apos;).mockImplementation(() =&gt; {})
+const boundary = new WeatherErrorBoundary({</file>
+<file path="tests/geo.test.ts" level="3" tokens="24">import { describe, expect, test } from &apos;vitest&apos;
+import {
+const distance = distanceInKilometers(</file>
+<file path="tests/geocoding.test.ts" level="3" tokens="71">import { afterEach, describe, expect, test, vi } from &apos;vitest&apos;
+import { reverseGeocode, searchCity } from &apos;../src/services/geocoding&apos;
+const fetchMock = vi.fn(async (
+const fetchMock = vi.fn((
+const controller = new AbortController()
+const request = reverseGeocode(48, 2, controller.signal)</file>
+<file path="tests/runtimeCache.test.js" level="3" tokens="177">import { expect, test } from &apos;vitest&apos;
+import { loadCachedResource } from &apos;../server/cachedResource.js&apos;
+const FRESH_TTL = 60
+const STALE_TTL = 300
+const cache = new FakeRuntimeCache()
+const cachedRecord = { value: &apos;cached&apos; }
+let providerCalls = 0
+const result = await loadCachedResource({
+const cache = new FakeRuntimeCache()
+const staleRecord = { value: &apos;stale&apos; }
+const result = await loadCachedResource({
+const cache = new FakeRuntimeCache()
+const oldRecord = { value: &apos;old&apos; }
+const liveRecord = { value: &apos;live&apos; }
+const result = await loadCachedResource({
+class FakeRuntimeCache {
+constructor() {
+advance(milliseconds) {
+async get(key) {
+const entry = this.entries.get(key)
+async set(key, value, options) {</file>
+<file path="tests/translateWeather.test.ts" level="3" tokens="60">import { describe, expect, test } from &apos;vitest&apos;
+import type { OpenMeteoResponse } from &apos;../src/types/weather&apos;
+import { translateWeather } from &apos;../src/weather/translateWeather&apos;
+const weather = translateWeather(buildPayload(), {
+function buildPayload(): OpenMeteoResponse {</file>
+<file path="tests/upstreamBackoff.test.js" level="3" tokens="27">import { afterEach, describe, expect, test, vi } from &apos;vitest&apos;
+import {
+const writes = []
+const cache = {</file>
+<file path="tests/weatherInterpolation.test.ts" level="3" tokens="137">import { describe, expect, test } from &apos;vitest&apos;
+import {
+import type { WeatherMapSample } from &apos;../src/types/weather&apos;
+import { degreesToRadians } from &apos;../src/utils/geo&apos;
+const samples = [
+const result = interpolateWeatherAt(0, 0, samples)
+const samples = [
+const result = interpolateWeatherAt(0, 0, samples)
+const first = buildSample(-1, 10, 0, 0.2, false)
+const second = buildSample(1, 20, 0, 0.4, false)
+const displayed = getWeatherMapSamplesAtTime(
+function buildSample(
+function buildFrame(</file>
+<file path="tsconfig.json" level="3" tokens="25">&quot;compilerOptions&quot;: {
+&quot;include&quot;: [&quot;src&quot;],
+&quot;references&quot;: [{ &quot;path&quot;: &quot;./tsconfig.node.json&quot; }]</file>
+<file path="tsconfig.node.json" level="3" tokens="14">&quot;compilerOptions&quot;: {
+&quot;include&quot;: [&quot;vite.config.ts&quot;]</file>
+<file path="tsconfig.server.json" level="3" tokens="10">&quot;compilerOptions&quot;: {
+&quot;include&quot;: [
+...</file>
+<file path="tsconfig.verify.json" level="3" tokens="22">&quot;extends&quot;: &quot;./tsconfig.json&quot;,
+&quot;compilerOptions&quot;: {
+&quot;include&quot;: [
+...
+&quot;references&quot;: []</file>
+<file path="vercel.json" level="3" tokens="43">&quot;$schema&quot;: &quot;https://openapi.vercel.sh/vercel.json&quot;,
+&quot;framework&quot;: &quot;vite&quot;,
+&quot;buildCommand&quot;: &quot;npm run build&quot;,
+&quot;outputDirectory&quot;: &quot;dist&quot;,
+&quot;headers&quot;: [</file>
+<file path="vite.config.ts" level="3" tokens="896">import { defineConfig, loadEnv } from &apos;vite&apos;
+import { readFileSync } from &apos;node:fs&apos;
+import type { IncomingMessage, ServerResponse } from &apos;node:http&apos;
+import type { Plugin } from &apos;vite&apos;
+import react from &apos;@vitejs/plugin-react&apos;
+... 6 more imports
+type WeatherCacheRecord = {
+type UpstreamResult = {
+type Next = (error?: unknown) =&gt; void
+const pending = new Map&lt;string, Promise&lt;UpstreamResult&gt;&gt;()
+const blockedUntil = new Map&lt;string, number&gt;()
+let lastUpstreamTime = 0
+const MIN_SPACING_MS = 300
+const LOCAL_UPSTREAM_TIMEOUT_MS = 8000
+const DEFAULT_RETRY_AFTER_SECONDS = 15 * 60
+const DEPLOYED_API_ORIGIN = &apos;https://aether-five-rose.vercel.app&apos;
+const packageVersion = (
+const buildVersion = `v${packageVersion}`
+function scheduleUpstream(url: string): Promise&lt;UpstreamResult&gt; {
+const provider = new URL(url).origin
+const blockedFor = Math.max(
+const existing = pending.get(url)
+const promise = fetchUpstream(url)
+async function fetchUpstream(url: string): Promise&lt;UpstreamResult&gt; {
+const response = await fetchWithTimeout(url, {
+const body = await response.text()
+const result: UpstreamResult = {
+const retryAfter = parseRetryAfter(response.headers.get(&apos;retry-after&apos;))
+const provider = new URL(url).origin
+function parseRetryAfter(value: string | null) {
+const seconds = Number(value)
+const retryAt = Date.parse(value)
+async function ensureSpacing() {
+const elapsed = Date.now() - lastUpstreamTime
+export default defineConfig(({ mode }) =&gt; {
+const env = loadEnv(mode, process.cwd(), &apos;&apos;)
+function localWeatherApi(): Plugin {
+const cache = new Map&lt;string, WeatherCacheRecord&gt;()
+const handleWeatherRequest = async (
+const requestUrl = new URL(request.url ?? &apos;/&apos;, &apos;http://localhost&apos;)
+const isHeatAlertsRequest = requestUrl.pathname === &apos;/api/heat-alerts&apos;
+const isGeocodeRequest = requestUrl.pathname === &apos;/api/geocode&apos;
+const isEcmwfRequest = requestUrl.pathname === &apos;/api/ecmwf&apos;
+const isFireTileRequest = requestUrl.pathname === &apos;/api/fire-tile&apos;
+const isReportedFiresRequest = requestUrl.pathname === &apos;/api/reported-fires&apos;
+const isEffisFireTileRequest = requestUrl.pathname === &apos;/api/effis-fire-tile&apos;
+const upstreamEndpoint = requestUrl.pathname === &apos;/api/weather&apos;
+const parsed = parseGeocodeRequest(requestUrl.searchParams)
+const cacheKey = `${requestUrl.pathname}?${parsed.cacheKey}`
+const cached = cache.get(cacheKey)
+const now = Date.now()
+const record = {
+const tile = parseFireTileCoordinates(
+const mapKey = process.env.FIRMS_MAP_KEY
+const upstream = await fetchWithTimeout(
+const contentType = upstream.headers.get(&apos;content-type&apos;) ?? &apos;&apos;
+const tile = parseEffisTileCoordinates(
+const upstream = await fetchWithTimeout(
+const contentType = upstream.headers.get(&apos;content-type&apos;) ?? &apos;&apos;
+const latitude = Number(requestUrl.searchParams.get(&apos;latitude&apos;))
+const longitude = Number(requestUrl.searchParams.get(&apos;longitude&apos;))
+const forecastHours = Math.min(
+const cacheKey = `${requestUrl.pathname}?${latitude.toFixed(3)}:${longitude.toFixed(3)}:${forecastHours}`
+const cached = cache.get(cacheKey)
+const now = Date.now()
+const record = {
+const coordinates = parseHeatAlertCoordinates(
+const cacheKey = `${requestUrl.pathname}?${coordinates.latitude.toFixed(3)}:${coordinates.longitude.toFixed(3)}`
+const cached = cache.get(cacheKey)
+const now = Date.now()
+const record = {
+const parameterConfig = requestUrl.pathname === &apos;/api/weather&apos;
+const canonical = buildCanonicalOpenMeteoParams(
+const canonicalQuery = canonical.params.toString()
+const cacheKey = `${requestUrl.pathname}?${canonicalQuery}`
+const cached = cache.get(cacheKey)
+const now = Date.now()
+let result = await scheduleUpstream(`${upstreamEndpoint}?${canonicalQuery}`)
+const freshness = requestUrl.pathname === &apos;/api/air-quality&apos;
+const record = {
+configureServer(server) {
+configurePreviewServer(server) {
+function sendUpstreamFailure(
+const timedOut = error instanceof Error &amp;&amp; (
+function sendCachedWeather(
+function readFirstHeader(headers: Headers, names: string[]) {
+const value = headers.get(name)</file>
+</files>
+</repository_context>
