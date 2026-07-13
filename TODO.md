@@ -4,7 +4,7 @@
 
 - [x] Show loading, unavailable, missing-key, and last-updated states for every fire layer.
 - [ ] Protect the NASA FIRMS proxy with rate limits, request coalescing, and stronger CDN caching.
-- [ ] Put fire tiles in a separate short-lived PWA cache so they cannot evict weather responses.
+- [x] Put fire tiles in a separate short-lived PWA cache so they cannot evict weather responses.
 - [x] Add a visible legend explaining EFFIS detection-age colors and source timestamps.
 - [x] Replace the EFFIS `48h` label with `Today + yesterday`, or use exact rolling timestamps if supported.
 

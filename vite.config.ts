@@ -235,7 +235,31 @@ export default defineConfig(({ mode }) => {
             {
               urlPattern: ({ url }) => (
                 url.origin === self.location.origin &&
-                url.pathname.startsWith('/api/')
+                [
+                  '/api/fire-tile',
+                  '/api/effis-fire-tile'
+                ].includes(url.pathname)
+              ),
+              handler: 'StaleWhileRevalidate',
+              options: {
+                cacheName: getCacheNamespace('fire-tiles'),
+                cacheableResponse: {
+                  statuses: [0, 200]
+                },
+                expiration: {
+                  maxEntries: 192,
+                  maxAgeSeconds: 15 * 60
+                }
+              }
+            },
+            {
+              urlPattern: ({ url }) => (
+                url.origin === self.location.origin &&
+                url.pathname.startsWith('/api/') &&
+                ![
+                  '/api/fire-tile',
+                  '/api/effis-fire-tile'
+                ].includes(url.pathname)
               ),
               handler: 'NetworkFirst',
               options: {

@@ -23,7 +23,7 @@ Aether is an interactive full-screen weather map built with React, TypeScript, M
 - City search and animated map navigation
 - Debounced, cancellable reverse geocoding that respects Nominatim request limits
 - Persistent browser cache using IndexedDB
-- Installable PWA with offline app shell and cached weather responses
+- Installable PWA with offline app shell, cached weather responses, and an isolated short-lived fire-tile cache
 - Automatic background refresh while the app is open
 - Five-day ECMWF IFS visual forecast with timeline playback
 - Adaptive map sample density when the upstream request budget is low
@@ -98,7 +98,7 @@ Open the local URL printed by Vite. Nodemon restarts Vite when API, server, or V
 
 ## Cache version and invalidation
 
-Disposable caches share `CACHE_VERSION` from `shared/cacheVersion.js`. The version is included in browser forecast keys, IndexedDB names, PWA API caches, and Vercel Runtime Cache namespaces. The latest successful location forecast remains available offline for 24 hours.
+Disposable caches share `CACHE_VERSION` from `shared/cacheVersion.js`. The version is included in browser forecast keys, IndexedDB names, PWA API caches, and Vercel Runtime Cache namespaces. The latest successful location forecast remains available offline for 24 hours. NASA FIRMS and Copernicus EFFIS tiles use a separate PWA cache with a 15-minute lifetime and a 192-tile limit, so map tiles cannot evict weather API responses.
 
 To invalidate cached data:
 
