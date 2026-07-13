@@ -172,6 +172,12 @@ export type JetStreamSample = {
 
 export type AirQualityReading = Omit<AirQualityMapSample, 'updatedAt'>
 
+export type MapFirePointer = {
+  title: string
+  source: string
+  detail: string
+}
+
 export type MapWeatherPointer = {
   screenX: number
   screenY: number
@@ -190,4 +196,5 @@ export type MapWeatherPointer = {
   pm10?: number
   nitrogenDioxide?: number
   ozone?: number
+  fire?: MapFirePointer
 }

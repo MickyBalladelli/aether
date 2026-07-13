@@ -2,6 +2,7 @@ import AirIcon from '@mui/icons-material/Air'
 import BlurOnIcon from '@mui/icons-material/BlurOn'
 import DeviceThermostatIcon from '@mui/icons-material/DeviceThermostat'
 import FlightIcon from '@mui/icons-material/Flight'
+import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment'
 import WaterDropIcon from '@mui/icons-material/WaterDrop'
 import type { MapWeatherPointer } from '../types/weather'
 
@@ -59,6 +60,17 @@ export function MapWeatherTooltip({ reading }: MapWeatherTooltipProps) {
           <span>
             AQI {Math.round(reading.europeanAqi)} · PM2.5 {reading.pm2_5?.toFixed(1)} µg/m³
           </span>
+        </div>
+      )}
+
+      {reading.fire && (
+        <div className="map-weather-tooltip-fire">
+          <div className="map-weather-tooltip-row">
+            <LocalFireDepartmentIcon />
+            <strong>{reading.fire.title}</strong>
+          </div>
+          <span>{reading.fire.source}</span>
+          <span>{reading.fire.detail}</span>
         </div>
       )}
     </aside>

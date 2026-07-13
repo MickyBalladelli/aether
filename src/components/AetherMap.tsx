@@ -5,6 +5,7 @@ import { FireLayerStatus } from './FireLayerStatus'
 import { WeatherMapAnimation } from '../map/WeatherMapAnimation'
 import { WeatherRadarLayer } from '../map/WeatherRadarLayer'
 import { ReportedFireLayer } from '../map/ReportedFireLayer'
+import { findFireTileAtPoint } from '../map/fireTileHitTest'
 import {
   INITIAL_FIRE_LAYER_STATUSES
 } from '../map/fireLayerStatus'
@@ -24,6 +25,7 @@ import { renderWeatherBadge } from '../map/weatherBadge'
 import type {
   AirQualityMapSample,
   JetStreamSample,
+  MapFirePointer,
   MapWeatherPointer,
   WeatherLocation,
   WeatherMapSample,
@@ -41,6 +43,16 @@ const FIRE_LAYER_DESCRIPTION = [
   'They may include extinguished fires or other hot sources,',
   'and clouds can hide active fires.'
 ].join(' ')
+const FIRMS_HOVER_INFO: MapFirePointer = {
+  title: 'Heat detection',
+  source: 'NASA FIRMS · VIIRS',
+  detail: 'Detected within the last 24 hours. Not a confirmed active fire.'
+}
+const EFFIS_HOVER_INFO: MapFirePointer = {
+  title: 'Europe heat detection',
+  source: 'Copernicus EFFIS · VIIRS',
+  detail: 'Detected today or yesterday. Not a confirmed active fire.'
+}
 
 type MapTileStyle = 'standard' | 'dark'
 
@@ -90,6 +102,7 @@ export function AetherMap({
   } | null>(null)
   const frameRef = useRef(0)
   const pointerFrameRef = useRef(0)
+  const reportedFireHoverRef = useRef<MapFirePointer | null>(null)
   const [fireLayerStatuses, setFireLayerStatuses] = useState(
     INITIAL_FIRE_LAYER_STATUSES
   )
@@ -170,7 +183,11 @@ export function AetherMap({
     const initialTiles = tileStyle === 'dark' ? darkTiles : standardTiles
     const reportedFires = new ReportedFireLayer(
       map,
-      status => updateFireLayerStatus('reported-wildfires', status)
+      status => updateFireLayerStatus('reported-wildfires', status),
+      fire => {
+        reportedFireHoverRef.current = fire
+        pointerRefreshRef.current()
+      }
     )
     const fireTiles = L.tileLayer(
       '/api/fire-tile?z={z}&x={x}&y={y}',
@@ -416,11 +433,20 @@ export function AetherMap({
         pointer.longitude,
         jetStreamSamplesRef.current
       )
+      const fire = reportedFireHoverRef.current ?? findFireTileAtPoint(
+        map,
+        L.point(pointer.x, pointer.y),
+        [
+          { layer: effisFireTiles, info: EFFIS_HOVER_INFO },
+          { layer: fireTiles, info: FIRMS_HOVER_INFO }
+        ]
+      )
 
       pointerCallbackRef.current({
         ...reading,
         ...(jetStream ?? {}),
         ...(airQuality ?? {}),
+        ...(fire ? { fire } : {}),
         screenX: Math.max(12, Math.min(pointer.x + 16, size.x - 206)),
         screenY: Math.max(12, Math.min(pointer.y + 16, size.y - 206))
       })
@@ -438,6 +464,7 @@ export function AetherMap({
     const clearPointerWeather = () => {
       window.cancelAnimationFrame(pointerFrameRef.current)
       lastPointerRef.current = null
+      reportedFireHoverRef.current = null
       pointerCallbackRef.current(null)
     }
     const pointerBlockingControls = [

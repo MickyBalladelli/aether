@@ -1,6 +1,7 @@
 import L from 'leaflet'
 import { fetchWithTimeout } from '../../shared/fetchTimeout.js'
 import type { FireLayerStatusPatch } from './fireLayerStatus'
+import type { MapFirePointer } from '../types/weather'
 
 type ReportedFire = {
   id: string
@@ -20,15 +21,18 @@ export class ReportedFireLayer {
   private readonly layer = L.layerGroup()
   private readonly map: L.Map
   private readonly onStatusChange: (status: FireLayerStatusPatch) => void
+  private readonly onFireHover: (fire: MapFirePointer | null) => void
   private abortController: AbortController | null = null
   private refreshTimeout = 0
 
   constructor(
     map: L.Map,
-    onStatusChange: (status: FireLayerStatusPatch) => void
+    onStatusChange: (status: FireLayerStatusPatch) => void,
+    onFireHover: (fire: MapFirePointer | null) => void
   ) {
     this.map = map
     this.onStatusChange = onStatusChange
+    this.onFireHover = onFireHover
   }
 
   getLeafletLayer() {
@@ -44,6 +48,7 @@ export class ReportedFireLayer {
     this.map.off('overlayadd', this.handleOverlayAdd)
     this.map.off('overlayremove', this.handleOverlayRemove)
     this.stopRefresh()
+    this.onFireHover(null)
     this.layer.clearLayers()
   }
 
@@ -56,6 +61,7 @@ export class ReportedFireLayer {
   private readonly handleOverlayRemove = (event: L.LayersControlEvent) => {
     if (event.layer === this.layer) {
       this.stopRefresh()
+      this.onFireHover(null)
     }
   }
 
@@ -127,6 +133,8 @@ export class ReportedFireLayer {
       })
 
       marker.bindPopup(buildPopup(fire), { maxWidth: 280 })
+      marker.on('mouseover', () => this.onFireHover(buildHoverInfo(fire)))
+      marker.on('mouseout', () => this.onFireHover(null))
       marker.addTo(this.layer)
     }
   }
@@ -135,6 +143,22 @@ export class ReportedFireLayer {
     window.clearTimeout(this.refreshTimeout)
     this.abortController?.abort()
     this.abortController = null
+  }
+}
+
+function buildHoverInfo(fire: ReportedFire): MapFirePointer {
+  const details = [
+    fire.magnitude,
+    fire.reportedAt
+      ? `Reported ${new Date(fire.reportedAt).toLocaleString()}`
+      : null,
+    fire.description
+  ].filter(Boolean)
+
+  return {
+    title: fire.title,
+    source: 'NASA EONET · reported wildfire',
+    detail: details.join(' · ') || 'Open wildfire report'
   }
 }
 
