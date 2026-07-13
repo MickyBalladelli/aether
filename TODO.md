@@ -10,7 +10,7 @@
 
 ## Priority 2 — Better fire data and controls
 
-- [ ] Add stronger regional incident feeds: NIFC for the USA and CWFIS for Canada.
+- [x] Add stronger regional incident feeds: NIFC for the USA and CWFIS for Canada.
 - [ ] Deduplicate reported fires using source incident IDs instead of rounded coordinates.
 - [x] Save enabled map overlays between sessions.
 - [x] Separate reported incidents from satellite detections in the layer control.

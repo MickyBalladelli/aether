@@ -11,6 +11,7 @@ type ReportedFire = {
   longitude: number
   reportedAt: string | null
   magnitude: string | null
+  source: string
   sourceUrl: string | null
 }
 
@@ -157,7 +158,7 @@ function buildHoverInfo(fire: ReportedFire): MapFirePointer {
 
   return {
     title: fire.title,
-    source: 'NASA EONET · reported wildfire',
+    source: `${fire.source} · reported wildfire`,
     detail: details.join(' · ') || 'Open wildfire report'
   }
 }
@@ -196,7 +197,7 @@ function buildPopup(fire: ReportedFire) {
     source.href = fire.sourceUrl
     source.target = '_blank'
     source.rel = 'noreferrer'
-    source.textContent = 'Open source report'
+    source.textContent = `Open ${fire.source} report`
     container.append(source)
   }
 

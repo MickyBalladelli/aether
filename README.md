@@ -15,7 +15,7 @@ Aether is an interactive full-screen weather map built with React, TypeScript, M
 - European AQI layer with PM2.5 readings
 - Animated precipitation radar
 - Optional NASA FIRMS heat-detection layer for the last 24 hours
-- Optional reported open-wildfire layer from NASA EONET
+- Optional reported open-wildfire layer from NIFC WFIGS, NRCan CWFIS, and NASA EONET
 - Copernicus EFFIS fire-detection coverage for Europe and the Mediterranean
 - Saved radar opacity control
 - Storm and lightning effects
@@ -45,6 +45,8 @@ Aether is an interactive full-screen weather map built with React, TypeScript, M
 - [CARTO](https://carto.com/basemaps/) supplies the optional Dark Matter base map.
 - [MeteoGate](https://meteogate.eu/) supplies official European high-temperature warnings from MeteoAlarm members.
 - [NASA FIRMS](https://firms.modaps.eosdis.nasa.gov/) supplies global VIIRS active-fire and thermal-anomaly detections from the last 24 hours.
+- [NIFC WFIGS](https://www.nifc.gov/) supplies current incident locations reported by United States wildfire agencies.
+- [NRCan CWFIS](https://cwfis.cfs.nrcan.gc.ca/en/) supplies active fires reported by Canadian provincial, territorial, and federal agencies.
 - [NASA EONET](https://eonet.gsfc.nasa.gov/) supplies curated wildfire events that sources still mark as open.
 - [Copernicus EFFIS](https://forest-fire.emergency.copernicus.eu/) supplies filtered VIIRS fire detections for Europe and the Mediterranean.
 
@@ -73,7 +75,7 @@ The FIRMS tile proxy limits each client to 240 requests per minute and coalesces
 
 These points are recent satellite hotspots, not confirmed fire perimeters or a guarantee that a fire is still burning. A detection may be an extinguished fire, volcano, industrial heat source, or another hot surface. Clouds, smoke, satellite timing, and sensor limits can also hide active fires. Use the layer for awareness, not emergency decisions.
 
-The separate reported open-wildfire overlay uses recent NASA EONET events that remain marked open. Prescribed burns are removed. These reports are more meaningful than raw heat detections, but global coverage is incomplete and closure updates can lag. The United States, Canada, and Europe have stronger regional agency feeds; there is no single authoritative worldwide live incident feed.
+The separate reported open-wildfire overlay prioritizes current NIFC WFIGS incidents in the United States and NRCan CWFIS active-fire reports in Canada, then adds recent NASA EONET events for broader coverage. Prescribed and extinguished fires are removed where the source exposes those fields. If one provider is unavailable, the remaining feeds still load. These reports are more meaningful than raw heat detections, but global coverage is incomplete and closure updates can lag; there is no single authoritative worldwide live incident feed.
 
 The Europe fire-detection overlay uses the Copernicus European Forest Fire Information System (EFFIS) VIIRS layer for today and yesterday in UTC. This is a calendar-date window, not an exact rolling 48-hour period. EFFIS filters likely agricultural burns and false alarms using land cover, distance from artificial surfaces, and hotspot confidence. It covers Europe and the Mediterranean region and normally updates several times per day. These remain satellite detections, not firefighter-confirmed incidents, and can be hidden by cloud, smoke, satellite timing, or sensor limits.
 

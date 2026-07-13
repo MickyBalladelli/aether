@@ -262,11 +262,11 @@ export function AetherMap({
     )
     reportedFireInput?.closest('label')?.setAttribute(
       'title',
-      'Wildfires reported by official or curated sources and still marked open. Coverage is incomplete and status can lag.'
+      'Open wildfire incidents from NIFC in the USA, CWFIS in Canada, and NASA EONET elsewhere. Coverage is incomplete and status can lag.'
     )
     reportedFireInput?.setAttribute(
       'aria-label',
-      'Reported open wildfires. Coverage is incomplete and status can lag.'
+      'Reported open wildfires from NIFC, CWFIS, and NASA EONET. Coverage is incomplete and status can lag.'
     )
     effisFireInput?.closest('label')?.setAttribute(
       'title',

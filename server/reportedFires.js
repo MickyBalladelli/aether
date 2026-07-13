@@ -4,30 +4,215 @@ const EONET_WILDFIRES_URL = [
   'https://eonet.gsfc.nasa.gov/api/v3/events/geojson',
   '?category=wildfires&status=open&days=30&limit=500'
 ].join('')
-const EONET_TIMEOUT_MS = 8000
+const NIFC_INCIDENTS_URL = buildUrl(
+  'https://services3.arcgis.com/T4QMspbfLg3qTGWY/ArcGIS/rest/services/WFIGS_Incident_Locations_Current/FeatureServer/0/query',
+  {
+    where: "IncidentTypeCategory IN ('WF','CX')",
+    outFields: [
+      'IrwinID',
+      'UniqueFireIdentifier',
+      'IncidentName',
+      'IncidentShortDescription',
+      'IncidentSize',
+      'FireDiscoveryDateTime',
+      'ModifiedOnDateTime_dt',
+      'PercentContained',
+      'POOState',
+      'IncidentTypeCategory'
+    ].join(','),
+    returnGeometry: 'true',
+    outSR: '4326',
+    f: 'geojson',
+    resultRecordCount: '2000'
+  }
+)
+const NIFC_SOURCE_URL = 'https://www.arcgis.com/home/item.html?id=44776b299f2842479f0bad4541c81eb9'
+const CWFIS_ENDPOINT = 'https://geoserver.cwfif.nrcan.gc.ca/geoserver/ows'
+const CWFIS_SOURCE_URL = 'https://cwfis.cfs.nrcan.gc.ca/en/'
+const PROVIDER_TIMEOUT_MS = 10000
 
 export async function getReportedFires() {
+  const results = await Promise.allSettled([
+    getNifcFires(),
+    getCwfisFires(),
+    getEonetFires()
+  ])
+  const available = results.filter(result => result.status === 'fulfilled')
+
+  if (available.length === 0) {
+    throw new Error('All reported wildfire feeds are unavailable')
+  }
+
+  return deduplicateFires(available.flatMap(result => result.value))
+}
+
+async function getNifcFires() {
+  const payload = await fetchGeoJson(NIFC_INCIDENTS_URL, 'NIFC WFIGS')
+
+  return readFeatures(payload)
+    .map(normalizeNifcFire)
+    .filter(Boolean)
+}
+
+async function getCwfisFires() {
+  const now = new Date()
+  const url = buildUrl(CWFIS_ENDPOINT, {
+    service: 'WFS',
+    version: '2.0.0',
+    request: 'GetFeature',
+    typeNames: 'public:cwfif_national_activefires',
+    outputFormat: 'application/json',
+    srsName: 'EPSG:4326',
+    count: '2000',
+    CQL_FILTER: [
+      `record_end > '${now.toISOString()}'`,
+      'fire_was_prescribed = 0',
+      "stage_of_control_status <> 'EX'"
+    ].join(' AND ')
+  })
+  const payload = await fetchGeoJson(url, 'NRCan CWFIS')
+
+  return readFeatures(payload)
+    .map(normalizeCwfisFire)
+    .filter(Boolean)
+}
+
+async function getEonetFires() {
+  const payload = await fetchGeoJson(EONET_WILDFIRES_URL, 'NASA EONET')
+
+  return readFeatures(payload)
+    .map(normalizeEonetFire)
+    .filter(Boolean)
+}
+
+async function fetchGeoJson(url, provider) {
   const response = await fetchWithTimeout(
-    EONET_WILDFIRES_URL,
+    url,
     {
       headers: {
         Accept: 'application/geo+json, application/json',
         'User-Agent': 'Aether Weather Map'
       }
     },
-    EONET_TIMEOUT_MS
+    PROVIDER_TIMEOUT_MS
   )
 
   if (!response.ok) {
-    throw new Error(`NASA EONET returned ${response.status}`)
+    throw new Error(`${provider} returned ${response.status}`)
   }
 
-  const payload = await response.json()
-  const features = Array.isArray(payload?.features) ? payload.features : []
+  const contentType = response.headers.get('content-type') ?? ''
 
-  return deduplicateFires(features
-    .map(normalizeReportedFire)
-    .filter(Boolean))
+  if (!contentType.includes('json')) {
+    throw new Error(`${provider} returned invalid data`)
+  }
+
+  return response.json()
+}
+
+function normalizeNifcFire(feature) {
+  const properties = feature?.properties
+  const location = readPoint(feature?.geometry)
+  const title = readText(properties?.IncidentName)
+
+  if (
+    !location ||
+    !title ||
+    !['WF', 'CX'].includes(properties?.IncidentTypeCategory)
+  ) {
+    return null
+  }
+
+  const size = readPositiveNumber(properties.IncidentSize)
+  const contained = readPercentage(properties.PercentContained)
+  const description = [
+    readText(properties.IncidentShortDescription),
+    formatUsState(properties.POOState),
+    contained === null ? null : `${contained}% contained`
+  ].filter(Boolean).join(' · ')
+  const sourceId = readText(properties.IrwinID) ??
+    readText(properties.UniqueFireIdentifier)
+
+  return {
+    id: `nifc:${sourceId ?? `${location.latitude}:${location.longitude}:${title}`}`,
+    title,
+    description: description || null,
+    ...location,
+    reportedAt: readDate(
+      properties.ModifiedOnDateTime_dt ?? properties.FireDiscoveryDateTime
+    ),
+    magnitude: size === null ? null : `${formatNumber(size)} acres`,
+    source: 'NIFC WFIGS',
+    sourceUrl: NIFC_SOURCE_URL
+  }
+}
+
+function normalizeCwfisFire(feature) {
+  const properties = feature?.properties
+  const location = readCoordinateProperties(properties) ??
+    readPoint(feature?.geometry)
+  const sourceId = readText(properties?.national_fire_id) ??
+    readText(properties?.agency_fire_id)
+
+  if (
+    !location ||
+    !sourceId ||
+    Number(properties?.fire_was_prescribed) === 1 ||
+    properties?.stage_of_control_status === 'EX'
+  ) {
+    return null
+  }
+
+  const size = readPositiveNumber(properties.fire_size)
+  const contained = readPercentage(properties.percent_contained)
+  const description = [
+    describeCanadianStatus(properties.stage_of_control_status),
+    readText(properties.agency_code)
+      ? `Agency ${readText(properties.agency_code)}`
+      : null,
+    contained === null ? null : `${contained}% contained`
+  ].filter(Boolean).join(' · ')
+
+  return {
+    id: `cwfis:${sourceId}`,
+    title: `Fire ${sourceId}`,
+    description: description || null,
+    ...location,
+    reportedAt: readDate(
+      properties.status_date ?? properties.situation_report_date
+    ),
+    magnitude: size === null ? null : `${formatNumber(size)} ha`,
+    source: 'NRCan CWFIS',
+    sourceUrl: CWFIS_SOURCE_URL
+  }
+}
+
+function normalizeEonetFire(feature) {
+  const properties = feature?.properties
+  const location = readPoint(feature?.geometry)
+  const title = readText(properties?.title)
+
+  if (!location || !title || isPrescribedFire(title)) {
+    return null
+  }
+
+  const source = Array.isArray(properties.sources)
+    ? properties.sources.find(item => readUrl(item?.url))
+    : null
+
+  return {
+    id: `eonet:${readText(properties.id) ?? `${location.latitude}:${location.longitude}:${title}`}`,
+    title,
+    description: readText(properties.description),
+    ...location,
+    reportedAt: readDate(properties.date),
+    magnitude: readMagnitude(
+      properties.magnitudeValue,
+      properties.magnitudeUnit
+    ),
+    source: 'NASA EONET',
+    sourceUrl: readUrl(source?.url)
+  }
 }
 
 function deduplicateFires(fires) {
@@ -47,23 +232,31 @@ function deduplicateFires(fires) {
   return Array.from(unique.values())
 }
 
-function normalizeReportedFire(feature) {
-  const properties = feature?.properties
-  const coordinates = feature?.geometry?.coordinates
-  const title = readText(properties?.title)
+function readFeatures(payload) {
+  return Array.isArray(payload?.features) ? payload.features : []
+}
+
+function readPoint(geometry) {
+  const coordinates = geometry?.coordinates
 
   if (
-    feature?.geometry?.type !== 'Point' ||
+    geometry?.type !== 'Point' ||
     !Array.isArray(coordinates) ||
-    coordinates.length < 2 ||
-    !title ||
-    isPrescribedFire(title)
+    coordinates.length < 2
   ) {
     return null
   }
 
-  const longitude = Number(coordinates[0])
-  const latitude = Number(coordinates[1])
+  return validateLocation(coordinates[1], coordinates[0])
+}
+
+function readCoordinateProperties(properties) {
+  return validateLocation(properties?.latitude, properties?.longitude)
+}
+
+function validateLocation(latitudeValue, longitudeValue) {
+  const latitude = Number(latitudeValue)
+  const longitude = Number(longitudeValue)
 
   if (
     !Number.isFinite(latitude) ||
@@ -76,20 +269,21 @@ function normalizeReportedFire(feature) {
     return null
   }
 
-  const source = Array.isArray(properties.sources)
-    ? properties.sources.find(item => readUrl(item?.url))
-    : null
+  return { latitude, longitude }
+}
 
+function describeCanadianStatus(value) {
   return {
-    id: readText(properties.id) ?? `${latitude}:${longitude}:${title}`,
-    title,
-    description: readText(properties.description),
-    latitude,
-    longitude,
-    reportedAt: readDate(properties.date),
-    magnitude: readMagnitude(properties.magnitudeValue, properties.magnitudeUnit),
-    sourceUrl: readUrl(source?.url)
-  }
+    OC: 'Out of control',
+    BH: 'Being held',
+    UC: 'Under control'
+  }[value] ?? 'Active'
+}
+
+function formatUsState(value) {
+  const state = readText(value)
+
+  return state?.startsWith('US-') ? state.slice(3) : state
 }
 
 function isPrescribedFire(title) {
@@ -103,20 +297,36 @@ function readText(value) {
 }
 
 function readDate(value) {
-  if (typeof value !== 'string' || Number.isNaN(Date.parse(value))) {
-    return null
-  }
+  const date = typeof value === 'number' ? new Date(value) : new Date(value)
 
-  return value
+  return !value || Number.isNaN(date.getTime()) ? null : date.toISOString()
+}
+
+function readPositiveNumber(value) {
+  const number = Number(value)
+
+  return Number.isFinite(number) && number >= 0 ? number : null
+}
+
+function readPercentage(value) {
+  const number = Number(value)
+
+  return Number.isFinite(number) && number >= 0 && number <= 100
+    ? Math.round(number)
+    : null
 }
 
 function readMagnitude(value, unit) {
-  const amount = Number(value)
+  const amount = readPositiveNumber(value)
   const label = readText(unit)
 
-  return Number.isFinite(amount) && amount >= 0 && label
-    ? `${amount.toLocaleString('en-US')} ${label}`
+  return amount !== null && label
+    ? `${formatNumber(amount)} ${label}`
     : null
+}
+
+function formatNumber(value) {
+  return value.toLocaleString('en-US', { maximumFractionDigits: 1 })
 }
 
 function readUrl(value) {
@@ -131,4 +341,14 @@ function readUrl(value) {
   } catch {
     return null
   }
+}
+
+function buildUrl(endpoint, values) {
+  const url = new URL(endpoint)
+
+  for (const [key, value] of Object.entries(values)) {
+    url.searchParams.set(key, value)
+  }
+
+  return url.toString()
 }

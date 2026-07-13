@@ -40,6 +40,16 @@ const DATA_SOURCES = [
     url: 'https://firms.modaps.eosdis.nasa.gov/'
   },
   {
+    name: 'NIFC WFIGS',
+    kind: 'USA incidents',
+    url: 'https://www.nifc.gov/'
+  },
+  {
+    name: 'NRCan CWFIS',
+    kind: 'Canada incidents',
+    url: 'https://cwfis.cfs.nrcan.gc.ca/en/'
+  },
+  {
     name: 'NASA EONET',
     kind: 'Reported fires',
     url: 'https://eonet.gsfc.nasa.gov/'
