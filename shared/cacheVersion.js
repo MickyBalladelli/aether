@@ -1,4 +1,4 @@
-export const CACHE_VERSION = 11
+export const CACHE_VERSION = 12
 
 export function getCacheNamespace(name) {
   return `aether-${name}-v${CACHE_VERSION}`
