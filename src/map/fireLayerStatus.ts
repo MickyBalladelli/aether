@@ -1,6 +1,7 @@
 export type FireLayerId =
   | 'heat-detections'
   | 'reported-wildfires'
+  | 'africa-detections'
   | 'europe-detections'
 
 export type FireLayerState =
@@ -34,6 +35,13 @@ export const INITIAL_FIRE_LAYER_STATUSES: FireLayerStatus[] = [
   {
     id: 'reported-wildfires',
     label: 'Reported open wildfires',
+    enabled: false,
+    state: 'idle',
+    lastUpdated: null
+  },
+  {
+    id: 'africa-detections',
+    label: 'Africa fire detections · Today + yesterday',
     enabled: false,
     state: 'idle',
     lastUpdated: null

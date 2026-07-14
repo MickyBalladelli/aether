@@ -55,8 +55,13 @@ const DATA_SOURCES = [
     url: 'https://eonet.gsfc.nasa.gov/'
   },
   {
-    name: 'Copernicus EFFIS',
+    name: 'Copernicus EFFIS Europe',
     kind: 'Europe fires',
+    url: 'https://forest-fire.emergency.copernicus.eu/'
+  },
+  {
+    name: 'Copernicus EFFIS Africa',
+    kind: 'Africa fires',
     url: 'https://forest-fire.emergency.copernicus.eu/'
   }
 ]

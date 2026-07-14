@@ -39,12 +39,14 @@ const WORLD_BOUNDS = L.latLngBounds(
   [85.05112878, 180]
 )
 const AMERICAS_FIRE_BOUNDS = L.latLngBounds([-60, -170], [85, -30])
-const EUROPE_FIRE_BOUNDS = L.latLngBounds([25, -20], [72, 45])
+const AFRICA_FIRE_BOUNDS = L.latLngBounds([-35, -20], [40, 55])
+const EUROPE_FIRE_BOUNDS = L.latLngBounds([40, -25], [72, 45])
 const MAP_TILE_STYLE_KEY = 'aether:map-tile-style'
 const MAP_OVERLAYS_KEY = 'aether:map-overlays'
 const MAP_OVERLAY_IDS: FireLayerId[] = [
   'heat-detections',
   'reported-wildfires',
+  'africa-detections',
   'europe-detections'
 ]
 const FIRE_LAYER_DESCRIPTION = [
@@ -57,7 +59,12 @@ const FIRMS_HOVER_INFO: MapFirePointer = {
   source: 'NASA FIRMS · VIIRS',
   detail: 'Detected within the last 24 hours. Not a confirmed active fire.'
 }
-const EFFIS_HOVER_INFO: MapFirePointer = {
+const AFRICA_EFFIS_HOVER_INFO: MapFirePointer = {
+  title: 'Africa heat detection',
+  source: 'Copernicus EFFIS · VIIRS',
+  detail: 'Detected today or yesterday. Not a confirmed active fire.'
+}
+const EUROPE_EFFIS_HOVER_INFO: MapFirePointer = {
   title: 'Europe heat detection',
   source: 'Copernicus EFFIS · VIIRS',
   detail: 'Detected today or yesterday. Not a confirmed active fire.'
@@ -212,7 +219,19 @@ export function AetherMap({
         attribution: 'Americas heat detections NASA FIRMS'
       }
     )
-    const effisFireTiles = new AnimatedFireTileLayer(
+    const africaFireTiles = new AnimatedFireTileLayer(
+      '/api/effis-fire-tile?z={z}&x={x}&y={y}',
+      {
+        bounds: AFRICA_FIRE_BOUNDS,
+        detectionBounds: AFRICA_FIRE_BOUNDS,
+        maxNativeZoom: 12,
+        maxZoom: 19,
+        noWrap: true,
+        opacity: 0.92,
+        attribution: 'African fire detections Copernicus EFFIS'
+      }
+    )
+    const europeFireTiles = new AnimatedFireTileLayer(
       '/api/effis-fire-tile?z={z}&x={x}&y={y}',
       {
         bounds: EUROPE_FIRE_BOUNDS,
@@ -227,7 +246,8 @@ export function AetherMap({
     const mapOverlayLayers: Record<FireLayerId, L.Layer> = {
       'heat-detections': fireTiles,
       'reported-wildfires': reportedFires.getLeafletLayer(),
-      'europe-detections': effisFireTiles
+      'africa-detections': africaFireTiles,
+      'europe-detections': europeFireTiles
     }
 
     initialTiles.addTo(map)
@@ -239,7 +259,8 @@ export function AetherMap({
       },
       {
         'Americas heat detections · 24h': fireTiles,
-        'Europe fire detections · Today + yesterday': effisFireTiles,
+        'Africa fire detections · Today + yesterday': africaFireTiles,
+        'Europe fire detections · Today + yesterday': europeFireTiles,
         'Reported open wildfires': reportedFires.getLeafletLayer()
       },
       {
@@ -253,8 +274,9 @@ export function AetherMap({
       ) ?? []
     )
     const heatLayerInput = overlayInputs[0]
-    const effisFireInput = overlayInputs[1]
-    const reportedFireInput = overlayInputs[2]
+    const africaFireInput = overlayInputs[1]
+    const europeFireInput = overlayInputs[2]
+    const reportedFireInput = overlayInputs[3]
 
     addLayerControlHeading(heatLayerInput, 'Satellite detections')
     addLayerControlHeading(reportedFireInput, 'Reported incidents')
@@ -275,11 +297,19 @@ export function AetherMap({
       'aria-label',
       'Reported open wildfires from NIFC, CWFIS, and NASA EONET. Americas incidents follow the Americas heat-detection toggle. Coverage is incomplete and status can lag.'
     )
-    effisFireInput?.closest('label')?.setAttribute(
+    africaFireInput?.closest('label')?.setAttribute(
       'title',
-      'Copernicus EFFIS filtered VIIRS detections from today and yesterday across Europe and the Mediterranean. These are not confirmed incident reports.'
+      'Copernicus EFFIS filtered VIIRS detections from today and yesterday across Africa. These are not confirmed incident reports.'
     )
-    effisFireInput?.setAttribute(
+    africaFireInput?.setAttribute(
+      'aria-label',
+      'Copernicus Africa fire detections from today and yesterday. These are not confirmed incident reports.'
+    )
+    europeFireInput?.closest('label')?.setAttribute(
+      'title',
+      'Copernicus EFFIS filtered VIIRS detections from today and yesterday across Europe. These are not confirmed incident reports.'
+    )
+    europeFireInput?.setAttribute(
       'aria-label',
       'Copernicus Europe fire detections from today and yesterday. These are not confirmed incident reports.'
     )
@@ -288,7 +318,8 @@ export function AetherMap({
     }
     let firmsConfigured: boolean | null = null
     let firmsLoadedTiles = 0
-    let effisLoadedTiles = 0
+    let africaLoadedTiles = 0
+    let europeLoadedTiles = 0
     const fireStatusController = new AbortController()
     const handleFireOverlayAdd = (event: L.LayersControlEvent) => {
       if (event.layer === fireTiles) {
@@ -302,7 +333,12 @@ export function AetherMap({
           enabled: true,
           state: 'loading'
         })
-      } else if (event.layer === effisFireTiles) {
+      } else if (event.layer === africaFireTiles) {
+        updateFireLayerStatus('africa-detections', {
+          enabled: true,
+          state: 'loading'
+        })
+      } else if (event.layer === europeFireTiles) {
         updateFireLayerStatus('europe-detections', {
           enabled: true,
           state: 'loading'
@@ -313,7 +349,8 @@ export function AetherMap({
         event.layer,
         fireTiles,
         reportedFires.getLeafletLayer(),
-        effisFireTiles
+        africaFireTiles,
+        europeFireTiles
       )) {
         saveEnabledMapOverlays(map, mapOverlayLayers)
       }
@@ -327,7 +364,8 @@ export function AetherMap({
         event.layer,
         fireTiles,
         reportedFires.getLeafletLayer(),
-        effisFireTiles
+        africaFireTiles,
+        europeFireTiles
       )
 
       if (layerId) {
@@ -359,24 +397,44 @@ export function AetherMap({
         ...(firmsLoadedTiles > 0 ? { lastUpdated: Date.now() } : {})
       })
     }
-    const handleEffisLoading = () => {
-      effisLoadedTiles = 0
+    const handleAfricaLoading = () => {
+      africaLoadedTiles = 0
 
-      if (map.hasLayer(effisFireTiles)) {
+      if (map.hasLayer(africaFireTiles)) {
+        updateFireLayerStatus('africa-detections', { state: 'loading' })
+      }
+    }
+    const handleAfricaTileLoad = () => {
+      africaLoadedTiles += 1
+    }
+    const handleAfricaLoad = () => {
+      if (!map.hasLayer(africaFireTiles)) {
+        return
+      }
+
+      updateFireLayerStatus('africa-detections', {
+        state: africaLoadedTiles > 0 ? 'available' : 'unavailable',
+        ...(africaLoadedTiles > 0 ? { lastUpdated: Date.now() } : {})
+      })
+    }
+    const handleEuropeLoading = () => {
+      europeLoadedTiles = 0
+
+      if (map.hasLayer(europeFireTiles)) {
         updateFireLayerStatus('europe-detections', { state: 'loading' })
       }
     }
-    const handleEffisTileLoad = () => {
-      effisLoadedTiles += 1
+    const handleEuropeTileLoad = () => {
+      europeLoadedTiles += 1
     }
-    const handleEffisLoad = () => {
-      if (!map.hasLayer(effisFireTiles)) {
+    const handleEuropeLoad = () => {
+      if (!map.hasLayer(europeFireTiles)) {
         return
       }
 
       updateFireLayerStatus('europe-detections', {
-        state: effisLoadedTiles > 0 ? 'available' : 'unavailable',
-        ...(effisLoadedTiles > 0 ? { lastUpdated: Date.now() } : {})
+        state: europeLoadedTiles > 0 ? 'available' : 'unavailable',
+        ...(europeLoadedTiles > 0 ? { lastUpdated: Date.now() } : {})
       })
     }
 
@@ -386,9 +444,12 @@ export function AetherMap({
     fireTiles.on('loading', handleFirmsLoading)
     fireTiles.on('tileload', handleFirmsTileLoad)
     fireTiles.on('load', handleFirmsLoad)
-    effisFireTiles.on('loading', handleEffisLoading)
-    effisFireTiles.on('tileload', handleEffisTileLoad)
-    effisFireTiles.on('load', handleEffisLoad)
+    africaFireTiles.on('loading', handleAfricaLoading)
+    africaFireTiles.on('tileload', handleAfricaTileLoad)
+    africaFireTiles.on('load', handleAfricaLoad)
+    europeFireTiles.on('loading', handleEuropeLoading)
+    europeFireTiles.on('tileload', handleEuropeTileLoad)
+    europeFireTiles.on('load', handleEuropeLoad)
     void fetchWithTimeout(
       '/api/fire-layer-status',
       { signal: fireStatusController.signal },
@@ -475,7 +536,8 @@ export function AetherMap({
         map,
         L.point(pointer.x, pointer.y),
         [
-          { layer: effisFireTiles, info: EFFIS_HOVER_INFO },
+          { layer: africaFireTiles, info: AFRICA_EFFIS_HOVER_INFO },
+          { layer: europeFireTiles, info: EUROPE_EFFIS_HOVER_INFO },
           { layer: fireTiles, info: FIRMS_HOVER_INFO }
         ]
       )
@@ -578,9 +640,12 @@ export function AetherMap({
       fireTiles.off('loading', handleFirmsLoading)
       fireTiles.off('tileload', handleFirmsTileLoad)
       fireTiles.off('load', handleFirmsLoad)
-      effisFireTiles.off('loading', handleEffisLoading)
-      effisFireTiles.off('tileload', handleEffisTileLoad)
-      effisFireTiles.off('load', handleEffisLoad)
+      africaFireTiles.off('loading', handleAfricaLoading)
+      africaFireTiles.off('tileload', handleAfricaTileLoad)
+      africaFireTiles.off('load', handleAfricaLoad)
+      europeFireTiles.off('loading', handleEuropeLoading)
+      europeFireTiles.off('tileload', handleEuropeTileLoad)
+      europeFireTiles.off('load', handleEuropeLoad)
       map.off('movestart zoomstart', clearPointerWeather)
       elementRef.current?.removeEventListener('mouseleave', clearPointerWeather)
       pointerRefreshRef.current = () => {}
@@ -727,7 +792,8 @@ function getFireLayerId(
   layer: L.Layer,
   firmsLayer: L.Layer,
   reportedLayer: L.Layer,
-  effisLayer: L.Layer
+  africaLayer: L.Layer,
+  europeLayer: L.Layer
 ): FireLayerId | null {
   if (layer === firmsLayer) {
     return 'heat-detections'
@@ -737,7 +803,11 @@ function getFireLayerId(
     return 'reported-wildfires'
   }
 
-  return layer === effisLayer ? 'europe-detections' : null
+  if (layer === africaLayer) {
+    return 'africa-detections'
+  }
+
+  return layer === europeLayer ? 'europe-detections' : null
 }
 
 function addLayerControlHeading(

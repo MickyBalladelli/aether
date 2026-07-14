@@ -14,9 +14,11 @@ const STATE_LABELS: Record<FireLayerStatusValue['state'], string> = {
 
 export function FireLayerStatus({ statuses }: FireLayerStatusProps) {
   const enabledStatuses = statuses.filter(status => status.enabled)
-  const effisStatus = enabledStatuses.find(
-    status => status.id === 'europe-detections'
-  )
+  const effisStatuses = enabledStatuses.filter(status => (
+    status.id === 'europe-detections' || status.id === 'africa-detections'
+  ))
+  const effisStatus = effisStatuses.find(status => status.lastUpdated) ??
+    effisStatuses[0]
 
   if (enabledStatuses.length === 0) {
     return null
