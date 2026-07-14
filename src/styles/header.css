@@ -17,7 +17,7 @@
   border-bottom: 1px solid var(--glass-line);
   background:
     linear-gradient(110deg, rgba(255, 255, 255, 0.1), transparent 45%),
-    rgba(6, 15, 20, 0.76);
+    var(--app-surface-strong);
   box-shadow: 0 10px 36px rgba(0, 0, 0, 0.24);
   backdrop-filter: blur(20px) saturate(145%);
   z-index: 3;
@@ -29,11 +29,11 @@
   left: 50%;
   z-index: 4;
   padding: 7px 12px;
-  border: 1px solid rgba(143, 229, 255, 0.34);
+  border: 1px solid var(--glass-line);
   border-radius: 999px;
-  background: rgba(7, 20, 27, 0.86);
+  background: var(--app-surface-strong);
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
-  color: #dff8ff;
+  color: var(--app-text);
   font-size: 12px !important;
   font-weight: 750 !important;
   line-height: 1.2 !important;
@@ -64,7 +64,7 @@
 }
 
 .brand-name {
-  color: #f7fcff;
+  color: var(--app-text);
   font-weight: 800;
   line-height: 1;
   letter-spacing: 0.02em;
@@ -76,7 +76,7 @@
 }
 
 .brand-version {
-  color: rgba(230, 247, 255, 0.48);
+  color: var(--app-text-muted);
   font-size: 9px;
   font-weight: 700;
   line-height: 1;
@@ -87,11 +87,11 @@
 .brand-divider {
   width: 1px;
   height: 18px;
-  background: rgba(190, 237, 255, 0.2);
+  background: var(--glass-line);
 }
 
 .brand-place {
-  color: rgba(230, 247, 255, 0.72);
+  color: var(--app-text-muted);
   line-height: 1;
 }
 
@@ -124,7 +124,7 @@
   max-height: min(520px, calc(100dvh - 24px));
   border: 1px solid rgba(190, 237, 255, 0.22);
   border-radius: 10px !important;
-  background: rgba(7, 17, 22, 0.94) !important;
+  background: var(--app-surface-strong) !important;
   box-shadow: var(--glass-shadow) !important;
   backdrop-filter: blur(18px) saturate(140%);
 }
@@ -149,7 +149,7 @@
   align-items: center;
   gap: 7px;
   padding: 4px 16px 2px;
-  color: rgba(230, 247, 255, 0.56);
+  color: var(--app-text-muted);
 }
 
 .location-bookmarks-heading svg {
@@ -170,7 +170,7 @@
 
 .location-bookmarks-label > :last-child,
 .location-bookmarks-empty {
-  color: rgba(230, 247, 255, 0.5);
+  color: var(--app-text-muted);
 }
 
 .location-bookmarks-empty {
@@ -193,8 +193,9 @@
 
 .city-search-input .MuiOutlinedInput-root {
   height: 36px;
-  background: rgba(255, 255, 255, 0.07);
+  background: var(--app-surface);
   font-size: 13px;
+  color: var(--app-text);
 }
 
 .city-search-input .MuiOutlinedInput-input {
@@ -202,20 +203,20 @@
 }
 
 .city-search-input .MuiOutlinedInput-notchedOutline {
-  border-color: rgba(190, 237, 255, 0.18);
+  border-color: var(--glass-line);
 }
 
 .city-search-button {
   width: 36px;
   height: 36px;
-  border: 1px solid rgba(143, 229, 255, 0.32);
+  border: 1px solid var(--glass-line);
   border-radius: 9px;
-  background: rgba(143, 229, 255, 0.14);
-  color: #bcefff;
+  background: var(--app-surface);
+  color: var(--app-text);
 }
 
 .city-search-button:hover {
-  background: rgba(143, 229, 255, 0.24);
+  background: var(--app-surface-soft);
 }
 
 .search-status {
@@ -224,10 +225,10 @@
   gap: 6px;
   min-height: 28px;
   padding: 4px 9px;
-  border: 1px solid rgba(190, 237, 255, 0.3);
+  border: 1px solid var(--glass-line);
   border-radius: 999px;
-  background: rgba(230, 247, 255, 0.1);
-  color: #f4fbff;
+  background: var(--app-surface);
+  color: var(--app-text);
   font-size: 11px;
   font-weight: 750;
   letter-spacing: 0.02em;
@@ -274,9 +275,9 @@
 .data-state-tooltip {
   max-width: 280px !important;
   padding: 2px 0 0 0 !important;
-  border: 1px solid rgba(190, 237, 255, 0.25) !important;
+  border: 1px solid var(--glass-line) !important;
   border-radius: 8px !important;
-  background: rgba(7, 17, 22, 0.94) !important;
+  background: var(--app-surface-strong) !important;
   backdrop-filter: blur(18px) saturate(140%);
   box-shadow: 0 12px 38px rgba(0, 0, 0, 0.42) !important;
 }
@@ -290,7 +291,7 @@
 }
 
 .data-state-legend dt {
-  color: rgba(247, 252, 255, 0.92);
+  color: var(--app-text);
   font-size: 12px;
   font-weight: 750;
   line-height: 1.45;
@@ -298,7 +299,7 @@
 
 .data-state-legend dd {
   margin: 0;
-  color: rgba(230, 247, 255, 0.58);
+  color: var(--app-text-muted);
   font-size: 11px;
   line-height: 1.45;
 }
@@ -306,25 +307,25 @@
 .search-status-live {
   border-color: rgba(140, 233, 170, 0.5);
   background: rgba(140, 233, 170, 0.16);
-  color: #dcffe8;
+  color: var(--app-text);
 }
 
 .search-status-cached {
   border-color: rgba(143, 229, 255, 0.5);
   background: rgba(143, 229, 255, 0.16);
-  color: #dff8ff;
+  color: var(--app-text);
 }
 
 .search-status-stale {
   border-color: rgba(255, 196, 112, 0.55);
   background: rgba(255, 196, 112, 0.16);
-  color: #ffe8c2;
+  color: var(--app-text);
 }
 
 .search-status-unavailable {
   border-color: rgba(255, 118, 118, 0.55);
   background: rgba(255, 118, 118, 0.16);
-  color: #ffd6d6;
+  color: var(--app-text);
 }
 
 .search-status-stale::before {

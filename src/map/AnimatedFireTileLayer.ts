@@ -28,17 +28,21 @@ export class AnimatedFireTileLayer extends L.TileLayer {
       : null
   }
 
-  onAdd(map: L.Map) {
+  onAdd(map: L.Map): this {
     super.onAdd(map)
     this.mapRef = map
     this.handleMapViewChange()
     map.on('moveend zoomend', this.handleMapViewChange)
+
+    return this
   }
 
-  onRemove(map: L.Map) {
+  onRemove(map: L.Map): this {
     map.off('moveend zoomend', this.handleMapViewChange)
     this.mapRef = null
     super.onRemove(map)
+
+    return this
   }
 
   createTile(coords: L.Coords, done: L.DoneCallback): HTMLImageElement {

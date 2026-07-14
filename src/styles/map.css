@@ -2,13 +2,13 @@
   position: fixed;
   inset: 0;
   z-index: 0;
-  background: #0c1b20;
+  background: var(--app-bg);
 }
 
 .leaflet-container {
   width: 100%;
   height: 100%;
-  background: #0c1b20;
+  background: var(--app-bg);
   font-family: "Inter", "SF Pro Display", system-ui, sans-serif;
 }
 
@@ -31,17 +31,17 @@
 }
 
 .leaflet-control-zoom a {
-  background: rgba(10, 21, 27, 0.84) !important;
-  color: #f4fbff !important;
-  border-bottom-color: rgba(190, 237, 255, 0.16) !important;
+  background: var(--app-surface-strong) !important;
+  color: var(--app-text) !important;
+  border-bottom-color: var(--glass-line) !important;
 }
 
 .leaflet-control-layers {
   border: 1px solid var(--glass-line) !important;
   border-radius: 8px !important;
-  background: rgba(10, 21, 27, 0.88) !important;
+  background: var(--app-surface-strong) !important;
   box-shadow: var(--glass-shadow) !important;
-  color: #f4fbff;
+  color: var(--app-text);
   backdrop-filter: blur(12px);
 }
 
@@ -60,8 +60,8 @@
 .leaflet-control-layers-section-title {
   margin: 7px 0 3px;
   padding-top: 7px;
-  border-top: 1px solid rgba(190, 237, 255, 0.14);
-  color: rgba(189, 239, 255, 0.62);
+  border-top: 1px solid var(--glass-line);
+  color: var(--app-text-muted);
   font-size: 9px;
   font-weight: 800;
   text-transform: uppercase;
@@ -86,14 +86,14 @@
   gap: 6px;
   height: var(--footer-height);
   padding: 0 max(8px, env(safe-area-inset-right)) 0 max(8px, env(safe-area-inset-left));
-  color: rgba(230, 247, 255, 0.58);
+  color: var(--app-text-muted);
   font-size: 10px;
   pointer-events: none;
   text-shadow: 0 1px 5px rgba(0, 0, 0, 0.9);
 }
 
 .data-source-carousel-label {
-  color: rgba(230, 247, 255, 0.42);
+  color: var(--app-text-muted);
   font-weight: 750;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -108,7 +108,7 @@
 }
 
 .data-source-carousel-item a {
-  color: #bdefff;
+  color: var(--app-link);
   font-size: 11px;
   font-weight: 800;
   text-decoration: none;
@@ -118,12 +118,12 @@
 
 .data-source-carousel-item a:hover,
 .data-source-carousel-item a:focus-visible {
-  color: #fff;
+  color: var(--app-text);
   text-decoration: underline;
 }
 
 .data-source-carousel-item span {
-  color: rgba(230, 247, 255, 0.48);
+  color: var(--app-text-muted);
 }
 
 .data-source-carousel-window {

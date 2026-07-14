@@ -68,7 +68,6 @@ const DATA_STATE_TOOLTIP = (
           location={location}
           onSelect={onLocationSelect}
         />
-
         <Box
           component="form"
           className="map-search"

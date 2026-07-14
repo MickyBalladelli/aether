@@ -57,13 +57,6 @@ import type {
 
 const REVERSE_GEOCODE_DEBOUNCE_MS = 350
 const HOVER_GEOCODE_DEBOUNCE_MS = 650
-const AetherMap = lazy(async () => ({
-  default: (await import('./components/AetherMap')).AetherMap
-}))
-const WeatherDashboard = lazy(async () => ({
-  default: (await import('./components/WeatherDashboard')).WeatherDashboard
-}))
-
 const theme = createTheme({
   palette: {
     mode: 'dark',
@@ -85,6 +78,12 @@ const theme = createTheme({
     borderRadius: 8
   }
 })
+const AetherMap = lazy(async () => ({
+  default: (await import('./components/AetherMap')).AetherMap
+}))
+const WeatherDashboard = lazy(async () => ({
+  default: (await import('./components/WeatherDashboard')).WeatherDashboard
+}))
 
 export default function App() {
   const [weather, setWeather] = useState<WeatherConfig | null>(null)
@@ -144,7 +143,6 @@ export default function App() {
     () => getWeatherMapSamplesAtTime(mapSamples, ecmwfPlaybackTime),
     [ecmwfPlaybackTime, mapSamples]
   )
-
   useEffect(() => () => {
     window.clearTimeout(reverseGeocodeTimeoutRef.current)
     reverseGeocodeAbortRef.current?.abort()

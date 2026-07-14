@@ -253,10 +253,7 @@ export function AetherMap({
     initialTiles.addTo(map)
 
     const tileControl = L.control.layers(
-      {
-        Standard: standardTiles,
-        Dark: darkTiles
-      },
+      {},
       {
         'Americas heat detections · 24h': fireTiles,
         'Africa fire detections · Today + yesterday': africaFireTiles,
@@ -313,9 +310,6 @@ export function AetherMap({
       'aria-label',
       'Copernicus Europe fire detections from today and yesterday. These are not confirmed incident reports.'
     )
-    const handleTileStyleChange = (event: L.LayersControlEvent) => {
-      saveMapTileStyle(event.name === 'Dark' ? 'dark' : 'standard')
-    }
     let firmsConfigured: boolean | null = null
     let firmsLoadedTiles = 0
     let africaLoadedTiles = 0
@@ -438,7 +432,6 @@ export function AetherMap({
       })
     }
 
-    map.on('baselayerchange', handleTileStyleChange)
     map.on('overlayadd', handleFireOverlayAdd)
     map.on('overlayremove', handleFireOverlayRemove)
     fireTiles.on('loading', handleFirmsLoading)
@@ -634,7 +627,6 @@ export function AetherMap({
       map.off('moveend zoomend resize', animation.invalidate, animation)
       map.off('mousemove', handleMouseMove)
       map.off('click', handleMapClick)
-      map.off('baselayerchange', handleTileStyleChange)
       map.off('overlayadd', handleFireOverlayAdd)
       map.off('overlayremove', handleFireOverlayRemove)
       fireTiles.off('loading', handleFirmsLoading)
@@ -831,19 +823,11 @@ function addLayerControlHeading(
 
 function loadMapTileStyle(): MapTileStyle {
   try {
-    return window.localStorage.getItem(MAP_TILE_STYLE_KEY) === 'dark'
-      ? 'dark'
-      : 'standard'
-  } catch {
-    return 'standard'
-  }
-}
+    const stored = window.localStorage.getItem(MAP_TILE_STYLE_KEY)
 
-function saveMapTileStyle(style: MapTileStyle) {
-  try {
-    window.localStorage.setItem(MAP_TILE_STYLE_KEY, style)
+    return stored === 'standard' ? 'standard' : 'dark'
   } catch {
-    return
+    return 'dark'
   }
 }
 

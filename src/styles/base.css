@@ -1,11 +1,19 @@
 :root {
-  color: #f4fbff;
-  background: #071014;
+  color: var(--app-text);
+  background: var(--app-bg);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  --glass-bg: rgba(10, 21, 27, 0.56);
-  --glass-line: rgba(190, 237, 255, 0.2);
+  --app-bg: #071014;
+  --app-surface: rgba(10, 21, 27, 0.56);
+  --app-surface-strong: rgba(7, 17, 22, 0.84);
+  --app-surface-soft: rgba(255, 255, 255, 0.06);
+  --app-text: #f4fbff;
+  --app-text-muted: rgba(230, 247, 255, 0.68);
+  --app-link: #bdefff;
+  --app-line: rgba(190, 237, 255, 0.2);
+  --glass-bg: var(--app-surface);
+  --glass-line: var(--app-line);
   --glass-shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
   --header-height: 56px;
   --footer-height: 38px;
@@ -26,6 +34,8 @@ body,
 
 body {
   overflow: hidden;
+  background: var(--app-bg);
+  color: var(--app-text);
 }
 
 .visually-hidden {
@@ -46,7 +56,8 @@ body {
   height: 100vh;
   min-height: 520px;
   overflow: hidden;
-  background: #071014;
+  background: var(--app-bg);
+  color: var(--app-text);
 }
 
 .map-loading {
@@ -54,8 +65,8 @@ body {
   inset: 0;
   display: grid;
   place-items: center;
-  background: #0c1b20;
-  color: rgba(230, 247, 255, 0.68);
+  background: var(--app-bg);
+  color: var(--app-text-muted);
 }
 
 .render-error {
@@ -107,9 +118,9 @@ body {
   padding: 8px 12px;
   border: 1px solid rgba(255, 214, 102, 0.42);
   border-radius: 999px;
-  background: rgba(37, 28, 8, 0.9);
+  background: var(--app-surface-strong);
   box-shadow: var(--glass-shadow);
-  color: #ffe59b;
+  color: var(--app-text);
   font-size: 12px;
   font-weight: 700;
   transform: translateX(-50%);
