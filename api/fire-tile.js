@@ -70,7 +70,7 @@ export default async function handler(request, response) {
   }
 
   const cache = getSharedCache(getCacheNamespace('fire-tiles'))
-  const cacheKey = `${tile.z}:${tile.x}:${tile.y}`
+  const cacheKey = `tsd-4:${tile.z}:${tile.x}:${tile.y}`
   let providerFailures = 0
   let quota = null
 

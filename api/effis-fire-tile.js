@@ -41,7 +41,8 @@ export default async function handler(request, response) {
   }
 
   const cache = getSharedCache(getCacheNamespace('effis-fire-tiles'))
-  const cacheKey = `${tile.z}:${tile.x}:${tile.y}`
+    const utcDate = new Date().toISOString().slice(0, 10)
+    const cacheKey = `${utcDate}:${tile.z}:${tile.x}:${tile.y}`
   let providerFailures = 0
   let quota = null
 

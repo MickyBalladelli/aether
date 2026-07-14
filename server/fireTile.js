@@ -38,7 +38,16 @@ export function buildFireTileUrl(mapKey, tile) {
     BBOX: `${west},${south},${east},${north}`
   })
 
-  return `https://firms.modaps.eosdis.nasa.gov/mapserver/wms/fires/${encodeURIComponent(mapKey)}/fires_viirs_24/circle/5/255+82+40/?${params.toString()}`
+  const layers = [
+    'tsd_4_viirs_00_06',
+    'tsd_4_viirs_06_12',
+    'tsd_4_viirs_12_24'
+  ].join(',')
+  const symbols = 'circle,circle,circle'
+  const sizes = '5,5,5'
+  const colors = '209+0+217,255+145+174,255+36+23'
+
+  return `https://firms.modaps.eosdis.nasa.gov/mapserver/wms/time_since_detection_4/${encodeURIComponent(mapKey)}/${layers}/${symbols}/${sizes}/${colors}/?${params.toString()}`
 }
 
 function parseInteger(value) {

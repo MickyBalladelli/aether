@@ -40,19 +40,6 @@ export function buildFireFlameMarkup(index: number, className = '') {
     `
 }
 
-export function buildTileFireMarkup(index: number) {
-  return `
-    <span
-      class="reported-fire-flame is-tile-detection"
-      style="--fire-delay: ${getAnimationDelay(index)}s"
-      aria-hidden="true"
-    >
-      <span class="reported-fire-glow"></span>
-      <span class="animated-fire-emoji">🔥</span>
-    </span>
-  `
-}
-
 function getAnimationDelay(index: number) {
   return -((index % 9) * 0.09).toFixed(2)
 }

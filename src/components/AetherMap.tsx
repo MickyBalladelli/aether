@@ -6,7 +6,6 @@ import { WeatherMapAnimation } from '../map/WeatherMapAnimation'
 import { WeatherRadarLayer } from '../map/WeatherRadarLayer'
 import { ReportedFireLayer } from '../map/ReportedFireLayer'
 import { findFireTileAtPoint } from '../map/fireTileHitTest'
-import { AnimatedFireTileLayer } from '../map/AnimatedFireTileLayer'
 import {
   INITIAL_FIRE_LAYER_STATUSES
 } from '../map/fireLayerStatus'
@@ -207,11 +206,10 @@ export function AetherMap({
       }
     )
     reportedFires.setExcludedBounds(AMERICAS_FIRE_BOUNDS)
-    const fireTiles = new AnimatedFireTileLayer(
+    const fireTiles = L.tileLayer(
       '/api/fire-tile?z={z}&x={x}&y={y}',
       {
         bounds: AMERICAS_FIRE_BOUNDS,
-        detectionBounds: AMERICAS_FIRE_BOUNDS,
         maxNativeZoom: 12,
         maxZoom: 19,
         noWrap: true,
@@ -219,11 +217,10 @@ export function AetherMap({
         attribution: 'Americas heat detections NASA FIRMS'
       }
     )
-    const africaFireTiles = new AnimatedFireTileLayer(
+    const africaFireTiles = L.tileLayer(
       '/api/effis-fire-tile?z={z}&x={x}&y={y}',
       {
         bounds: AFRICA_FIRE_BOUNDS,
-        detectionBounds: AFRICA_FIRE_BOUNDS,
         maxNativeZoom: 12,
         maxZoom: 19,
         noWrap: true,
@@ -231,16 +228,14 @@ export function AetherMap({
         attribution: 'African fire detections Copernicus EFFIS'
       }
     )
-    const europeFireTiles = new AnimatedFireTileLayer(
+    const europeFireTiles = L.tileLayer(
       '/api/effis-fire-tile?z={z}&x={x}&y={y}',
       {
         bounds: EUROPE_FIRE_BOUNDS,
-        detectionBounds: EUROPE_FIRE_BOUNDS,
         maxNativeZoom: 12,
         maxZoom: 19,
         noWrap: true,
         opacity: 0.92,
-        useVisibilityBudget: false,
         attribution: 'European fire detections Copernicus EFFIS'
       }
     )

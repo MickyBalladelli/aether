@@ -17,8 +17,14 @@ export function FireLayerStatus({ statuses }: FireLayerStatusProps) {
   const effisStatuses = enabledStatuses.filter(status => (
     status.id === 'europe-detections' || status.id === 'africa-detections'
   ))
-  const effisStatus = effisStatuses.find(status => status.lastUpdated) ??
-    effisStatuses[0]
+  const firmsStatus = enabledStatuses.find(status => status.id === 'heat-detections')
+  const detectionStatuses = [firmsStatus, ...effisStatuses].filter(
+    (status): status is FireLayerStatusValue => Boolean(status)
+  )
+  const detectionStatus = detectionStatuses.find(status => status.lastUpdated) ??
+    detectionStatuses[0]
+  const hasEffis = effisStatuses.length > 0
+  const hasFirms = Boolean(firmsStatus)
 
   if (enabledStatuses.length === 0) {
     return null
@@ -50,31 +56,53 @@ export function FireLayerStatus({ statuses }: FireLayerStatusProps) {
           )}
         </div>
       ))}
-      {effisStatus && (
+      {detectionStatus && (
         <section
           className="effis-fire-legend"
-          aria-label="EFFIS detection age legend"
+          aria-label="VIIRS detection age legend"
         >
-          <strong>EFFIS VIIRS detection age</strong>
+          <strong>{formatLegendTitle(hasEffis, hasFirms)}</strong>
           <div className="effis-fire-legend-ages">
             <span><i className="is-six-hours" />≤ 6 hours</span>
             <span><i className="is-twelve-hours" />6–12 hours</span>
             <span><i className="is-day" />12–24 hours</span>
-            <span><i className="is-older" />Older · yesterday</span>
+            {hasEffis && (
+              <span><i className="is-older" />Older · yesterday</span>
+            )}
           </div>
-          <span className="effis-fire-legend-satellites">
-            ■ Suomi · ● NOAA-20 · ◆ NOAA-21
-          </span>
+          {hasEffis && (
+            <span className="effis-fire-legend-satellites">
+              ■ Suomi · ● NOAA-20 · ◆ NOAA-21
+            </span>
+          )}
           <span className="effis-fire-legend-time">
-            Source window UTC: {formatEffisWindow()}
-            {effisStatus.lastUpdated
-              ? ` · Tiles loaded ${formatTime(effisStatus.lastUpdated)}`
+            {formatSourceWindow(hasEffis, hasFirms)}
+            {detectionStatus.lastUpdated
+              ? ` · Tiles loaded ${formatTime(detectionStatus.lastUpdated)}`
               : ''}
           </span>
         </section>
       )}
     </aside>
   )
+}
+
+function formatLegendTitle(hasEffis: boolean, hasFirms: boolean) {
+  if (hasEffis && hasFirms) {
+    return 'VIIRS detection age'
+  }
+
+  return hasFirms ? 'NASA FIRMS VIIRS detection age' : 'EFFIS VIIRS detection age'
+}
+
+function formatSourceWindow(hasEffis: boolean, hasFirms: boolean) {
+  if (hasEffis && hasFirms) {
+    return `Source windows UTC: Americas last 24h · EFFIS ${formatEffisWindow()}`
+  }
+
+  return hasFirms
+    ? 'Source window UTC: Americas last 24 hours'
+    : `Source window UTC: ${formatEffisWindow()}`
 }
 
 function formatTime(timestamp: number) {
