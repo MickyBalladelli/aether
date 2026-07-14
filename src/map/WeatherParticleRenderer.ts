@@ -4,11 +4,14 @@ import {
   JET_STREAM_COLORS,
   JET_STREAM_NAMES,
   JET_STREAM_OUTLINE_COLORS,
+  OCEAN_TEMPERATURE_COLORS,
+  OCEAN_TEMPERATURE_STOPS,
   WIND_COLORS
 } from './weatherPalette'
 import type {
   LightningSegment,
   Particle,
+  ProjectedOceanCurrentSample,
   ProjectedSample
 } from './weatherAnimationTypes'
 
@@ -210,6 +213,71 @@ export class WeatherParticleRenderer {
     this.drawJetStreamLegend()
   }
 
+  drawOceanCurrent(
+    samples: ProjectedOceanCurrentSample[],
+    deltaTime: number
+  ) {
+    if (samples.length === 0) {
+      return
+    }
+
+    this.context.fillStyle = 'rgba(2, 21, 36, 0.12)'
+    this.context.fillRect(0, 0, this.width, this.height)
+
+    if (this.reducedMotion) {
+      this.drawOceanCurrentLegend()
+      return
+    }
+
+    const activeCount = Math.min(PARTICLE_COUNT, 480)
+    const paths = OCEAN_TEMPERATURE_COLORS.map(() => new Path2D())
+    const usedBuckets = new Set<number>()
+
+    this.context.save()
+    this.context.lineCap = 'round'
+
+    for (let index = 0; index < activeCount; index += 1) {
+      const particle = this.particles[index]
+
+      if (particle.life <= 0 || this.isOutside(particle.x, particle.y, 40)) {
+        this.resetWindParticle(particle)
+      }
+
+      const field = oceanCurrentFieldAt(particle.x, particle.y, samples)
+
+      if (!field) {
+        particle.life = 0
+        continue
+      }
+
+      const speed = 18 + Math.min(field.speed, 3) * 78
+      const tail = 7 + Math.min(field.speed, 3) * 18
+
+      particle.x += field.x * speed * deltaTime
+      particle.y += field.y * speed * deltaTime
+      particle.life -= deltaTime
+
+      const bucket = oceanTemperatureBucket(field.temperature)
+      const path = paths[bucket]
+
+      usedBuckets.add(bucket)
+      path.moveTo(particle.x - field.x * tail, particle.y - field.y * tail)
+      path.lineTo(particle.x, particle.y)
+    }
+
+    for (const bucket of usedBuckets) {
+      this.context.lineWidth = 4.4
+      this.context.strokeStyle = 'rgba(0, 8, 16, 0.76)'
+      this.context.stroke(paths[bucket])
+      this.context.lineWidth = 1.8
+      this.context.strokeStyle = OCEAN_TEMPERATURE_COLORS[bucket]
+      this.context.stroke(paths[bucket])
+    }
+
+    this.context.restore()
+    this.drawOceanCurrentLegend()
+  }
+
   drawPrecipitation(samples: ProjectedSample[], deltaTime: number) {
     const wetSamples = samples.filter(({ sample }) => (
       sample.precipitation > 0.02 || sample.snowfall > 0.02
@@ -368,6 +436,37 @@ export class WeatherParticleRenderer {
     this.context.fillText('300+ km/h', x + legendWidth, y + 29)
   }
 
+  private drawOceanCurrentLegend() {
+    const legendWidth = Math.min(430, this.width - 48)
+    const x = (this.width - legendWidth) / 2
+    const y = this.height - LEGEND_BOTTOM_INSET
+    const gradient = this.context.createLinearGradient(x, 0, x + legendWidth, 0)
+
+    for (let index = 0; index < OCEAN_TEMPERATURE_COLORS.length; index += 1) {
+      gradient.addColorStop(
+        index / (OCEAN_TEMPERATURE_COLORS.length - 1),
+        OCEAN_TEMPERATURE_COLORS[index]
+      )
+    }
+
+    this.context.fillStyle = 'rgba(2, 12, 22, 0.82)'
+    this.context.beginPath()
+    this.context.roundRect(x - 12, y - 26, legendWidth + 24, 58, 8)
+    this.context.fill()
+    this.context.fillStyle = 'rgba(214, 242, 255, 0.9)'
+    this.context.font = '700 9px Inter, system-ui, sans-serif'
+    this.context.textAlign = 'left'
+    this.context.fillText('SEA SURFACE TEMPERATURE · NOAA OISST', x, y - 9)
+    this.context.fillStyle = gradient
+    this.context.fillRect(x, y, legendWidth, 12)
+    this.context.fillStyle = 'rgba(247, 252, 255, 0.96)'
+    this.context.font = '700 12px Inter, system-ui, sans-serif'
+    this.context.textAlign = 'left'
+    this.context.fillText('-2°C', x, y + 29)
+    this.context.textAlign = 'right'
+    this.context.fillText('34+°C', x + legendWidth, y + 29)
+  }
+
   private updateLightning(deltaTime: number) {
     let flash = 0
 
@@ -447,4 +546,100 @@ export class WeatherParticleRenderer {
       y > this.height + padding
     )
   }
+}
+
+function oceanCurrentFieldAt(
+  x: number,
+  y: number,
+  samples: ProjectedOceanCurrentSample[]
+) {
+  const nearest: Array<{
+    distance: number
+    sample: ProjectedOceanCurrentSample | null
+  }> = Array.from({ length: 4 }, () => ({
+    distance: Number.POSITIVE_INFINITY,
+    sample: null
+  }))
+  let closestGridPoint: ProjectedOceanCurrentSample | null = null
+  let closestGridDistance = Number.POSITIVE_INFINITY
+
+  for (const sample of samples) {
+    const deltaX = sample.x - x
+    const deltaY = sample.y - y
+    const distance = deltaX * deltaX + deltaY * deltaY
+
+    if (distance < closestGridDistance) {
+      closestGridPoint = sample
+      closestGridDistance = distance
+    }
+
+    if (!sample.sample.ocean) {
+      continue
+    }
+
+    for (let index = 0; index < nearest.length; index += 1) {
+      if (distance >= nearest[index].distance) {
+        continue
+      }
+
+      for (let shift = nearest.length - 1; shift > index; shift -= 1) {
+        nearest[shift] = nearest[shift - 1]
+      }
+
+      nearest[index] = { distance, sample }
+      break
+    }
+  }
+
+  if (
+    !closestGridPoint?.sample.ocean ||
+    !nearest[0].sample ||
+    nearest[0].distance > 180 * 180
+  ) {
+    return null
+  }
+
+  let eastward = 0
+  let northward = 0
+  let temperature = 0
+  let totalWeight = 0
+
+  for (const item of nearest) {
+    if (!item.sample) {
+      continue
+    }
+
+    const weight = 1 / (item.distance + 144)
+
+    eastward += item.sample.sample.eastward * weight
+    northward += item.sample.sample.northward * weight
+    temperature += item.sample.sample.temperature * weight
+    totalWeight += weight
+  }
+
+  if (totalWeight === 0) {
+    return null
+  }
+
+  eastward /= totalWeight
+  northward /= totalWeight
+
+  const speed = Math.hypot(eastward, northward)
+
+  if (speed < 0.005) {
+    return null
+  }
+
+  return {
+    x: eastward / speed,
+    y: -northward / speed,
+    speed,
+    temperature: temperature / totalWeight
+  }
+}
+
+function oceanTemperatureBucket(temperature: number) {
+  const upper = OCEAN_TEMPERATURE_STOPS.findIndex(stop => temperature <= stop)
+
+  return upper === -1 ? OCEAN_TEMPERATURE_STOPS.length - 1 : upper
 }

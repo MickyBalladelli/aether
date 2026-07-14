@@ -1,5 +1,6 @@
 import type {
   AirQualityMapSample,
+  OceanCurrentSample,
   WeatherMapSample
 } from '../types/weather'
 
@@ -20,6 +21,12 @@ export type ProjectedSample = {
 
 export type ProjectedAirQualitySample = {
   sample: AirQualityMapSample
+  x: number
+  y: number
+}
+
+export type ProjectedOceanCurrentSample = {
+  sample: OceanCurrentSample
   x: number
   y: number
 }

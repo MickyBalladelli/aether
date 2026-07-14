@@ -3,6 +3,7 @@ import { REDUCED_MOTION_QUERY } from '../utils/motion'
 import type {
   AirQualityMapSample,
   JetStreamSample,
+  OceanCurrentSample,
   WeatherMapSample,
   WeatherMode
 } from '../types/weather'
@@ -18,6 +19,7 @@ export class WeatherMapAnimation {
   private samples: WeatherMapSample[] = []
   private airQualitySamples: AirQualityMapSample[] = []
   private jetStreamSamples: JetStreamSample[] = []
+  private oceanCurrentSamples: OceanCurrentSample[] = []
   private mode: WeatherMode = 'temperature'
   private animationFrame = 0
   private lastTime = 0
@@ -84,16 +86,20 @@ export class WeatherMapAnimation {
     samples: WeatherMapSample[],
     mode: WeatherMode,
     airQualitySamples: AirQualityMapSample[],
-    jetStreamSamples: JetStreamSample[]
+    jetStreamSamples: JetStreamSample[],
+    oceanCurrentSamples: OceanCurrentSample[]
   ) {
     const samplesChanged = samples !== this.samples
     const airQualityChanged = airQualitySamples !== this.airQualitySamples
     const jetStreamChanged = jetStreamSamples !== this.jetStreamSamples
+    const oceanCurrentChanged = oceanCurrentSamples !== this.oceanCurrentSamples
     const activeDataChanged = mode === 'jet-stream'
       ? jetStreamChanged
       : mode === 'air-quality'
         ? airQualityChanged
-        : samplesChanged
+        : mode === 'ocean-current'
+          ? oceanCurrentChanged
+          : samplesChanged
 
     if (mode !== this.mode || activeDataChanged) {
       this.particleRenderer.reset()
@@ -102,6 +108,7 @@ export class WeatherMapAnimation {
     this.samples = samples
     this.airQualitySamples = airQualitySamples
     this.jetStreamSamples = jetStreamSamples
+    this.oceanCurrentSamples = oceanCurrentSamples
     this.mode = mode
     this.fieldRenderer.markDataChanged(samplesChanged, airQualityChanged)
 
@@ -187,6 +194,24 @@ export class WeatherMapAnimation {
         this.jetStreamSamples,
         deltaTime
       )
+      return
+    }
+
+    if (this.mode === 'ocean-current') {
+      const projectedSamples = this.oceanCurrentSamples.map(sample => {
+        const point = this.map.latLngToContainerPoint([
+          sample.latitude,
+          sample.longitude
+        ])
+
+        return {
+          sample,
+          x: point.x,
+          y: point.y
+        }
+      })
+
+      this.particleRenderer.drawOceanCurrent(projectedSamples, deltaTime)
       return
     }
 

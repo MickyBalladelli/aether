@@ -17,6 +17,7 @@ import { fetchWithTimeout } from '../../shared/fetchTimeout.js'
 import { interpolateWeatherAt } from '../services/weatherGrid'
 import { interpolateAirQualityAt } from '../services/airQuality'
 import { interpolateJetStreamAt } from '../services/jetStream'
+import { interpolateOceanCurrentAt } from '../services/oceanCurrents'
 import {
   REDUCED_MOTION_QUERY,
   prefersReducedMotion
@@ -25,6 +26,7 @@ import { renderWeatherBadge } from '../map/weatherBadge'
 import type {
   AirQualityMapSample,
   JetStreamSample,
+  OceanCurrentSample,
   MapFirePointer,
   MapWeatherPointer,
   WeatherLocation,
@@ -77,6 +79,7 @@ type AetherMapProps = {
   samples: WeatherMapSample[]
   jetStreamSamples: JetStreamSample[]
   airQualitySamples: AirQualityMapSample[]
+  oceanCurrentSamples: OceanCurrentSample[]
   radarOpacity: number
   onViewportChange: (viewport: WeatherViewport) => void
   onPointerWeatherChange: (reading: MapWeatherPointer | null) => void
@@ -89,6 +92,7 @@ export function AetherMap({
   samples,
   jetStreamSamples,
   airQualitySamples,
+  oceanCurrentSamples,
   radarOpacity,
   onViewportChange,
   onPointerWeatherChange,
@@ -104,6 +108,8 @@ export function AetherMap({
   const samplesRef = useRef(samples)
   const jetStreamSamplesRef = useRef(jetStreamSamples)
   const airQualitySamplesRef = useRef(airQualitySamples)
+  const oceanCurrentSamplesRef = useRef(oceanCurrentSamples)
+  const modeRef = useRef(mode)
   const pointerCallbackRef = useRef(onPointerWeatherChange)
   const clickCallbackRef = useRef(onMapClick)
   const clickedLatRef = useRef(0)
@@ -140,6 +146,16 @@ export function AetherMap({
     airQualitySamplesRef.current = airQualitySamples
     pointerRefreshRef.current()
   }, [airQualitySamples])
+
+  useEffect(() => {
+    oceanCurrentSamplesRef.current = oceanCurrentSamples
+    pointerRefreshRef.current()
+  }, [oceanCurrentSamples])
+
+  useEffect(() => {
+    modeRef.current = mode
+    pointerRefreshRef.current()
+  }, [mode])
 
   useEffect(() => {
     pointerCallbackRef.current = onPointerWeatherChange
@@ -521,6 +537,13 @@ export function AetherMap({
         pointer.longitude,
         jetStreamSamplesRef.current
       )
+      const oceanCurrent = modeRef.current === 'ocean-current'
+        ? interpolateOceanCurrentAt(
+            pointer.latitude,
+            pointer.longitude,
+            oceanCurrentSamplesRef.current
+          )
+        : null
       const fire = reportedFireHoverRef.current ?? findFireTileAtPoint(
         map,
         L.point(pointer.x, pointer.y),
@@ -535,6 +558,7 @@ export function AetherMap({
         ...reading,
         ...(jetStream ?? {}),
         ...(airQuality ?? {}),
+        ...(oceanCurrent ?? {}),
         ...(fire ? { fire } : {}),
         screenX: Math.max(12, Math.min(pointer.x + 16, size.x - 206)),
         screenY: Math.max(12, Math.min(pointer.y + 16, size.y - 206))
@@ -694,7 +718,11 @@ export function AetherMap({
 
     badgeLayer.clearLayers()
 
-    if (mode === 'air-quality' || mode === 'jet-stream') {
+    if (
+      mode === 'air-quality' ||
+      mode === 'jet-stream' ||
+      mode === 'ocean-current'
+    ) {
       return
     }
 
@@ -718,11 +746,12 @@ export function AetherMap({
       samples,
       mode,
       airQualitySamples,
-      jetStreamSamples
+      jetStreamSamples,
+      oceanCurrentSamples
     )
     radarRef.current?.setMode(mode)
     radarRef.current?.setOpacity(radarOpacity)
-  }, [airQualitySamples, jetStreamSamples, samples, mode, radarOpacity])
+  }, [airQualitySamples, jetStreamSamples, oceanCurrentSamples, samples, mode, radarOpacity])
 
   function handleMapKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     const map = mapRef.current

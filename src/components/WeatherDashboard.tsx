@@ -4,6 +4,7 @@ import DeviceThermostatIcon from '@mui/icons-material/DeviceThermostat'
 import FlightIcon from '@mui/icons-material/Flight'
 import ThunderstormIcon from '@mui/icons-material/Thunderstorm'
 import WaterDropIcon from '@mui/icons-material/WaterDrop'
+import WavesIcon from '@mui/icons-material/Waves'
 import { Box, Stack, Typography } from '@mui/material'
 import { useMemo, type ReactNode } from 'react'
 import type { AirQualityReading, EcmwfForecast, HeatAlert, WeatherConfig, WeatherEvolutionFrame, WeatherMode } from '../types/weather'
@@ -100,6 +101,15 @@ export function WeatherDashboard({
             value={formatAirQuality(airQuality)}
             selected={mode === 'air-quality'}
             onClick={() => onModeChange('air-quality')}
+          />
+          <Metric
+            icon={<WavesIcon />}
+            label="Ocean current"
+            value="NOAA · Global"
+            selected={mode === 'ocean-current'}
+            onClick={() => onModeChange(
+              mode === 'ocean-current' ? 'temperature' : 'ocean-current'
+            )}
           />
         </Stack>
 

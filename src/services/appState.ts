@@ -9,7 +9,8 @@ const WEATHER_MODES: readonly WeatherMode[] = [
   'jet-stream',
   'precipitation',
   'storm',
-  'air-quality'
+  'air-quality',
+  'ocean-current'
 ]
 
 export function loadInitialLocation() {

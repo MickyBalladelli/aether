@@ -26,6 +26,10 @@ import { fetchOpenMeteoForecast } from './services/openMeteo'
 import { fetchEcmwfLocationForecast } from './services/ecmwf'
 import { fetchOfficialHeatAlerts } from './services/heatAlerts'
 import {
+  fetchOceanCurrentData,
+  OCEAN_CURRENT_REFRESH_INTERVAL
+} from './services/oceanCurrents'
+import {
   JET_STREAM_REFRESH_INTERVAL,
   fetchJetStreamSamples
 } from './services/jetStream'
@@ -48,6 +52,7 @@ import type {
   WeatherDataState,
   AirQualityMapSample,
   JetStreamSample,
+  OceanCurrentData,
   WeatherEvolutionFrame,
   WeatherLocation,
   WeatherMapSample,
@@ -110,6 +115,7 @@ export default function App() {
   const [mapSamples, setMapSamples] = useState<WeatherMapSample[]>([])
   const [jetStreamSamples, setJetStreamSamples] = useState<JetStreamSample[]>([])
   const [airQualitySamples, setAirQualitySamples] = useState<AirQualityMapSample[]>([])
+  const [oceanCurrentData, setOceanCurrentData] = useState<OceanCurrentData | null>(null)
   const [pointerWeather, setPointerWeather] = useState<MapWeatherPointer | null>(null)
   const [radarOpacity, setRadarOpacity] = useState(loadRadarOpacity)
   const reverseGeocodeAbortRef = useRef<AbortController | null>(null)
@@ -486,6 +492,50 @@ export default function App() {
     }
   }, [viewport])
 
+  useEffect(() => {
+    if (!viewport || mapWeatherMode !== 'ocean-current') {
+      return
+    }
+
+    const controller = new AbortController()
+    let cancelled = false
+    let loading = false
+
+    const refreshOceanCurrents = async () => {
+      if (loading) {
+        return
+      }
+
+      loading = true
+
+      try {
+        const data = await fetchOceanCurrentData(viewport, controller.signal)
+
+        if (!cancelled) {
+          setOceanCurrentData(data)
+        }
+      } catch (error) {
+        if (!cancelled && !controller.signal.aborted) {
+          setStatus(error instanceof Error ? error.message : 'Ocean currents failed')
+        }
+      } finally {
+        loading = false
+      }
+    }
+    const timeout = window.setTimeout(refreshOceanCurrents, 120)
+    const interval = window.setInterval(
+      refreshOceanCurrents,
+      OCEAN_CURRENT_REFRESH_INTERVAL
+    )
+
+    return () => {
+      cancelled = true
+      controller.abort()
+      window.clearTimeout(timeout)
+      window.clearInterval(interval)
+    }
+  }, [mapWeatherMode, viewport])
+
   function handleMapClick(location: WeatherLocation) {
     cancelPendingReverseGeocode()
     setSelectedForecastReady(false)
@@ -575,6 +625,7 @@ export default function App() {
               samples={displayedSamples}
               jetStreamSamples={jetStreamSamples}
               airQualitySamples={airQualitySamples}
+              oceanCurrentSamples={oceanCurrentData?.samples ?? []}
               radarOpacity={radarOpacity}
               onViewportChange={handleViewportChange}
               onPointerWeatherChange={handlePointerWeatherChange}
@@ -608,7 +659,9 @@ export default function App() {
               ecmwfForecast={ecmwfForecast}
               ecmwfLoading={ecmwfLoading}
               onEcmwfFrameChange={
-                weatherMode === 'jet-stream' || weatherMode === 'air-quality'
+                weatherMode === 'jet-stream' ||
+                weatherMode === 'air-quality' ||
+                weatherMode === 'ocean-current'
                   ? null
                   : setEcmwfFrame
               }

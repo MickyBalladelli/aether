@@ -15,6 +15,16 @@ const DATA_SOURCES = [
     url: 'https://atmosphere.copernicus.eu/'
   },
   {
+    name: 'NOAA CoastWatch',
+    kind: 'Ocean currents + SST',
+    url: 'https://coastwatch.noaa.gov/'
+  },
+  {
+    name: 'NOAA CPC',
+    kind: 'El Niño / La Niña · RONI',
+    url: 'https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso/roni/'
+  },
+  {
     name: 'RainViewer',
     kind: 'Radar',
     url: 'https://www.rainviewer.com/api.html'

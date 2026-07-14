@@ -70,7 +70,7 @@ export type OpenMeteoAirQualityResponse = {
   current: OpenMeteoAirQualityCurrent
 }
 
-export type WeatherMode = 'temperature' | 'wind' | 'jet-stream' | 'precipitation' | 'storm' | 'air-quality'
+export type WeatherMode = 'temperature' | 'wind' | 'jet-stream' | 'precipitation' | 'storm' | 'air-quality' | 'ocean-current'
 
 export type WeatherDataState = 'loading' | 'live' | 'cached' | 'stale' | 'unavailable'
 
@@ -170,6 +170,43 @@ export type JetStreamSample = {
   northward: number
 }
 
+export type OceanCurrentSample = {
+  latitude: number
+  longitude: number
+  ocean: boolean
+  eastward: number
+  northward: number
+  speed: number
+  temperature: number
+  anomaly: number
+}
+
+export type OceanCurrentData = {
+  source: string
+  currentProduct: string
+  temperatureProduct: string
+  enso: {
+    index: 'RONI'
+    phase: 'el-nino' | 'la-nina' | 'neutral'
+    season: string
+    year: number
+    anomaly: number
+    provisional: boolean
+  } | null
+  currentTime: string | null
+  temperatureTime: string | null
+  stride: number
+  oceanSampleCount: number
+  samples: OceanCurrentSample[]
+}
+
+export type OceanCurrentReading = {
+  oceanCurrentSpeed: number
+  oceanCurrentAngle: number
+  seaSurfaceTemperature: number
+  seaSurfaceTemperatureAnomaly: number
+}
+
 export type AirQualityReading = Omit<AirQualityMapSample, 'updatedAt'>
 
 export type MapFirePointer = {
@@ -197,5 +234,9 @@ export type MapWeatherPointer = {
   pm10?: number
   nitrogenDioxide?: number
   ozone?: number
+  oceanCurrentSpeed?: number
+  oceanCurrentAngle?: number
+  seaSurfaceTemperature?: number
+  seaSurfaceTemperatureAnomaly?: number
   fire?: MapFirePointer
 }

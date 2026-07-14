@@ -5,6 +5,7 @@ import FlightIcon from '@mui/icons-material/Flight'
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
 import WaterDropIcon from '@mui/icons-material/WaterDrop'
+import WavesIcon from '@mui/icons-material/Waves'
 import type { MapWeatherPointer } from '../types/weather'
 
 type MapWeatherTooltipProps = {
@@ -40,6 +41,25 @@ export function MapWeatherTooltip({ reading }: MapWeatherTooltipProps) {
         <DeviceThermostatIcon />
         <span>{Math.round(reading.temperature)}°C</span>
       </div>
+
+      {reading.oceanCurrentSpeed !== undefined && reading.oceanCurrentAngle !== undefined && (
+        <div className="map-weather-tooltip-ocean">
+          <div className="map-weather-tooltip-row">
+            <WavesIcon />
+            <span>
+              Current {reading.oceanCurrentSpeed.toFixed(2)} m/s {formatWindDirection(reading.oceanCurrentAngle)}
+            </span>
+          </div>
+          {reading.seaSurfaceTemperature !== undefined && (
+            <span>
+              Sea {reading.seaSurfaceTemperature.toFixed(1)}°C
+              {reading.seaSurfaceTemperatureAnomaly !== undefined && (
+                ` · ${formatAnomaly(reading.seaSurfaceTemperatureAnomaly)} anomaly`
+              )}
+            </span>
+          )}
+        </div>
+      )}
 
       {reading.jetStreamSpeed !== undefined && reading.jetStreamAngle !== undefined && (
         <div className="map-weather-tooltip-row">
@@ -91,4 +111,8 @@ function formatWindDirection(angle: number) {
   const index = Math.round(degrees / 45) % directions.length
 
   return directions[index]
+}
+
+function formatAnomaly(anomaly: number) {
+  return `${anomaly >= 0 ? '+' : ''}${anomaly.toFixed(1)}°C`
 }

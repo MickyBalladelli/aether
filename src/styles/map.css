@@ -491,6 +491,19 @@
   line-height: 1.35;
 }
 
+.map-weather-tooltip-ocean {
+  display: grid;
+  gap: 3px;
+  padding-top: 7px;
+  border-top: 1px solid rgba(83, 211, 228, 0.25);
+  color: #bfeff5;
+  font-size: 11px;
+}
+
+.map-weather-tooltip-ocean .map-weather-tooltip-row svg {
+  color: #47cfe5;
+}
+
 .map-weather-tooltip-fire .map-weather-tooltip-row {
   color: #fff4ee;
   font-size: 12px;

@@ -9,6 +9,8 @@ Aether is an interactive full-screen weather map built with React, TypeScript, M
 ## Features
 
 - Animated wind particles colored by speed
+- Worldwide animated ocean currents colored by sea-surface temperature
+- NOAA RONI El Niño / La Niña state and OISST temperature anomalies
 - Zoom-independent animated 250 hPa jet-stream layer
 - Distinct outlines for the northern and southern polar and subtropical jets
 - Interpolated temperature layer and legend
@@ -41,6 +43,9 @@ Aether is an interactive full-screen weather map built with React, TypeScript, M
 - [Open-Meteo](https://open-meteo.com/) supplies modeled temperature, wind, precipitation, cloud, and storm data.
 - [ECMWF](https://www.ecmwf.int/) supplies the IFS forecast shown in the visual timeline through the Open-Meteo ECMWF API.
 - [Copernicus Atmosphere Monitoring Service (CAMS)](https://atmosphere.copernicus.eu/) supplies modeled air-quality data through the Open-Meteo Air Quality API.
+- [NOAA NESDIS CoastWatch](https://coastwatch.noaa.gov/) supplies the daily global 0.25° geostrophic surface-current grid.
+- [NOAA OISST v2.1](https://www.ncei.noaa.gov/products/optimum-interpolation-sst) supplies daily global sea-surface temperature and temperature anomalies.
+- [NOAA Climate Prediction Center](https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso/roni/) supplies the Relative Oceanic Niño Index used to show the El Niño, La Niña, or neutral RONI state.
 - [RainViewer](https://www.rainviewer.com/api.html) supplies precipitation radar tiles.
 - [OpenStreetMap](https://www.openstreetmap.org/) supplies the base map.
 - [CARTO](https://carto.com/basemaps/) supplies the optional Dark Matter base map.
@@ -67,6 +72,14 @@ Particle colors have two meanings:
 - The outer color identifies the latitude band: northern polar, northern subtropical, southern subtropical, or southern polar.
 
 These four outline categories make the major jet regions easier to distinguish. They are latitude-based visualization bands, not detected jet-axis boundaries.
+
+## Ocean-current layer
+
+The Ocean current switch loads the visible part of NOAA CoastWatch's daily global geostrophic surface-current grid. Animated particle direction follows the eastward and northward current components. Particle color shows NOAA OISST sea-surface temperature from -2°C to 34°C. Hovering over ocean water shows current speed and direction, temperature, and the local daily OISST anomaly.
+
+The control also shows NOAA CPC's latest provisional Relative Oceanic Niño Index. A warm or cold label requires the RONI threshold to persist across five overlapping three-month seasons. RONI is one ocean index for ENSO monitoring, not a local current forecast or a complete atmospheric diagnosis.
+
+The server requests only a padded, resolution-aware viewport and caches it for six hours. A stale result remains usable for three days if NOAA is temporarily unavailable. The current product is a 0.25° altimetry-derived geostrophic field, so it does not resolve tides, waves, rip currents, or fine coastal flow. It is not for navigation or safety decisions.
 
 ## Heat-detection layer
 
@@ -179,7 +192,7 @@ src/
 
 ## Accuracy
 
-Wind, Jet Stream, and temperature layers use modeled grid values with interpolation between fetched points. They are not measurements for every map pixel. Jet Stream outlines use latitude bands for visual identification and do not represent exact atmospheric boundaries. Radar availability and resolution depend on RainViewer coverage.
+Wind, Jet Stream, ocean-current, and temperature layers use gridded values with interpolation between fetched points. They are not measurements for every map pixel. Jet Stream outlines use latitude bands for visual identification and do not represent exact atmospheric boundaries. The ocean-current layer shows geostrophic surface flow, not tides or near-shore hazards. Radar availability and resolution depend on RainViewer coverage.
 
 ## License
 

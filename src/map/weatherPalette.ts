@@ -32,6 +32,18 @@ export const JET_STREAM_NAMES = [
   'S polar'
 ]
 
+export const OCEAN_TEMPERATURE_COLORS = [
+  '#5546d8',
+  '#2676ed',
+  '#21c5e8',
+  '#35d49a',
+  '#e2db48',
+  '#ff9838',
+  '#f13d5e'
+]
+
+export const OCEAN_TEMPERATURE_STOPS = [-2, 4, 10, 16, 22, 28, 34]
+
 export function airQualityColor(airQuality: number) {
   return interpolateColor(airQuality, [
     { value: 0, r: 50, g: 205, b: 115 },
