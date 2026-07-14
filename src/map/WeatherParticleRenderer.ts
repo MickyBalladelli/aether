@@ -23,7 +23,8 @@ import {
   windFieldAt
 } from './weatherVectorFields'
 
-const PARTICLE_COUNT = 560
+const PARTICLE_COUNT = 760
+const OCEAN_SPEED_STOPS = [0.3, 0.8]
 
 export class WeatherParticleRenderer {
   private readonly context: CanvasRenderingContext2D
@@ -229,9 +230,11 @@ export class WeatherParticleRenderer {
       return
     }
 
-    const activeCount = Math.min(PARTICLE_COUNT, 480)
-    const paths = OCEAN_TEMPERATURE_COLORS.map(() => new Path2D())
-    const usedBuckets = new Set<number>()
+    const activeCount = Math.min(PARTICLE_COUNT, 720)
+    const paths = OCEAN_TEMPERATURE_COLORS.map(() => (
+      OCEAN_SPEED_STOPS.map(() => new Path2D()).concat(new Path2D())
+    ))
+    const usedPaths = new Set<string>()
 
     this.context.save()
     this.context.lineCap = 'round'
@@ -240,7 +243,7 @@ export class WeatherParticleRenderer {
       const particle = this.particles[index]
 
       if (particle.life <= 0 || this.isOutside(particle.x, particle.y, 40)) {
-        this.resetWindParticle(particle)
+        this.resetOceanCurrentParticle(particle, samples)
       }
 
       const field = oceanCurrentFieldAt(particle.x, particle.y, samples)
@@ -258,20 +261,25 @@ export class WeatherParticleRenderer {
       particle.life -= deltaTime
 
       const bucket = oceanTemperatureBucket(field.temperature)
-      const path = paths[bucket]
+      const speedBucket = oceanSpeedBucket(field.speed)
+      const path = paths[bucket][speedBucket]
 
-      usedBuckets.add(bucket)
+      usedPaths.add(`${bucket}:${speedBucket}`)
       path.moveTo(particle.x - field.x * tail, particle.y - field.y * tail)
       path.lineTo(particle.x, particle.y)
     }
 
-    for (const bucket of usedBuckets) {
-      this.context.lineWidth = 4.4
+    for (const pathKey of usedPaths) {
+      const [bucket, speedBucket] = pathKey.split(':').map(Number)
+      const path = paths[bucket][speedBucket]
+
+      this.context.globalAlpha = 0.7 + speedBucket * 0.15
+      this.context.lineWidth = 4 + speedBucket * 1.4
       this.context.strokeStyle = 'rgba(0, 8, 16, 0.76)'
-      this.context.stroke(paths[bucket])
-      this.context.lineWidth = 1.8
+      this.context.stroke(path)
+      this.context.lineWidth = 1.5 + speedBucket * 0.65
       this.context.strokeStyle = OCEAN_TEMPERATURE_COLORS[bucket]
-      this.context.stroke(paths[bucket])
+      this.context.stroke(path)
     }
 
     this.context.restore()
@@ -522,6 +530,48 @@ export class WeatherParticleRenderer {
     particle.life = particle.maxLife
   }
 
+  private resetOceanCurrentParticle(
+    particle: Particle,
+    samples: ProjectedOceanCurrentSample[]
+  ) {
+    let source: ProjectedOceanCurrentSample | null = null
+    const favorFastCurrent = Math.random() < 0.78
+    const attempts = favorFastCurrent ? 8 : 3
+
+    for (let attempt = 0; attempt < attempts; attempt += 1) {
+      const candidate = samples[Math.floor(Math.random() * samples.length)]
+
+      if (
+        !candidate?.sample.ocean ||
+        candidate.x < -30 ||
+        candidate.x > this.width + 30 ||
+        candidate.y < -30 ||
+        candidate.y > this.height + 30
+      ) {
+        continue
+      }
+
+      if (
+        !source ||
+        (favorFastCurrent && candidate.sample.speed > source.sample.speed)
+      ) {
+        source = candidate
+      }
+    }
+
+    if (!source) {
+      this.resetWindParticle(particle)
+      return
+    }
+
+    const spread = favorFastCurrent ? 12 : 24
+
+    particle.x = source.x + (Math.random() - 0.5) * spread
+    particle.y = source.y + (Math.random() - 0.5) * spread
+    particle.maxLife = 2.8 + Math.random() * 4.2
+    particle.life = particle.maxLife
+  }
+
   private resetPrecipitationParticle(
     particle: Particle,
     samples: ProjectedSample[]
@@ -642,4 +692,10 @@ function oceanTemperatureBucket(temperature: number) {
   const upper = OCEAN_TEMPERATURE_STOPS.findIndex(stop => temperature <= stop)
 
   return upper === -1 ? OCEAN_TEMPERATURE_STOPS.length - 1 : upper
+}
+
+function oceanSpeedBucket(speed: number) {
+  const upper = OCEAN_SPEED_STOPS.findIndex(stop => speed <= stop)
+
+  return upper === -1 ? OCEAN_SPEED_STOPS.length : upper
 }
