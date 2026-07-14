@@ -54,11 +54,6 @@ const DATA_SOURCES = [
     url: 'https://www.openstreetmap.org/copyright'
   },
   {
-    name: 'CARTO',
-    kind: 'Dark map tiles',
-    url: 'https://carto.com/basemaps/'
-  },
-  {
     name: 'MeteoGate',
     kind: 'Official heat warnings',
     url: 'https://meteogate.eu/'

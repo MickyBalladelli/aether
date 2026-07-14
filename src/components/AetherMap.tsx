@@ -41,7 +41,6 @@ const WORLD_BOUNDS = L.latLngBounds(
 )
 const AFRICA_FIRE_BOUNDS = L.latLngBounds([-35, -20], [40, 55])
 const EUROPE_FIRE_BOUNDS = L.latLngBounds([40, -25], [72, 45])
-const MAP_TILE_STYLE_KEY = 'aether:map-tile-style'
 const MAP_OVERLAYS_KEY = 'aether:map-overlays'
 const MAP_OVERLAY_IDS: FireLayerId[] = [
   'heat-detections',
@@ -69,8 +68,6 @@ const EUROPE_EFFIS_HOVER_INFO: MapFirePointer = {
   source: 'Copernicus EFFIS · VIIRS',
   detail: 'Detected today or yesterday. Not a confirmed active fire.'
 }
-
-type MapTileStyle = 'standard' | 'dark'
 
 type AetherMapProps = {
   location: WeatherLocation
@@ -203,17 +200,6 @@ export function AetherMap({
         attribution: '&copy; OpenStreetMap contributors'
       }
     )
-    const darkTiles = L.tileLayer(
-      'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-      {
-        subdomains: 'abcd',
-        maxZoom: 20,
-        noWrap: true,
-        attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
-      }
-    )
-    const tileStyle = loadMapTileStyle()
-    const initialTiles = tileStyle === 'dark' ? darkTiles : standardTiles
     const reportedFires = new ReportedFireLayer(
       map,
       status => updateFireLayerStatus('reported-wildfires', status),
@@ -272,7 +258,7 @@ export function AetherMap({
       'europe-detections': europeFireTiles
     }
 
-    initialTiles.addTo(map)
+    standardTiles.addTo(map)
 
     const tileControl = L.control.layers(
       {},
@@ -861,16 +847,6 @@ function addLayerControlHeading(
   heading.setAttribute('aria-level', '3')
   heading.textContent = text
   label.before(heading)
-}
-
-function loadMapTileStyle(): MapTileStyle {
-  try {
-    const stored = window.localStorage.getItem(MAP_TILE_STYLE_KEY)
-
-    return stored === 'standard' ? 'standard' : 'dark'
-  } catch {
-    return 'dark'
-  }
 }
 
 function loadEnabledMapOverlays() {

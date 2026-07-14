@@ -35,7 +35,7 @@ Aether is an interactive full-screen weather map built with React, TypeScript, M
 - Isolated map and forecast error recovery
 - Responsive, compact map controls
 - About dialog with author and links to every data provider
-- Standard OpenStreetMap and CARTO Dark Matter tile styles
+- Always-light OpenStreetMap basemap
 - Vercel deployment configuration
 
 ## Data sources
@@ -48,7 +48,6 @@ Aether is an interactive full-screen weather map built with React, TypeScript, M
 - [NOAA Climate Prediction Center](https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso/roni/) supplies the Relative Oceanic Niño Index used to show the El Niño, La Niña, or neutral RONI state.
 - [RainViewer](https://www.rainviewer.com/api.html) supplies precipitation radar tiles.
 - [OpenStreetMap](https://www.openstreetmap.org/) supplies the base map.
-- [CARTO](https://carto.com/basemaps/) supplies the optional Dark Matter base map.
 - [MeteoGate](https://meteogate.eu/) supplies official European high-temperature warnings from MeteoAlarm members.
 - [NASA FIRMS](https://firms.modaps.eosdis.nasa.gov/) supplies global VIIRS active-fire and thermal-anomaly detections from the last 24 hours.
 - [NIFC WFIGS](https://www.nifc.gov/) supplies current incident locations reported by United States wildfire agencies.
@@ -128,7 +127,7 @@ Disposable caches share `CACHE_VERSION` from `shared/cacheVersion.js`. The versi
 
 The two-hour rule is per canonical cache key. Different coordinates, viewports, radar frames, or map tiles require different upstream records. Repeated requests for the same record are served by the browser cache, Vercel CDN, Upstash Redis, or Vercel Runtime Cache without calling the provider again during the fresh window.
 
-OpenStreetMap and CARTO basemap files remain on their provider CDNs under their tile policies. The two-hour Aether cache covers API data plus radar and fire visualization tiles proxied by this project.
+OpenStreetMap basemap files remain on its provider CDN under its tile policy. The two-hour Aether cache covers API data plus radar and fire visualization tiles proxied by this project.
 
 To invalidate cached data:
 
@@ -136,7 +135,7 @@ To invalidate cached data:
 2. Deploy the application.
 3. Verify the new application version in the Aether header.
 
-The new deployment writes to fresh cache namespaces, so incompatible old data is ignored. Old browser and server cache entries expire naturally. Favorites, recent locations, the selected location, map-style preferences, and enabled fire overlays are user data and are intentionally not cleared by a cache-version change.
+The new deployment writes to fresh cache namespaces, so incompatible old data is ignored. Old browser and server cache entries expire naturally. Favorites, recent locations, the selected location, and enabled fire overlays are user data and are intentionally not cleared by a cache-version change.
 
 Increment the cache version when a cached payload or storage schema becomes incompatible, or when a forced cache reset is required. Normal data refreshes do not need a version change.
 
