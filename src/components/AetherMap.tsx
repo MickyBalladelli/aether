@@ -25,6 +25,11 @@ import {
 } from '../utils/motion'
 import { renderWeatherBadge } from '../map/weatherBadge'
 import { addLayerControlInfo } from '../map/layerControlInfo'
+import {
+  loadEnabledMapOverlays,
+  saveEnabledMapOverlays
+} from '../map/mapOverlayState'
+import type { MapOverlayId } from '../map/mapOverlayState'
 import type {
   AirQualityMapSample,
   JetStreamSample,
@@ -43,7 +48,6 @@ const WORLD_BOUNDS = L.latLngBounds(
 )
 const AFRICA_FIRE_BOUNDS = L.latLngBounds([-35, -20], [40, 55])
 const EUROPE_FIRE_BOUNDS = L.latLngBounds([40, -25], [72, 45])
-const MAP_OVERLAYS_KEY = 'aether:map-overlays'
 const MAP_POINTER_BLOCK_SELECTOR = [
   '.aether-header',
   '.fire-layer-status',
@@ -56,14 +60,6 @@ const MAP_POINTER_BLOCK_SELECTOR = [
   '.radar-opacity-control',
   '.weather-panel'
 ].join(', ')
-type MapOverlayId = FireLayerId | 'volcano-activity'
-const MAP_OVERLAY_IDS: MapOverlayId[] = [
-  'volcano-activity',
-  'heat-detections',
-  'reported-wildfires',
-  'africa-detections',
-  'europe-detections'
-]
 const FIRE_LAYER_DESCRIPTION = [
   'Satellite heat detections from the last 24 hours.',
   'They may include extinguished fires or other hot sources,',
@@ -947,40 +943,4 @@ function addLayerControlHeading(
   heading.setAttribute('aria-level', '3')
   heading.textContent = text
   label.before(heading)
-}
-
-function loadEnabledMapOverlays() {
-  try {
-    const value = window.localStorage.getItem(MAP_OVERLAYS_KEY)
-    if (value === null) {
-      return new Set<MapOverlayId>(['volcano-activity'])
-    }
-
-    const parsed: unknown = JSON.parse(value)
-
-    if (!Array.isArray(parsed)) {
-      return new Set<MapOverlayId>()
-    }
-
-    return new Set(
-      MAP_OVERLAY_IDS.filter(layerId => parsed.includes(layerId))
-    )
-  } catch {
-    return new Set<MapOverlayId>(['volcano-activity'])
-  }
-}
-
-function saveEnabledMapOverlays(
-  map: L.Map,
-  layers: Record<MapOverlayId, L.Layer>
-) {
-  try {
-    const enabled = MAP_OVERLAY_IDS.filter(layerId => (
-      map.hasLayer(layers[layerId])
-    ))
-
-    window.localStorage.setItem(MAP_OVERLAYS_KEY, JSON.stringify(enabled))
-  } catch {
-    return
-  }
 }
