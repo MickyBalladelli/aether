@@ -1,9 +1,5 @@
 # Aether improvements
 
-## Priority 1 — Map smoothness and performance
-
-- [ ] Add a Low, Balanced, and High animation-quality control with Balanced as the default.
-
 ## Priority 2 — Reliability and regression coverage
 
 - [ ] Add browser checks for map click selection, the layer menu, information popovers, webcams, and saved overlay restoration.

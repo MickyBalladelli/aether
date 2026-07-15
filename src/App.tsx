@@ -1,6 +1,7 @@
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material'
 import { Suspense, lazy, useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react'
 import { AetherHeader } from './components/AetherHeader'
+import { AnimationQualityControl } from './components/AnimationQualityControl'
 import { ForecastDateLabel } from './components/ForecastDateLabel'
 import { MapWeatherTooltip } from './components/MapWeatherTooltip'
 import { OfflineStatus } from './components/OfflineStatus'
@@ -13,7 +14,9 @@ import { useMapPointerWeather } from './hooks/useMapPointerWeather'
 import { interpolateAirQualityAt } from './services/airQuality'
 import {
   loadInitialLocation,
+  loadAnimationQuality,
   loadRadarOpacity,
+  persistAnimationQuality,
   persistRadarOpacity,
   readUrlMode,
   updateUrlLocation
@@ -21,6 +24,7 @@ import {
 import { getWeatherMapSamplesAtTime } from './services/weatherGrid'
 import { describeWeatherCode } from './weather/weatherCode'
 import type {
+  AnimationQuality,
   WeatherConfig,
   WeatherEvolutionFrame,
   WeatherLocation,
@@ -111,6 +115,9 @@ export default function App() {
     getCachedPlace
   })
   const [radarOpacity, setRadarOpacity] = useState(loadRadarOpacity)
+  const [animationQuality, setAnimationQuality] = useState<AnimationQuality>(
+    loadAnimationQuality
+  )
   const selectedAirQuality = useMemo(
     () => interpolateAirQualityAt(
       selectedLocation.latitude,
@@ -148,6 +155,11 @@ export default function App() {
     persistRadarOpacity(opacity)
   }
 
+  function handleAnimationQualityChange(quality: AnimationQuality) {
+    setAnimationQuality(quality)
+    persistAnimationQuality(quality)
+  }
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -165,6 +177,7 @@ export default function App() {
               airQualitySamples={airQualitySamples}
               oceanCurrentSamples={oceanCurrentData?.samples ?? []}
               radarOpacity={radarOpacity}
+              animationQuality={animationQuality}
               onViewportChange={handleViewportChange}
               onPointerWeatherChange={handlePointerWeatherChange}
               onMapClick={handleMapClick}
@@ -174,6 +187,10 @@ export default function App() {
             mode={weatherMode}
             opacity={radarOpacity}
             onChange={handleRadarOpacityChange}
+          />
+          <AnimationQualityControl
+            quality={animationQuality}
+            onChange={handleAnimationQualityChange}
           />
           <MapWeatherTooltip reading={pointerWeather} />
         </WeatherErrorBoundary>

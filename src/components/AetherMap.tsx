@@ -24,6 +24,7 @@ import {
 } from '../utils/motion'
 import { renderWeatherBadge } from '../map/weatherBadge'
 import type {
+  AnimationQuality,
   AirQualityMapSample,
   JetStreamSample,
   OceanCurrentSample,
@@ -40,6 +41,7 @@ const WORLD_BOUNDS = L.latLngBounds(
 )
 const MAP_POINTER_BLOCK_SELECTOR = [
   '.aether-header',
+  '.animation-quality-control',
   '.fire-layer-status',
   '.leaflet-control',
   '.leaflet-marker-icon',
@@ -59,6 +61,7 @@ type AetherMapProps = {
   airQualitySamples: AirQualityMapSample[]
   oceanCurrentSamples: OceanCurrentSample[]
   radarOpacity: number
+  animationQuality: AnimationQuality
   onViewportChange: (viewport: WeatherViewport) => void
   onPointerWeatherChange: (reading: MapWeatherPointer | null) => void
   onMapClick: (location: WeatherLocation) => void
@@ -72,6 +75,7 @@ export function AetherMap({
   airQualitySamples,
   oceanCurrentSamples,
   radarOpacity,
+  animationQuality,
   onViewportChange,
   onPointerWeatherChange,
   onMapClick
@@ -467,8 +471,17 @@ export function AetherMap({
       jetStreamSamples,
       oceanCurrentSamples
     )
+    animationRef.current?.setQuality(animationQuality)
     layersRef.current?.setWeatherMode(mode, radarOpacity)
-  }, [airQualitySamples, jetStreamSamples, oceanCurrentSamples, samples, mode, radarOpacity])
+  }, [
+    airQualitySamples,
+    animationQuality,
+    jetStreamSamples,
+    oceanCurrentSamples,
+    samples,
+    mode,
+    radarOpacity
+  ])
 
   function handleMapKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     const map = mapRef.current

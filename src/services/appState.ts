@@ -1,8 +1,18 @@
 import { defaultCity } from '../data/cityCatalog'
-import type { WeatherLocation, WeatherMode } from '../types/weather'
+import type {
+  AnimationQuality,
+  WeatherLocation,
+  WeatherMode
+} from '../types/weather'
 
 const STORED_LOCATION_KEY = 'aether:location'
 const RADAR_OPACITY_KEY = 'aether:radar-opacity'
+const ANIMATION_QUALITY_KEY = 'aether:animation-quality'
+const ANIMATION_QUALITIES: readonly AnimationQuality[] = [
+  'low',
+  'balanced',
+  'high'
+]
 const WEATHER_MODES: readonly WeatherMode[] = [
   'temperature',
   'wind',
@@ -71,6 +81,26 @@ export function loadRadarOpacity() {
 export function persistRadarOpacity(opacity: number) {
   try {
     window.localStorage.setItem(RADAR_OPACITY_KEY, String(opacity))
+  } catch {
+    return
+  }
+}
+
+export function loadAnimationQuality(): AnimationQuality {
+  try {
+    const quality = window.localStorage.getItem(ANIMATION_QUALITY_KEY)
+
+    return ANIMATION_QUALITIES.includes(quality as AnimationQuality)
+      ? quality as AnimationQuality
+      : 'balanced'
+  } catch {
+    return 'balanced'
+  }
+}
+
+export function persistAnimationQuality(quality: AnimationQuality) {
+  try {
+    window.localStorage.setItem(ANIMATION_QUALITY_KEY, quality)
   } catch {
     return
   }

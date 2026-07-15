@@ -1,4 +1,4 @@
-type AnimationQuality = 'high' | 'balanced' | 'low'
+import type { AnimationQuality } from '../types/weather'
 
 const QUALITY_LEVELS: Array<{
   name: AnimationQuality
@@ -16,13 +16,21 @@ const FAST_FRAME_THRESHOLD_MS = 17.5
 
 export class AnimationPerformanceController {
   private level: number
+  private preferredLevel: number
   private averageFrameTime = 16.7
   private elapsed = 0
   private samples = 0
   private fastWindows = 0
 
-  constructor(devicePixelRatio: number) {
-    this.level = devicePixelRatio >= 1.75 ? 1 : 0
+  constructor(
+    devicePixelRatio: number,
+    quality: AnimationQuality = 'balanced'
+  ) {
+    this.preferredLevel = getQualityLevel(quality)
+    this.level = Math.max(
+      this.preferredLevel,
+      devicePixelRatio >= 1.75 ? 1 : 0
+    )
   }
 
   get densityScale() {
@@ -34,6 +42,17 @@ export class AnimationPerformanceController {
       window.devicePixelRatio || 1,
       QUALITY_LEVELS[this.level].maximumPixelRatio
     )
+  }
+
+  setPreference(quality: AnimationQuality) {
+    const nextLevel = getQualityLevel(quality)
+    const changed = this.level !== nextLevel
+
+    this.preferredLevel = nextLevel
+    this.level = nextLevel
+    this.resetMeasurement()
+
+    return changed
   }
 
   recordFrame(frameTime: number) {
@@ -66,7 +85,7 @@ export class AnimationPerformanceController {
       this.fastWindows = 0
     } else if (
       this.averageFrameTime < FAST_FRAME_THRESHOLD_MS &&
-      this.level > 0
+      this.level > this.preferredLevel
     ) {
       this.fastWindows += 1
 
@@ -93,4 +112,10 @@ export class AnimationPerformanceController {
     this.elapsed = 0
     this.samples = 0
   }
+}
+
+function getQualityLevel(quality: AnimationQuality) {
+  const level = QUALITY_LEVELS.findIndex(item => item.name === quality)
+
+  return level === -1 ? 1 : level
 }

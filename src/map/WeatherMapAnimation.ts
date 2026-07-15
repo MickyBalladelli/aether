@@ -1,6 +1,7 @@
 import L from 'leaflet'
 import { REDUCED_MOTION_QUERY } from '../utils/motion'
 import type {
+  AnimationQuality,
   AirQualityMapSample,
   JetStreamSample,
   OceanCurrentSample,
@@ -113,6 +114,19 @@ export class WeatherMapAnimation {
     this.unsubscribeVisibility?.()
     this.unsubscribeVisibility = null
     this.canvas.remove()
+  }
+
+  setQuality(quality: AnimationQuality) {
+    if (!this.performanceController.setPreference(quality)) {
+      return
+    }
+
+    this.resize(true)
+    this.syncRenderers()
+
+    if (this.reducedMotion && this.pageVisible) {
+      this.render(0, 0)
+    }
   }
 
   setData(

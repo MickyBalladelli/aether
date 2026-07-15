@@ -143,6 +143,8 @@ export type OpenMeteoAirQualityResponse = {
 
 export type WeatherMode = 'temperature' | 'wind' | 'jet-stream' | 'precipitation' | 'storm' | 'air-quality' | 'ocean-current'
 
+export type AnimationQuality = 'low' | 'balanced' | 'high'
+
 export type WeatherDataState = 'loading' | 'live' | 'cached' | 'stale' | 'unavailable'
 
 export type HeatRisk = {
