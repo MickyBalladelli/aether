@@ -43,6 +43,18 @@ const WORLD_BOUNDS = L.latLngBounds(
 const AFRICA_FIRE_BOUNDS = L.latLngBounds([-35, -20], [40, 55])
 const EUROPE_FIRE_BOUNDS = L.latLngBounds([40, -25], [72, 45])
 const MAP_OVERLAYS_KEY = 'aether:map-overlays'
+const MAP_POINTER_BLOCK_SELECTOR = [
+  '.aether-header',
+  '.fire-layer-status',
+  '.leaflet-control',
+  '.leaflet-marker-icon',
+  '.leaflet-interactive',
+  '.leaflet-popup',
+  '.leaflet-tooltip',
+  '.offline-status',
+  '.radar-opacity-control',
+  '.weather-panel'
+].join(', ')
 type MapOverlayId = FireLayerId | 'volcano-activity'
 const MAP_OVERLAY_IDS: MapOverlayId[] = [
   'volcano-activity',
@@ -122,7 +134,7 @@ export function AetherMap({
   } | null>(null)
   const frameRef = useRef(0)
   const pointerFrameRef = useRef(0)
-  const reportedFireHoverRef = useRef<MapFirePointer | null>(null)
+  const reportedFirePointerBlockedRef = useRef(false)
   const [fireLayerStatuses, setFireLayerStatuses] = useState(
     INITIAL_FIRE_LAYER_STATUSES
   )
@@ -207,8 +219,13 @@ export function AetherMap({
       map,
       status => updateFireLayerStatus('reported-wildfires', status),
       fire => {
-        reportedFireHoverRef.current = fire
-        pointerRefreshRef.current()
+        reportedFirePointerBlockedRef.current = Boolean(fire)
+
+        if (fire) {
+          pointerCallbackRef.current(null)
+        } else {
+          pointerRefreshRef.current()
+        }
       }
     )
     const volcanoActivity = new VolcanoActivityLayer(map)
@@ -523,7 +540,11 @@ export function AetherMap({
     const emitPointerWeather = () => {
       const pointer = lastPointerRef.current
 
-      if (pointerWeatherBlocked || !pointer) {
+      if (
+        pointerWeatherBlocked ||
+        reportedFirePointerBlockedRef.current ||
+        !pointer
+      ) {
         pointerCallbackRef.current(null)
         return
       }
@@ -557,7 +578,7 @@ export function AetherMap({
             oceanCurrentSamplesRef.current
           )
         : null
-      const fire = reportedFireHoverRef.current ?? findFireTileAtPoint(
+      const fire = findFireTileAtPoint(
         map,
         L.point(pointer.x, pointer.y),
         [
@@ -580,7 +601,11 @@ export function AetherMap({
     const handleMouseMove = (event: MouseEvent) => {
       const target = event.target
 
-      if (target instanceof Element && target.closest('.leaflet-control')) {
+      if (
+        target instanceof Element &&
+        target.closest(MAP_POINTER_BLOCK_SELECTOR)
+      ) {
+        clearPointerWeather()
         return
       }
 
@@ -599,8 +624,18 @@ export function AetherMap({
     const clearPointerWeather = () => {
       window.cancelAnimationFrame(pointerFrameRef.current)
       lastPointerRef.current = null
-      reportedFireHoverRef.current = null
+      reportedFirePointerBlockedRef.current = false
       pointerCallbackRef.current(null)
+    }
+    const handleWindowMouseMove = (event: MouseEvent) => {
+      const target = event.target
+
+      if (
+        target instanceof Element &&
+        target.closest(MAP_POINTER_BLOCK_SELECTOR)
+      ) {
+        clearPointerWeather()
+      }
     }
     const pointerBlockingControls = [
       tileControl.getContainer(),
@@ -654,6 +689,10 @@ export function AetherMap({
     })
     mapElement.addEventListener('mouseleave', clearPointerWeather)
     window.addEventListener('resize', handleWindowResize)
+    window.addEventListener('mousemove', handleWindowMouseMove, {
+      capture: true,
+      passive: true
+    })
     motionQuery.addEventListener('change', handleMotionPreferenceChange)
     emitViewport()
     mapRef.current = map
@@ -663,6 +702,7 @@ export function AetherMap({
       window.cancelAnimationFrame(pointerFrameRef.current)
       fireStatusController.abort()
       window.removeEventListener('resize', handleWindowResize)
+      window.removeEventListener('mousemove', handleWindowMouseMove, true)
       motionQuery.removeEventListener('change', handleMotionPreferenceChange)
       for (const control of pointerBlockingControls) {
         control?.removeEventListener('mouseenter', blockPointerWeather)

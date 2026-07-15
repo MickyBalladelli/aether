@@ -168,7 +168,7 @@
   background: rgba(7, 17, 22, 0.9);
   box-shadow: var(--glass-shadow);
   color: #e8f8ff;
-  pointer-events: none;
+  pointer-events: auto;
   backdrop-filter: blur(16px) saturate(140%);
 }
 
