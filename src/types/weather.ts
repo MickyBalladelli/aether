@@ -36,6 +36,24 @@ export type SoilMoistureReading = {
   longitude: number
 }
 
+export type NearbyWebcam = {
+  id: number
+  title: string
+  city: string
+  distanceKm: number
+  playerUrl: string
+  detailUrl: string
+  live: boolean
+  updatedAt?: string
+}
+
+export type NearbyWebcams = {
+  configured: boolean
+  radiusKm: number
+  total: number
+  webcams: NearbyWebcam[]
+}
+
 export type WeatherViewport = {
   north: number
   south: number

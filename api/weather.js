@@ -33,6 +33,7 @@ import {
 } from '../shared/providerValidation.js'
 import { handleTemperatureRecords } from '../server/temperatureRecords.js'
 import { handleSoilMoisture } from '../server/soilMoisture.js'
+import { handleWebcams } from '../server/webcams.js'
 
 const OPEN_METEO_ENDPOINT = 'https://api.open-meteo.com/v1/forecast'
 
@@ -50,6 +51,11 @@ export default async function handler(request, response) {
 
   if (request.query.history === 'soil-moisture') {
     await handleSoilMoisture(request, response)
+    return
+  }
+
+  if (request.query.resource === 'webcams') {
+    await handleWebcams(request, response)
     return
   }
 

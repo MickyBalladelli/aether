@@ -87,6 +87,11 @@ const DATA_SOURCES = [
     name: 'Smithsonian GVP / USGS',
     kind: 'Worldwide weekly volcano activity',
     url: 'https://volcano.si.edu/reports_weekly.cfm'
+  },
+  {
+    name: 'Windy Webcams',
+    kind: 'Nearby public webcams',
+    url: 'https://www.windy.com/webcams'
   }
 ]
 

@@ -14,6 +14,7 @@ import { SevereWeatherAlerts } from './SevereWeatherAlerts'
 import { SunTimes } from './SunTimes'
 import { TemperatureRecords } from './TemperatureRecords'
 import { SoilMoisture } from './SoilMoisture'
+import { NearbyWebcams } from './NearbyWebcams'
 
 type WeatherDashboardProps = {
   weather: WeatherConfig | null
@@ -121,6 +122,7 @@ export function WeatherDashboard({
         </Stack>
 
         <SoilMoisture location={location} />
+        <NearbyWebcams location={location} />
         <TemperatureRecords location={location} />
 
         <SunTimes

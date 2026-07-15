@@ -31,6 +31,10 @@ export default defineConfig(({ mode }) => {
     process.env.FIRMS_MAP_KEY = env.FIRMS_MAP_KEY
   }
 
+  if (!process.env.WINDY_KEY && env.WINDY_KEY) {
+    process.env.WINDY_KEY = env.WINDY_KEY
+  }
+
   if (!process.env.UPSTASH_REDIS_REST_URL && env.UPSTASH_REDIS_REST_URL) {
     process.env.UPSTASH_REDIS_REST_URL = env.UPSTASH_REDIS_REST_URL
   }

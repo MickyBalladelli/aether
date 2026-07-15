@@ -154,6 +154,7 @@ Create a `.env` file or set these server-side environment variables:
 | Variable | Required | Purpose |
 | --- | --- | --- |
 | `FIRMS_MAP_KEY` | No | Enables worldwide NASA FIRMS heat-detection tiles |
+| `WINDY_KEY` | No | Enables nearby public webcams from Windy |
 | `METEOGATE_KEY` | No | Enables official European heat warnings |
 | `ECMWF_KEY` | No | Uses the Open-Meteo customer endpoint for ECMWF before trying the free endpoint |
 | `UPSTASH_REDIS_REST_URL` | No | Enables shared Upstash caching |
@@ -162,6 +163,8 @@ Create a `.env` file or set these server-side environment variables:
 Without Upstash, production falls back to Vercel Runtime Cache and local development falls back to memory. US National Weather Service alerts, EFFIS, RainViewer, NOAA, OpenStreetMap, Nominatim, and the free Open-Meteo endpoints do not need project keys.
 
 Request a [NASA FIRMS map key](https://firms.modaps.eosdis.nasa.gov/api/map_key/) if you want the worldwide heat-detection overlay.
+
+Request a [Windy Webcams API key](https://api.windy.com/keys) to enable nearby live cameras. Camera players are loaded only when the webcam panel is opened.
 
 ## Local development
 
