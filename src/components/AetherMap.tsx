@@ -2,11 +2,11 @@ import L from 'leaflet'
 import { useEffect, useRef, useState } from 'react'
 import type { KeyboardEvent } from 'react'
 import { FireLayerStatus } from './FireLayerStatus'
+import {
+  createAetherMapLayers
+} from '../map/AetherMapLayers'
+import type { AetherMapLayers } from '../map/AetherMapLayers'
 import { WeatherMapAnimation } from '../map/WeatherMapAnimation'
-import { WeatherRadarLayer } from '../map/WeatherRadarLayer'
-import { ReportedFireLayer } from '../map/ReportedFireLayer'
-import { VolcanoActivityLayer } from '../map/VolcanoActivityLayer'
-import { findFireTileAtPoint } from '../map/fireTileHitTest'
 import {
   INITIAL_FIRE_LAYER_STATUSES
 } from '../map/fireLayerStatus'
@@ -14,7 +14,6 @@ import type {
   FireLayerId,
   FireLayerStatusPatch
 } from '../map/fireLayerStatus'
-import { fetchWithTimeout } from '../../shared/fetchTimeout.js'
 import { interpolateWeatherAt } from '../services/weatherGrid'
 import { interpolateAirQualityAt } from '../services/airQuality'
 import { interpolateJetStreamAt } from '../services/jetStream'
@@ -24,17 +23,10 @@ import {
   prefersReducedMotion
 } from '../utils/motion'
 import { renderWeatherBadge } from '../map/weatherBadge'
-import { addLayerControlInfo } from '../map/layerControlInfo'
-import {
-  loadEnabledMapOverlays,
-  saveEnabledMapOverlays
-} from '../map/mapOverlayState'
-import type { MapOverlayId } from '../map/mapOverlayState'
 import type {
   AirQualityMapSample,
   JetStreamSample,
   OceanCurrentSample,
-  MapFirePointer,
   MapWeatherPointer,
   WeatherLocation,
   WeatherMapSample,
@@ -46,8 +38,6 @@ const WORLD_BOUNDS = L.latLngBounds(
   [-85.05112878, -180],
   [85.05112878, 180]
 )
-const AFRICA_FIRE_BOUNDS = L.latLngBounds([-35, -20], [40, 55])
-const EUROPE_FIRE_BOUNDS = L.latLngBounds([40, -25], [72, 45])
 const MAP_POINTER_BLOCK_SELECTOR = [
   '.aether-header',
   '.fire-layer-status',
@@ -60,26 +50,6 @@ const MAP_POINTER_BLOCK_SELECTOR = [
   '.radar-opacity-control',
   '.weather-panel'
 ].join(', ')
-const FIRE_LAYER_DESCRIPTION = [
-  'Satellite heat detections from the last 24 hours.',
-  'They may include extinguished fires or other hot sources,',
-  'and clouds can hide active fires.'
-].join(' ')
-const FIRMS_HOVER_INFO: MapFirePointer = {
-  title: 'Worldwide heat detection',
-  source: 'NASA FIRMS · VIIRS',
-  detail: 'Detected within the last 24 hours. Not a confirmed active fire.'
-}
-const AFRICA_EFFIS_HOVER_INFO: MapFirePointer = {
-  title: 'Africa heat detection',
-  source: 'Copernicus EFFIS · VIIRS',
-  detail: 'Detected today or yesterday. Not a confirmed active fire.'
-}
-const EUROPE_EFFIS_HOVER_INFO: MapFirePointer = {
-  title: 'Europe heat detection',
-  source: 'Copernicus EFFIS · VIIRS',
-  detail: 'Detected today or yesterday. Not a confirmed active fire.'
-}
 
 type AetherMapProps = {
   location: WeatherLocation
@@ -112,7 +82,7 @@ export function AetherMap({
   const mapRef = useRef<L.Map | null>(null)
   const badgeLayerRef = useRef<L.LayerGroup | null>(null)
   const animationRef = useRef<WeatherMapAnimation | null>(null)
-  const radarRef = useRef<WeatherRadarLayer | null>(null)
+  const layersRef = useRef<AetherMapLayers | null>(null)
   const samplesRef = useRef(samples)
   const jetStreamSamplesRef = useRef(jetStreamSamples)
   const airQualitySamplesRef = useRef(airQualitySamples)
@@ -204,263 +174,25 @@ export function AetherMap({
       worldCopyJump: false
     })
 
-    const standardTiles = L.tileLayer(
-      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-      {
-        maxZoom: 19,
-        noWrap: true,
-        attribution: '&copy; OpenStreetMap contributors'
-      }
-    )
-    const reportedFires = new ReportedFireLayer(
+    const layers = createAetherMapLayers({
       map,
-      status => updateFireLayerStatus('reported-wildfires', status),
-      fire => {
-        reportedFirePointerBlockedRef.current = Boolean(fire)
+      updateFireLayerStatus,
+      onReportedFirePointerChange: blocked => {
+        reportedFirePointerBlockedRef.current = blocked
 
-        if (fire) {
+        if (blocked) {
           pointerCallbackRef.current(null)
         } else {
           pointerRefreshRef.current()
         }
       }
-    )
-    const volcanoActivity = new VolcanoActivityLayer(map)
-    const fireTiles = L.tileLayer(
-      '/api/fire-tile?z={z}&x={x}&y={y}',
-      {
-        keepBuffer: 6,
-        maxNativeZoom: 12,
-        maxZoom: 19,
-        noWrap: true,
-        opacity: 0.9,
-        updateWhenIdle: true,
-        updateWhenZooming: false,
-        attribution: 'Worldwide heat detections NASA FIRMS'
-      }
-    )
-    const africaFireTiles = L.tileLayer(
-      '/api/effis-fire-tile?z={z}&x={x}&y={y}',
-      {
-        bounds: AFRICA_FIRE_BOUNDS,
-        keepBuffer: 6,
-        minNativeZoom: 2,
-        maxNativeZoom: 12,
-        maxZoom: 19,
-        noWrap: true,
-        opacity: 0.92,
-        updateWhenIdle: true,
-        updateWhenZooming: false,
-        attribution: 'African fire detections Copernicus EFFIS'
-      }
-    )
-    const europeFireTiles = L.tileLayer(
-      '/api/effis-fire-tile?z={z}&x={x}&y={y}',
-      {
-        bounds: EUROPE_FIRE_BOUNDS,
-        keepBuffer: 6,
-        minNativeZoom: 2,
-        maxNativeZoom: 12,
-        maxZoom: 19,
-        noWrap: true,
-        opacity: 0.92,
-        updateWhenIdle: true,
-        updateWhenZooming: false,
-        attribution: 'European fire detections Copernicus EFFIS'
-      }
-    )
-    const mapOverlayLayers: Record<MapOverlayId, L.Layer> = {
-      'volcano-activity': volcanoActivity.getLeafletLayer(),
-      'heat-detections': fireTiles,
-      'reported-wildfires': reportedFires.getLeafletLayer(),
-      'africa-detections': africaFireTiles,
-      'europe-detections': europeFireTiles
-    }
-
-    standardTiles.addTo(map)
-
-    const tileControl = L.control.layers(
-      {},
-      {
-        'Worldwide weekly volcano activity': volcanoActivity.getLeafletLayer(),
-        'Worldwide heat detections · 24h': fireTiles,
-        'Africa fire detections · Today + yesterday': africaFireTiles,
-        'Europe fire detections · Today + yesterday': europeFireTiles,
-        'Reported open wildfires': reportedFires.getLeafletLayer()
-      },
-      {
-        collapsed: true,
-        position: 'topright'
-      }
-    ).addTo(map)
-    let firmsConfigured: boolean | null = null
-    let firmsLoadedTiles = 0
-    let africaLoadedTiles = 0
-    let europeLoadedTiles = 0
-    const fireStatusController = new AbortController()
-    const handleFireOverlayAdd = (event: L.LayersControlEvent) => {
-      if (event.layer === fireTiles) {
-        updateFireLayerStatus('heat-detections', {
-          enabled: true,
-          state: firmsConfigured === false ? 'missing-key' : 'loading'
-        })
-      } else if (event.layer === reportedFires.getLeafletLayer()) {
-        updateFireLayerStatus('reported-wildfires', {
-          enabled: true,
-          state: 'loading'
-        })
-      } else if (event.layer === africaFireTiles) {
-        updateFireLayerStatus('africa-detections', {
-          enabled: true,
-          state: 'loading'
-        })
-      } else if (event.layer === europeFireTiles) {
-        updateFireLayerStatus('europe-detections', {
-          enabled: true,
-          state: 'loading'
-        })
-      }
-
-      if (getMapOverlayId(
-        event.layer,
-        volcanoActivity.getLeafletLayer(),
-        fireTiles,
-        reportedFires.getLeafletLayer(),
-        africaFireTiles,
-        europeFireTiles
-      )) {
-        saveEnabledMapOverlays(map, mapOverlayLayers)
-      }
-    }
-    const handleFireOverlayRemove = (event: L.LayersControlEvent) => {
-      const layerId = getMapOverlayId(
-        event.layer,
-        volcanoActivity.getLeafletLayer(),
-        fireTiles,
-        reportedFires.getLeafletLayer(),
-        africaFireTiles,
-        europeFireTiles
-      )
-
-      if (layerId && layerId !== 'volcano-activity') {
-        updateFireLayerStatus(layerId, { enabled: false, state: 'idle' })
-      }
-
-      if (layerId) {
-        saveEnabledMapOverlays(map, mapOverlayLayers)
-      }
-    }
-    const handleFirmsLoading = () => {
-      firmsLoadedTiles = 0
-
-      if (map.hasLayer(fireTiles)) {
-        updateFireLayerStatus('heat-detections', {
-          state: firmsConfigured === false ? 'missing-key' : 'loading'
-        })
-      }
-    }
-    const handleFirmsTileLoad = () => {
-      firmsLoadedTiles += 1
-    }
-    const handleFirmsLoad = () => {
-      if (!map.hasLayer(fireTiles)) {
-        return
-      }
-
-      updateFireLayerStatus('heat-detections', {
-        state: firmsConfigured === false
-          ? 'missing-key'
-          : firmsLoadedTiles > 0 ? 'available' : 'unavailable',
-        ...(firmsLoadedTiles > 0 ? { lastUpdated: Date.now() } : {})
-      })
-    }
-    const handleAfricaLoading = () => {
-      africaLoadedTiles = 0
-
-      if (map.hasLayer(africaFireTiles)) {
-        updateFireLayerStatus('africa-detections', { state: 'loading' })
-      }
-    }
-    const handleAfricaTileLoad = () => {
-      africaLoadedTiles += 1
-    }
-    const handleAfricaLoad = () => {
-      if (!map.hasLayer(africaFireTiles)) {
-        return
-      }
-
-      updateFireLayerStatus('africa-detections', {
-        state: africaLoadedTiles > 0 ? 'available' : 'unavailable',
-        ...(africaLoadedTiles > 0 ? { lastUpdated: Date.now() } : {})
-      })
-    }
-    const handleEuropeLoading = () => {
-      europeLoadedTiles = 0
-
-      if (map.hasLayer(europeFireTiles)) {
-        updateFireLayerStatus('europe-detections', { state: 'loading' })
-      }
-    }
-    const handleEuropeTileLoad = () => {
-      europeLoadedTiles += 1
-    }
-    const handleEuropeLoad = () => {
-      if (!map.hasLayer(europeFireTiles)) {
-        return
-      }
-
-      updateFireLayerStatus('europe-detections', {
-        state: europeLoadedTiles > 0 ? 'available' : 'unavailable',
-        ...(europeLoadedTiles > 0 ? { lastUpdated: Date.now() } : {})
-      })
-    }
-
-    map.on('overlayadd', handleFireOverlayAdd)
-    map.on('overlayremove', handleFireOverlayRemove)
-    fireTiles.on('loading', handleFirmsLoading)
-    fireTiles.on('tileload', handleFirmsTileLoad)
-    fireTiles.on('load', handleFirmsLoad)
-    africaFireTiles.on('loading', handleAfricaLoading)
-    africaFireTiles.on('tileload', handleAfricaTileLoad)
-    africaFireTiles.on('load', handleAfricaLoad)
-    europeFireTiles.on('loading', handleEuropeLoading)
-    europeFireTiles.on('tileload', handleEuropeTileLoad)
-    europeFireTiles.on('load', handleEuropeLoad)
-    void fetchWithTimeout(
-      '/api/fire-layer-status',
-      { signal: fireStatusController.signal },
-      5000
-    ).then(async response => {
-      if (!response.ok) {
-        throw new Error('Fire layer status unavailable')
-      }
-
-      const payload = await response.json() as { firmsConfigured?: boolean }
-
-      firmsConfigured = payload.firmsConfigured === true
-
-      if (!firmsConfigured && map.hasLayer(fireTiles)) {
-        updateFireLayerStatus('heat-detections', { state: 'missing-key' })
-      }
-    }).catch(() => {
-      if (!fireStatusController.signal.aborted && map.hasLayer(fireTiles)) {
-        updateFireLayerStatus('heat-detections', { state: 'unavailable' })
-      }
     })
-    badgeLayerRef.current = L.layerGroup().addTo(map)
+
+    badgeLayerRef.current = layers.badgeLayer
+    layersRef.current = layers
     const animation = new WeatherMapAnimation(map, mapElement)
     animation.start()
     animationRef.current = animation
-    const radar = new WeatherRadarLayer(map)
-    radar.start()
-    radarRef.current = radar
-    reportedFires.start()
-    volcanoActivity.start()
-
-    for (const layerId of loadEnabledMapOverlays()) {
-      mapOverlayLayers[layerId].addTo(map)
-    }
-    const layerInfoCleanups = decorateLayerControl(tileControl)
 
     const emitViewport = () => {
       const bounds = map.getBounds()
@@ -521,15 +253,7 @@ export function AetherMap({
             oceanCurrentSamplesRef.current
           )
         : null
-      const fire = findFireTileAtPoint(
-        map,
-        L.point(pointer.x, pointer.y),
-        [
-          { layer: africaFireTiles, info: AFRICA_EFFIS_HOVER_INFO },
-          { layer: europeFireTiles, info: EUROPE_EFFIS_HOVER_INFO },
-          { layer: fireTiles, info: FIRMS_HOVER_INFO }
-        ]
-      )
+      const fire = layers.findFireAtPoint(L.point(pointer.x, pointer.y))
 
       pointerCallbackRef.current({
         ...reading,
@@ -581,7 +305,7 @@ export function AetherMap({
       }
     }
     const pointerBlockingControls = [
-      tileControl.getContainer(),
+      layers.controlContainer,
       map.zoomControl.getContainer()
     ]
     const blockPointerWeather = () => {
@@ -643,7 +367,6 @@ export function AetherMap({
     return () => {
       window.cancelAnimationFrame(frameRef.current)
       window.cancelAnimationFrame(pointerFrameRef.current)
-      fireStatusController.abort()
       window.removeEventListener('resize', handleWindowResize)
       window.removeEventListener('mousemove', handleWindowMouseMove, true)
       motionQuery.removeEventListener('change', handleMotionPreferenceChange)
@@ -654,35 +377,18 @@ export function AetherMap({
       map.off('moveend zoomend resize', scheduleViewport)
       map.off('moveend zoomend resize', animation.invalidate, animation)
       map.off('click', handleMapClick)
-      map.off('overlayadd', handleFireOverlayAdd)
-      map.off('overlayremove', handleFireOverlayRemove)
-      fireTiles.off('loading', handleFirmsLoading)
-      fireTiles.off('tileload', handleFirmsTileLoad)
-      fireTiles.off('load', handleFirmsLoad)
-      africaFireTiles.off('loading', handleAfricaLoading)
-      africaFireTiles.off('tileload', handleAfricaTileLoad)
-      africaFireTiles.off('load', handleAfricaLoad)
-      europeFireTiles.off('loading', handleEuropeLoading)
-      europeFireTiles.off('tileload', handleEuropeTileLoad)
-      europeFireTiles.off('load', handleEuropeLoad)
       map.off('movestart zoomstart', clearPointerWeather)
       mapElement.removeEventListener('mousemove', handleMouseMove, true)
       mapElement.removeEventListener('mouseleave', clearPointerWeather)
       pointerRefreshRef.current = () => {}
       pointerCallbackRef.current(null)
-      for (const cleanupLayerInfo of layerInfoCleanups) {
-        cleanupLayerInfo()
-      }
       animation.destroy()
-      radar.destroy()
-      reportedFires.destroy()
-      volcanoActivity.destroy()
-      tileControl.remove()
+      layers.destroy()
       map.remove()
       mapRef.current = null
       badgeLayerRef.current = null
       animationRef.current = null
-      radarRef.current = null
+      layersRef.current = null
     }
   }, [onViewportChange])
 
@@ -761,8 +467,7 @@ export function AetherMap({
       jetStreamSamples,
       oceanCurrentSamples
     )
-    radarRef.current?.setMode(mode)
-    radarRef.current?.setOpacity(radarOpacity)
+    layersRef.current?.setWeatherMode(mode, radarOpacity)
   }, [airQualitySamples, jetStreamSamples, oceanCurrentSamples, samples, mode, radarOpacity])
 
   function handleMapKeyDown(event: KeyboardEvent<HTMLDivElement>) {
@@ -815,132 +520,4 @@ export function AetherMap({
       <FireLayerStatus statuses={fireLayerStatuses} />
     </>
   )
-}
-
-function decorateLayerControl(tileControl: L.Control.Layers) {
-  const overlayInputs = Array.from(
-    tileControl.getContainer()?.querySelectorAll<HTMLInputElement>(
-      'input.leaflet-control-layers-selector[type="checkbox"]'
-    ) ?? []
-  )
-  const volcanoLayerInput = overlayInputs[0]
-  const heatLayerInput = overlayInputs[1]
-  const africaFireInput = overlayInputs[2]
-  const europeFireInput = overlayInputs[3]
-  const reportedFireInput = overlayInputs[4]
-
-  addLayerControlHeading(volcanoLayerInput, 'Volcanoes')
-  addLayerControlHeading(heatLayerInput, 'Satellite detections')
-  addLayerControlHeading(reportedFireInput, 'Reported incidents')
-
-  volcanoLayerInput?.setAttribute(
-    'aria-label',
-    'Worldwide weekly volcano activity from Smithsonian GVP and USGS. Reports are preliminary and not comprehensive.'
-  )
-  heatLayerInput?.setAttribute(
-    'aria-label',
-    `Worldwide heat detections from the last 24 hours. ${FIRE_LAYER_DESCRIPTION}`
-  )
-  reportedFireInput?.setAttribute(
-    'aria-label',
-    'Reported open wildfires from NIFC, CWFIS, and NASA EONET. Coverage is incomplete and status can lag.'
-  )
-  africaFireInput?.setAttribute(
-    'aria-label',
-    'Copernicus Africa fire detections from today and yesterday. These are not confirmed incident reports.'
-  )
-  europeFireInput?.setAttribute(
-    'aria-label',
-    'Copernicus Europe fire detections from today and yesterday. These are not confirmed incident reports.'
-  )
-
-  return [
-    addLayerControlInfo(volcanoLayerInput, {
-      id: 'volcanoes',
-      label: 'worldwide weekly volcano activity',
-      detail: 'Preliminary worldwide activity reported this week by the Smithsonian Global Volcanism Program and USGS.'
-    }),
-    addLayerControlInfo(heatLayerInput, {
-      id: 'worldwide-heat',
-      label: 'worldwide heat detections',
-      detail: FIRE_LAYER_DESCRIPTION
-    }),
-    addLayerControlInfo(africaFireInput, {
-      id: 'africa-fire',
-      label: 'Africa fire detections',
-      detail: 'Copernicus EFFIS filtered VIIRS detections from today and yesterday across Africa. These are not confirmed incident reports.'
-    }),
-    addLayerControlInfo(europeFireInput, {
-      id: 'europe-fire',
-      label: 'Europe fire detections',
-      detail: 'Copernicus EFFIS filtered VIIRS detections from today and yesterday across Europe. These are not confirmed incident reports.'
-    }),
-    addLayerControlInfo(reportedFireInput, {
-      id: 'reported-fires',
-      label: 'reported open wildfires',
-      detail: 'Open wildfire incidents from NIFC in the USA, CWFIS in Canada, and NASA EONET elsewhere. Coverage is incomplete and status can lag.'
-    })
-  ]
-}
-
-function getFireLayerId(
-  layer: L.Layer,
-  firmsLayer: L.Layer,
-  reportedLayer: L.Layer,
-  africaLayer: L.Layer,
-  europeLayer: L.Layer
-): FireLayerId | null {
-  if (layer === firmsLayer) {
-    return 'heat-detections'
-  }
-
-  if (layer === reportedLayer) {
-    return 'reported-wildfires'
-  }
-
-  if (layer === africaLayer) {
-    return 'africa-detections'
-  }
-
-  return layer === europeLayer ? 'europe-detections' : null
-}
-
-function getMapOverlayId(
-  layer: L.Layer,
-  volcanoLayer: L.Layer,
-  firmsLayer: L.Layer,
-  reportedLayer: L.Layer,
-  africaLayer: L.Layer,
-  europeLayer: L.Layer
-): MapOverlayId | null {
-  if (layer === volcanoLayer) {
-    return 'volcano-activity'
-  }
-
-  return getFireLayerId(
-    layer,
-    firmsLayer,
-    reportedLayer,
-    africaLayer,
-    europeLayer
-  )
-}
-
-function addLayerControlHeading(
-  input: HTMLInputElement | undefined,
-  text: string
-) {
-  const label = input?.closest('label')
-
-  if (!label) {
-    return
-  }
-
-  const heading = document.createElement('div')
-
-  heading.className = 'leaflet-control-layers-section-title'
-  heading.setAttribute('role', 'heading')
-  heading.setAttribute('aria-level', '3')
-  heading.textContent = text
-  label.before(heading)
 }
