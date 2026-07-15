@@ -4,13 +4,17 @@ import { loadCachedResource } from '../server/cachedResource.js'
 import { logCacheMetric } from '../server/cacheMetrics.js'
 import { getSharedCache } from '../server/sharedCache.js'
 import { getCacheNamespace } from '../shared/cacheVersion.js'
-import { SOURCE_REFRESH_SECONDS } from '../shared/cachePolicy.js'
 
 const METADATA_URL = 'https://api.rainviewer.com/public/weather-maps.json'
 const TILE_HOST = 'https://tilecache.rainviewer.com'
-const STALE_TTL = 24 * 60 * 60
+const METADATA_FRESH_TTL = 5 * 60
+const METADATA_STALE_TTL = 30 * 60
+const RADAR_TILE_FRESH_TTL = 24 * 60 * 60
+const RADAR_TILE_STALE_TTL = 7 * 24 * 60 * 60
+const COVERAGE_TILE_FRESH_TTL = 30 * 24 * 60 * 60
+const COVERAGE_TILE_STALE_TTL = 90 * 24 * 60 * 60
 const TILE_TIMEOUT_MS = 10000
-const FRAME_PATH_PATTERN = /^\/v2\/radar\/\d+$/
+const FRAME_PATH_PATTERN = /^\/v2\/radar\/[a-z0-9_-]{6,64}$/i
 
 export default async function handler(request, response) {
   if (request.method !== 'GET') {
@@ -22,7 +26,17 @@ export default async function handler(request, response) {
   const path = getQueryValue(request.query.path)
 
   if (path !== undefined) {
-    await sendRadarTile(request, response, path)
+    await sendRadarTile(
+      request,
+      response,
+      path,
+      getQueryValue(request.query.sample) === '1'
+    )
+    return
+  }
+
+  if (getQueryValue(request.query.coverage) === '1') {
+    await sendCoverageTile(request, response)
     return
   }
 
@@ -34,8 +48,8 @@ async function sendRadarMetadata(response) {
     const result = await loadCachedResource({
       cache: getSharedCache(getCacheNamespace('radar-metadata')),
       cacheKey: 'current',
-      freshTtl: SOURCE_REFRESH_SECONDS,
-      staleTtl: STALE_TTL,
+      freshTtl: METADATA_FRESH_TTL,
+      staleTtl: METADATA_STALE_TTL,
       onFreshMiss: () => logCacheMetric('radar-metadata', 'miss'),
       load: async () => {
         const upstream = await fetchCoalesced(
@@ -59,19 +73,24 @@ async function sendRadarMetadata(response) {
           throw new Error('RainViewer metadata is empty')
         }
 
-        return { frames }
+        return {
+          frames,
+          generated: Number.isFinite(payload?.generated)
+            ? payload.generated
+            : null
+        }
       }
     })
 
     logResult('radar-metadata', result.source)
-    setCacheHeaders(response, result.source)
+    setCacheHeaders(response, result.source, METADATA_FRESH_TTL)
     response.status(200).json(result.record)
   } catch {
     response.status(502).json({ error: 'Radar metadata unavailable' })
   }
 }
 
-async function sendRadarTile(request, response, path) {
+async function sendRadarTile(request, response, path, rawSample) {
   const tile = parseTile(
     path,
     getQueryValue(request.query.z),
@@ -84,19 +103,20 @@ async function sendRadarTile(request, response, path) {
     return
   }
 
-  const cacheKey = `${tile.path}:${tile.z}:${tile.x}:${tile.y}`
+  const rendering = rawSample ? 'sample' : 'map'
+  const cacheKey = `${tile.path}:${tile.z}:${tile.x}:${tile.y}:${rendering}`
 
   try {
     const result = await loadCachedResource({
       cache: getSharedCache(getCacheNamespace('radar-tiles')),
       cacheKey,
-      freshTtl: SOURCE_REFRESH_SECONDS,
-      staleTtl: STALE_TTL,
+      freshTtl: RADAR_TILE_FRESH_TTL,
+      staleTtl: RADAR_TILE_STALE_TTL,
       onFreshMiss: () => logCacheMetric('radar-tile', 'miss'),
       load: async () => {
         const upstream = await fetchTileCoalesced(
           `rainviewer:${cacheKey}`,
-          `${TILE_HOST}${tile.path}/256/${tile.z}/${tile.x}/${tile.y}/2/1_1.png`,
+          `${TILE_HOST}${tile.path}/256/${tile.z}/${tile.x}/${tile.y}/2/${rawSample ? '0_0' : '1_1'}.png`,
           TILE_TIMEOUT_MS,
           'radar-tile'
         )
@@ -113,7 +133,7 @@ async function sendRadarTile(request, response, path) {
     })
 
     logResult('radar-tile', result.source)
-    setCacheHeaders(response, result.source)
+    setCacheHeaders(response, result.source, RADAR_TILE_FRESH_TTL)
     response.setHeader('Content-Type', result.record.contentType)
     response.status(200).send(Buffer.from(result.record.image, 'base64'))
   } catch {
@@ -121,19 +141,75 @@ async function sendRadarTile(request, response, path) {
   }
 }
 
+async function sendCoverageTile(request, response) {
+  const tile = parseTileCoordinates(
+    getQueryValue(request.query.z),
+    getQueryValue(request.query.x),
+    getQueryValue(request.query.y)
+  )
+
+  if (!tile) {
+    response.status(400).json({ error: 'Invalid radar coverage tile' })
+    return
+  }
+
+  const cacheKey = `${tile.z}:${tile.x}:${tile.y}`
+
+  try {
+    const result = await loadCachedResource({
+      cache: getSharedCache(getCacheNamespace('radar-coverage')),
+      cacheKey,
+      freshTtl: COVERAGE_TILE_FRESH_TTL,
+      staleTtl: COVERAGE_TILE_STALE_TTL,
+      onFreshMiss: () => logCacheMetric('radar-coverage', 'miss'),
+      load: async () => {
+        const upstream = await fetchTileCoalesced(
+          `rainviewer:coverage:${cacheKey}`,
+          `${TILE_HOST}/v2/coverage/0/256/${tile.z}/${tile.x}/${tile.y}/0/0_0.png`,
+          TILE_TIMEOUT_MS,
+          'radar-coverage'
+        )
+
+        if (!upstream.ok || !upstream.contentType.includes('image')) {
+          throw new Error(`RainViewer coverage returned ${upstream.status}`)
+        }
+
+        return {
+          contentType: upstream.contentType,
+          image: Buffer.from(upstream.body).toString('base64')
+        }
+      }
+    })
+
+    logResult('radar-coverage', result.source)
+    setCacheHeaders(response, result.source, COVERAGE_TILE_FRESH_TTL)
+    response.setHeader('Content-Type', result.record.contentType)
+    response.status(200).send(Buffer.from(result.record.image, 'base64'))
+  } catch {
+    response.status(502).json({ error: 'Radar coverage unavailable' })
+  }
+}
+
 function parseTile(path, zValue, xValue, yValue) {
-  const z = parseInteger(zValue)
-  const x = parseInteger(xValue)
-  const y = parseInteger(yValue)
+  const tile = parseTileCoordinates(zValue, xValue, yValue)
 
   if (
     typeof path !== 'string' ||
     !FRAME_PATH_PATTERN.test(path) ||
-    z === null ||
-    x === null ||
-    y === null ||
-    z > 7
+    !tile
   ) {
+    return null
+  }
+
+  return { path, ...tile }
+}
+
+function parseTileCoordinates(zValue, xValue, yValue) {
+  const z = parseInteger(zValue)
+  const x = parseInteger(xValue)
+  const y = parseInteger(yValue)
+
+  if (z === null || x === null || y === null || z > 7) {
     return null
   }
 
@@ -143,7 +219,7 @@ function parseTile(path, zValue, xValue, yValue) {
     return null
   }
 
-  return { path, z, x, y }
+  return { z, x, y }
 }
 
 function parseInteger(value) {
@@ -172,15 +248,12 @@ function logResult(route, source) {
   }
 }
 
-function setCacheHeaders(response, source) {
+function setCacheHeaders(response, source, maxAge) {
   response.setHeader('X-Aether-Cache', source)
-  response.setHeader(
-    'Cache-Control',
-    `public, max-age=${SOURCE_REFRESH_SECONDS}`
-  )
+  response.setHeader('Cache-Control', `public, max-age=${maxAge}`)
   response.setHeader(
     'Vercel-CDN-Cache-Control',
-    `public, s-maxage=${SOURCE_REFRESH_SECONDS}, stale-while-revalidate=86400`
+    `public, s-maxage=${maxAge}, stale-while-revalidate=86400`
   )
 }
 

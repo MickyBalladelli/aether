@@ -1,15 +1,15 @@
-import { getWeeklyVolcanoActivity } from '../server/volcanoActivity.js'
-import { loadCachedResource } from '../server/cachedResource.js'
+import { getWeeklyVolcanoActivity } from './volcanoActivity.js'
+import { loadCachedResource } from './cachedResource.js'
 import {
   logCacheMetric,
   logProviderFailure,
   logQuotaAlert
-} from '../server/cacheMetrics.js'
-import { getSharedCache } from '../server/sharedCache.js'
+} from './cacheMetrics.js'
+import { getSharedCache } from './sharedCache.js'
 import {
   readProviderQuota,
   setProviderHeaders
-} from '../server/providerQuota.js'
+} from './providerQuota.js'
 import { getCacheNamespace } from '../shared/cacheVersion.js'
 
 const FRESH_CACHE_TTL = 6 * 60 * 60

@@ -12,12 +12,18 @@ import {
 } from '../server/providerQuota.js'
 import { getCacheNamespace } from '../shared/cacheVersion.js'
 import { SOURCE_REFRESH_SECONDS } from '../shared/cachePolicy.js'
+import volcanoActivityHandler from '../server/volcanoActivityHandler.js'
 
 const FRESH_CACHE_TTL = SOURCE_REFRESH_SECONDS
 const STALE_CACHE_TTL = 24 * 60 * 60
 const METRICS_ROUTE = 'reported-fires'
 
 export default async function handler(request, response) {
+  if (getQueryValue(request.query.resource) === 'volcano-activity') {
+    await volcanoActivityHandler(request, response)
+    return
+  }
+
   if (request.method !== 'GET') {
     response.setHeader('Allow', 'GET')
     response.status(405).json({ error: 'Method not allowed' })
@@ -83,4 +89,8 @@ export default async function handler(request, response) {
     setProviderHeaders(response, providerFailures, quota)
     response.status(502).json({ error: 'Reported wildfire feed unavailable' })
   }
+}
+
+function getQueryValue(value) {
+  return Array.isArray(value) ? value[0] : value
 }

@@ -4,6 +4,7 @@ import DeviceThermostatIcon from '@mui/icons-material/DeviceThermostat'
 import FlightIcon from '@mui/icons-material/Flight'
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
+import RadarIcon from '@mui/icons-material/Radar'
 import WaterDropIcon from '@mui/icons-material/WaterDrop'
 import WavesIcon from '@mui/icons-material/Waves'
 import type { MapWeatherPointer } from '../types/weather'
@@ -82,6 +83,20 @@ export function MapWeatherTooltip({ reading }: MapWeatherTooltipProps) {
         <span>{reading.precipitation.toFixed(1)} mm</span>
       </div>
 
+      {reading.radarRain && (
+        <div className={`map-weather-tooltip-radar is-${reading.radarRain.status}`}>
+          <div className="map-weather-tooltip-row">
+            <RadarIcon />
+            <strong>{formatRadarRain(reading.radarRain)}</strong>
+          </div>
+          {reading.radarRain.observedAt && (
+            <span>
+              Latest radar · {formatRadarAge(reading.radarRain.observedAt)}
+            </span>
+          )}
+        </div>
+      )}
+
       {reading.europeanAqi !== undefined && (
         <div className="map-weather-tooltip-row">
           <BlurOnIcon />
@@ -115,4 +130,33 @@ function formatWindDirection(angle: number) {
 
 function formatAnomaly(anomaly: number) {
   return `${anomaly >= 0 ? '+' : ''}${anomaly.toFixed(1)}°C`
+}
+
+function formatRadarRain(reading: NonNullable<MapWeatherPointer['radarRain']>) {
+  if (reading.status === 'checking') {
+    return 'Checking local radar…'
+  }
+
+  if (reading.status === 'rain') {
+    return 'Radar detects rain here'
+  }
+
+  if (reading.status === 'dry') {
+    return 'No rain detected here'
+  }
+
+  if (reading.status === 'no-coverage') {
+    return 'No radar coverage here'
+  }
+
+  return 'Radar unavailable here'
+}
+
+function formatRadarAge(observedAt: string) {
+  const minutes = Math.max(
+    0,
+    Math.round((Date.now() - Date.parse(observedAt)) / 60000)
+  )
+
+  return minutes < 1 ? 'just now' : `${minutes} min ago`
 }

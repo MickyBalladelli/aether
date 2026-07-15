@@ -25,6 +25,10 @@ import { fetchOpenMeteoForecast } from './services/openMeteo'
 import { fetchEcmwfLocationForecast } from './services/ecmwf'
 import { fetchOfficialHeatAlerts } from './services/heatAlerts'
 import {
+  getRadarSampleKey,
+  sampleRadarRainAt
+} from './services/radarRain'
+import {
   fetchOceanCurrentData,
   OCEAN_CURRENT_REFRESH_INTERVAL
 } from './services/oceanCurrents'
@@ -56,11 +60,13 @@ import type {
   WeatherLocation,
   WeatherMapSample,
   WeatherMode,
-  WeatherViewport
+  WeatherViewport,
+  RadarRainReading
 } from './types/weather'
 
 const REVERSE_GEOCODE_DEBOUNCE_MS = 350
 const HOVER_GEOCODE_DEBOUNCE_MS = 650
+const HOVER_RADAR_DEBOUNCE_MS = 1000
 const theme = createTheme({
   palette: {
     mode: 'dark',
@@ -124,6 +130,13 @@ export default function App() {
   const hoverGeocodeTimeoutRef = useRef(0)
   const hoverGeocodeKeyRef = useRef('')
   const hoverPlaceCacheRef = useRef(new Map<string, string | null>())
+  const hoverRadarTimeoutRef = useRef(0)
+  const hoverRadarRequestRef = useRef(0)
+  const hoverRadarKeyRef = useRef('')
+  const hoverRadarResultRef = useRef<{
+    key: string
+    reading: RadarRainReading
+  } | null>(null)
   const selectedAirQuality = useMemo(
     () => interpolateAirQualityAt(
       selectedLocation.latitude,
@@ -153,6 +166,8 @@ export default function App() {
     reverseGeocodeAbortRef.current?.abort()
     window.clearTimeout(hoverGeocodeTimeoutRef.current)
     hoverGeocodeAbortRef.current?.abort()
+    window.clearTimeout(hoverRadarTimeoutRef.current)
+    hoverRadarRequestRef.current += 1
   }, [])
 
   useEffect(() => {
@@ -264,22 +279,70 @@ export default function App() {
   }, [])
   const handlePointerWeatherChange = useCallback((reading: MapWeatherPointer | null) => {
     window.clearTimeout(hoverGeocodeTimeoutRef.current)
+    window.clearTimeout(hoverRadarTimeoutRef.current)
     hoverGeocodeAbortRef.current?.abort()
     hoverGeocodeAbortRef.current = null
 
     if (!reading) {
       hoverGeocodeKeyRef.current = ''
+      hoverRadarKeyRef.current = ''
+      hoverRadarResultRef.current = null
+      hoverRadarRequestRef.current += 1
       setPointerWeather(null)
       return
     }
 
     const key = getHoverPlaceKey(reading.latitude, reading.longitude)
+    const radarKey = getRadarSampleKey(reading.latitude, reading.longitude)
     const cachedPlace = hoverPlaceCacheRef.current.get(key)
+    const cachedRadar = hoverRadarResultRef.current?.key === radarKey
+      ? hoverRadarResultRef.current.reading
+      : null
+    const nextReading = {
+      ...reading,
+      ...(cachedRadar ? { radarRain: cachedRadar } : {})
+    }
 
     hoverGeocodeKeyRef.current = key
+    hoverRadarKeyRef.current = radarKey
     setPointerWeather(cachedPlace
-      ? { ...reading, placeLabel: cachedPlace }
-      : reading)
+      ? { ...nextReading, placeLabel: cachedPlace }
+      : nextReading)
+
+    if (!cachedRadar) {
+      const radarRequest = hoverRadarRequestRef.current + 1
+
+      hoverRadarRequestRef.current = radarRequest
+      hoverRadarTimeoutRef.current = window.setTimeout(async () => {
+        if (
+          hoverRadarRequestRef.current !== radarRequest ||
+          hoverRadarKeyRef.current !== radarKey
+        ) {
+          return
+        }
+
+        setPointerWeather(current => current
+          ? { ...current, radarRain: { status: 'checking' } }
+          : current)
+
+        const radarRain = await sampleRadarRainAt(
+          reading.latitude,
+          reading.longitude
+        )
+
+        if (
+          hoverRadarRequestRef.current !== radarRequest ||
+          hoverRadarKeyRef.current !== radarKey
+        ) {
+          return
+        }
+
+        hoverRadarResultRef.current = { key: radarKey, reading: radarRain }
+        setPointerWeather(current => current
+          ? { ...current, radarRain }
+          : current)
+      }, HOVER_RADAR_DEBOUNCE_MS)
+    }
 
     if (hoverPlaceCacheRef.current.has(key)) {
       return
@@ -657,6 +720,7 @@ export default function App() {
           <Suspense fallback={<div className="weather-panel">Loading forecast</div>}>
             <WeatherDashboard
               weather={displayedWeather}
+              alertWeather={weather}
               ecmwfForecast={ecmwfForecast}
               ecmwfLoading={ecmwfLoading}
               onEcmwfFrameChange={

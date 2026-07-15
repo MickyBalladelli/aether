@@ -89,11 +89,7 @@ export default defineConfig(({ mode }) => {
                 [
                   '/api/fire-tile',
                   '/api/effis-fire-tile'
-                ].includes(url.pathname) ||
-                (
-                  url.pathname === '/api/radar' &&
-                  url.searchParams.has('path')
-                )
+                ].includes(url.pathname)
               ),
               handler: 'CacheFirst',
               options: {
@@ -110,6 +106,27 @@ export default defineConfig(({ mode }) => {
             {
               urlPattern: ({ url }) => (
                 url.origin === self.location.origin &&
+                url.pathname === '/api/radar' &&
+                (
+                  url.searchParams.has('path') ||
+                  url.searchParams.has('coverage')
+                )
+              ),
+              handler: 'CacheFirst',
+              options: {
+                cacheName: getCacheNamespace('radar-tiles'),
+                cacheableResponse: {
+                  statuses: [0, 200]
+                },
+                expiration: {
+                  maxEntries: 256,
+                  maxAgeSeconds: 24 * 60 * 60
+                }
+              }
+            },
+            {
+              urlPattern: ({ url }) => (
+                url.origin === self.location.origin &&
                 url.pathname.startsWith('/api/') &&
                 ![
                   '/api/fire-tile',
@@ -117,7 +134,10 @@ export default defineConfig(({ mode }) => {
                 ].includes(url.pathname) &&
                 !(
                   url.pathname === '/api/radar' &&
-                  url.searchParams.has('path')
+                  (
+                    url.searchParams.has('path') ||
+                    url.searchParams.has('coverage')
+                  )
                 )
               ),
               handler: 'NetworkFirst',

@@ -215,6 +215,11 @@ export type MapFirePointer = {
   detail: string
 }
 
+export type RadarRainReading = {
+  status: 'checking' | 'rain' | 'dry' | 'no-coverage' | 'unavailable'
+  observedAt?: string
+}
+
 export type MapWeatherPointer = {
   screenX: number
   screenY: number
@@ -238,5 +243,6 @@ export type MapWeatherPointer = {
   oceanCurrentAngle?: number
   seaSurfaceTemperature?: number
   seaSurfaceTemperatureAnomaly?: number
+  radarRain?: RadarRainReading
   fire?: MapFirePointer
 }

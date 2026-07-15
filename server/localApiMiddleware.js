@@ -10,7 +10,7 @@ import oceanCurrentsHandler from '../api/ocean-currents.js'
 import radarHandler from '../api/radar.js'
 import reportedFiresHandler from '../api/reported-fires.js'
 import weatherHandler from '../api/weather.js'
-import volcanoActivityHandler from '../api/volcano-activity.js'
+import volcanoActivityHandler from './volcanoActivityHandler.js'
 
 const MAX_BODY_BYTES = 64 * 1024
 const handlers = new Map([

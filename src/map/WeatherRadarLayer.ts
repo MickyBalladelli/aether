@@ -2,7 +2,6 @@ import L from 'leaflet'
 import type { WeatherMode } from '../types/weather'
 import { REDUCED_MOTION_QUERY } from '../utils/motion'
 import { fetchWithTimeout } from '../../shared/fetchTimeout.js'
-import { SOURCE_REFRESH_MS } from '../../shared/cachePolicy.js'
 
 type RadarFrame = {
   time: number
@@ -14,7 +13,7 @@ type RadarMetadata = {
 }
 
 const METADATA_URL = '/api/radar'
-const METADATA_REFRESH = SOURCE_REFRESH_MS
+const METADATA_REFRESH = 5 * 60 * 1000
 const FRAME_DURATION = 1100
 const FRAME_COUNT = 6
 const PANE_NAME = 'weather-radar-pane'

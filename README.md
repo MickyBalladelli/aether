@@ -21,6 +21,7 @@ Aether is a full-screen weather and environmental map built with React, TypeScri
 - Ocean particles colored by NOAA sea-surface temperature
 - Ocean hover values for current speed, direction, temperature, and OISST anomaly
 - Weather, air quality, Jet Stream, ocean, and fire details at the pointer
+- Latest radar check for rain at the exact hovered map cell
 - Nearest place name after pausing over the map
 - Always-light OpenStreetMap base map
 
@@ -130,6 +131,8 @@ This product does not show tides, waves, rip currents, or detailed coastal flow.
 ### Radar
 
 Radar appears in Precipitation and Storm modes. Aether animates the six latest RainViewer frames, supports saved opacity, and shows only the latest frame when reduced motion is enabled.
+
+The map tooltip samples the newest unsmoothed RainViewer radar tile at the hovered coordinate. It reports rain only above a small reflectivity threshold, verifies radar coverage before reporting no rain, and shows the observation age. Hover checks are debounced; metadata, decoded tiles, immutable frame tiles, and the coverage mask are cached separately to avoid repeated provider requests. Public RainViewer tiles are limited to zoom level 7, so this is the finest open composite cell available from this feed, not a rain-gauge measurement.
 
 ### Fire overlays
 

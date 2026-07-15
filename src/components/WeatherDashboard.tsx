@@ -14,6 +14,7 @@ import { SunTimes } from './SunTimes'
 
 type WeatherDashboardProps = {
   weather: WeatherConfig | null
+  alertWeather: WeatherConfig | null
   ecmwfForecast: EcmwfForecast | null
   ecmwfLoading: boolean
   onEcmwfFrameChange: ((frame: EcmwfForecast['frames'][number] | null) => void) | null
@@ -26,6 +27,7 @@ type WeatherDashboardProps = {
 
 export function WeatherDashboard({
   weather,
+  alertWeather,
   ecmwfForecast,
   ecmwfLoading,
   onEcmwfFrameChange,
@@ -56,7 +58,7 @@ export function WeatherDashboard({
     <Box component="aside" className="weather-panel" aria-label="Weather layers and forecast">
       <Stack spacing={1.25}>
         <SevereWeatherAlerts
-          weather={weather}
+          weather={alertWeather}
           officialHeatAlerts={officialHeatAlerts}
         />
         <Stack className="metric-grid">
