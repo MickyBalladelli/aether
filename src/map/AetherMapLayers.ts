@@ -47,6 +47,7 @@ const EUROPE_EFFIS_HOVER_INFO: MapFirePointer = {
 
 type AetherMapLayersOptions = {
   map: L.Map
+  mapLanguage: string
   onReportedFirePointerChange: (blocked: boolean) => void
   updateFireLayerStatus: (
     id: FireLayerId,
@@ -59,11 +60,13 @@ export type AetherMapLayers = {
   controlContainer: HTMLElement | null
   destroy: () => void
   findFireAtPoint: (point: L.Point) => MapFirePointer | null
+  setMapLanguage: (language: string) => void
   setWeatherMode: (mode: WeatherMode, radarOpacity: number) => void
 }
 
 export function createAetherMapLayers({
   map,
+  mapLanguage,
   onReportedFirePointerChange,
   updateFireLayerStatus
 }: AetherMapLayersOptions): AetherMapLayers {
@@ -126,7 +129,7 @@ export function createAetherMapLayers({
     'europe-detections': europeFireTiles
   }
 
-  addBaseMap(map)
+  const baseMap = addBaseMap(map, mapLanguage)
 
   const layerControl = L.control.layers(
     {},
@@ -337,6 +340,7 @@ export function createAetherMapLayers({
       },
       { layer: fireTiles, info: FIRMS_HOVER_INFO }
     ]),
+    setMapLanguage: baseMap.setLanguage,
     setWeatherMode: (mode, radarOpacity) => {
       radar.setMode(mode)
       radar.setOpacity(radarOpacity)

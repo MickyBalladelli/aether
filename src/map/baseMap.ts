@@ -10,6 +10,7 @@ export function addBaseMap(
   map: L.Map,
   language = MAP_LABEL_LANGUAGE
 ) {
+  let currentLanguage = language
   const layer = L.maplibreGL({
     style: OPEN_FREE_MAP_STYLE,
     attributionControl: {
@@ -25,11 +26,20 @@ export function addBaseMap(
 
   container.style.opacity = '0'
   vectorMap.once('style.load', () => {
-    localizeMapLabels(vectorMap, language)
+    localizeMapLabels(vectorMap, currentLanguage)
     container.style.opacity = '1'
   })
 
-  return layer
+  return {
+    layer,
+    setLanguage: (nextLanguage: string) => {
+      currentLanguage = nextLanguage
+
+      if (vectorMap.isStyleLoaded()) {
+        localizeMapLabels(vectorMap, currentLanguage)
+      }
+    }
+  }
 }
 
 export function localizeMapLabels(

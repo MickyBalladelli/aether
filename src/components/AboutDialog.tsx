@@ -11,115 +11,122 @@ import {
   Typography
 } from '@mui/material'
 import { useState } from 'react'
+import { useI18n } from '../i18n/I18nContext'
+import type { TranslationKey } from '../i18n/translations'
 import { SourceLogo } from './SourceLogo'
 
-const DATA_SOURCES = [
+const DATA_SOURCES: Array<{
+  name: string
+  kind: TranslationKey
+  url: string
+}> = [
   {
     name: 'Open-Meteo',
-    kind: 'Weather models and forecasts',
+    kind: 'source.weather',
     url: 'https://open-meteo.com/'
   },
   {
     name: 'ECMWF',
-    kind: 'IFS forecast model',
+    kind: 'source.ifs',
     url: 'https://www.ecmwf.int/'
   },
   {
     name: 'Copernicus CAMS',
-    kind: 'Air quality',
+    kind: 'source.airQuality',
     url: 'https://atmosphere.copernicus.eu/'
   },
   {
     name: 'NOAA CoastWatch',
-    kind: 'Ocean currents',
+    kind: 'source.oceanCurrents',
     url: 'https://coastwatch.noaa.gov/'
   },
   {
     name: 'NOAA OISST',
-    kind: 'Sea-surface temperature',
+    kind: 'source.seaTemperature',
     url: 'https://www.ncei.noaa.gov/products/optimum-interpolation-sst'
   },
   {
     name: 'NOAA CPC',
-    kind: 'El Niño and La Niña RONI',
+    kind: 'source.enso',
     url: 'https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso/roni/'
   },
   {
     name: 'RainViewer',
-    kind: 'Precipitation radar',
+    kind: 'source.radar',
     url: 'https://www.rainviewer.com/api.html'
   },
   {
     name: 'OpenFreeMap / OpenMapTiles',
-    kind: 'Vector map rendering and localized labels',
+    kind: 'source.mapRendering',
     url: 'https://openfreemap.org/'
   },
   {
     name: 'OpenStreetMap',
-    kind: 'Map data and geocoding',
+    kind: 'source.mapData',
     url: 'https://www.openstreetmap.org/copyright'
   },
   {
     name: 'MeteoGate',
-    kind: 'Official heat warnings',
+    kind: 'source.heatWarnings',
     url: 'https://meteogate.eu/'
   },
   {
     name: 'NASA FIRMS',
-    kind: 'Worldwide heat detections',
+    kind: 'source.worldHeat',
     url: 'https://firms.modaps.eosdis.nasa.gov/'
   },
   {
     name: 'NIFC WFIGS',
-    kind: 'United States fire incidents',
+    kind: 'source.usFires',
     url: 'https://www.nifc.gov/'
   },
   {
     name: 'NRCan CWFIS',
-    kind: 'Canadian fire incidents',
+    kind: 'source.canadaFires',
     url: 'https://cwfis.cfs.nrcan.gc.ca/en/'
   },
   {
     name: 'NASA EONET',
-    kind: 'Reported wildfire events',
+    kind: 'source.reportedFires',
     url: 'https://eonet.gsfc.nasa.gov/'
   },
   {
     name: 'Copernicus EFFIS',
-    kind: 'Europe and Africa fire detections',
+    kind: 'source.europeAfricaFires',
     url: 'https://forest-fire.emergency.copernicus.eu/'
   },
   {
     name: 'Smithsonian GVP / USGS',
-    kind: 'Worldwide weekly volcano activity',
+    kind: 'source.volcanoes',
     url: 'https://volcano.si.edu/reports_weekly.cfm'
   },
   {
     name: 'Windy Webcams',
-    kind: 'Nearby public webcams',
+    kind: 'source.webcams',
     url: 'https://www.windy.com/webcams'
   },
   {
     name: '7Timer Astro',
-    kind: 'Cloud, seeing and transparency',
+    kind: 'source.astronomy',
     url: 'https://www.7timer.info/'
   },
   {
     name: 'World Atlas',
-    kind: 'Artificial night-sky brightness',
+    kind: 'source.nightSky',
     url: 'https://doi.org/10.1126/sciadv.1600377'
   }
 ]
 
 export function AboutDialog() {
   const [open, setOpen] = useState(false)
+  const { t } = useI18n()
 
   return (
     <>
-      <Tooltip title="About Aether">
+      <Tooltip title={t('about.tooltip')}>
         <IconButton
           className="about-button"
-          aria-label="About Aether"
+          aria-label={t('about.tooltip')}
           onClick={() => setOpen(true)}
         >
           <InfoOutlinedIcon fontSize="small" />
@@ -139,17 +146,17 @@ export function AboutDialog() {
               Aether
             </Typography>
             <Typography component="h2" variant="h5">
-              About
+              {t('about.title')}
             </Typography>
           </Box>
-          <IconButton aria-label="Close about dialog" onClick={() => setOpen(false)}>
+          <IconButton aria-label={t('about.close')} onClick={() => setOpen(false)}>
             <CloseIcon />
           </IconButton>
         </DialogTitle>
         <DialogContent dividers className="about-dialog-content">
           <Box component="section" className="about-author">
             <Typography component="h3" className="about-section-title">
-              Author
+              {t('about.author')}
             </Typography>
             <Link
               href="https://github.com/MickyBalladelli/aether"
@@ -161,7 +168,7 @@ export function AboutDialog() {
           </Box>
           <Box component="section">
             <Typography component="h3" className="about-section-title">
-              Data sources
+              {t('about.dataSources')}
             </Typography>
             <Box component="ul" className="about-source-list">
               {DATA_SOURCES.map(source => (
@@ -171,7 +178,7 @@ export function AboutDialog() {
                     <Link href={source.url} target="_blank" rel="noreferrer">
                       {source.name}
                     </Link>
-                    <Typography component="span">{source.kind}</Typography>
+                    <Typography component="span">{t(source.kind)}</Typography>
                   </Box>
                 </Box>
               ))}

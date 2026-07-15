@@ -55,6 +55,7 @@ const MAP_POINTER_BLOCK_SELECTOR = [
 
 type AetherMapProps = {
   location: WeatherLocation
+  mapLanguage: string
   mode: WeatherMode
   samples: WeatherMapSample[]
   jetStreamSamples: JetStreamSample[]
@@ -69,6 +70,7 @@ type AetherMapProps = {
 
 export function AetherMap({
   location,
+  mapLanguage,
   mode,
   samples,
   jetStreamSamples,
@@ -82,6 +84,7 @@ export function AetherMap({
 }: AetherMapProps) {
   const elementRef = useRef<HTMLDivElement | null>(null)
   const initialLocationRef = useRef(location)
+  const initialMapLanguageRef = useRef(mapLanguage)
   const locationRef = useRef(location)
   const mapRef = useRef<L.Map | null>(null)
   const badgeLayerRef = useRef<L.LayerGroup | null>(null)
@@ -180,6 +183,7 @@ export function AetherMap({
 
     const layers = createAetherMapLayers({
       map,
+      mapLanguage: initialMapLanguageRef.current,
       updateFireLayerStatus,
       onReportedFirePointerChange: blocked => {
         reportedFirePointerBlockedRef.current = blocked
@@ -395,6 +399,10 @@ export function AetherMap({
       layersRef.current = null
     }
   }, [onViewportChange])
+
+  useEffect(() => {
+    layersRef.current?.setMapLanguage(mapLanguage)
+  }, [mapLanguage])
 
   useEffect(() => {
     const map = mapRef.current

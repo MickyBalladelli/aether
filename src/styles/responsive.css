@@ -68,7 +68,8 @@
     width: min(250px, calc(100vw - 12px));
   }
 
-  .about-button {
+  .about-button,
+  .setup-button {
     width: 34px;
     height: 34px;
   }

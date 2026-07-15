@@ -5,6 +5,7 @@ import type { FormEvent } from 'react'
 import type { WeatherDataState, WeatherLocation } from '../types/weather'
 import { AboutDialog } from './AboutDialog'
 import { LocationBookmarks } from './LocationBookmarks'
+import { SetupDialog } from './SetupDialog'
 import { WeatherRetryButton } from './WeatherRetryButton'
 
 type AetherHeaderProps = {
@@ -107,6 +108,7 @@ const DATA_STATE_TOOLTIP = (
             />
           </Box>
         </Box>
+        <SetupDialog />
         <AboutDialog />
       </Box>
     </Box>

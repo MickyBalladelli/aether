@@ -11,6 +11,7 @@ import { useLocationSelection } from './hooks/useLocationSelection'
 import { useLocationWeather } from './hooks/useLocationWeather'
 import { useMapWeatherData } from './hooks/useMapWeatherData'
 import { useMapPointerWeather } from './hooks/useMapPointerWeather'
+import { useI18n } from './i18n/I18nContext'
 import { interpolateAirQualityAt } from './services/airQuality'
 import {
   loadInitialLocation,
@@ -61,6 +62,7 @@ const WeatherDashboard = lazy(async () => ({
 }))
 
 export default function App() {
+  const { language } = useI18n()
   const [selectedLocation, setSelectedLocation] = useState<WeatherLocation>(
     loadInitialLocation
   )
@@ -171,6 +173,7 @@ export default function App() {
           <Suspense fallback={<div className="map-loading">Loading map</div>}>
             <AetherMap
               location={selectedLocation}
+              mapLanguage={language}
               mode={mapWeatherMode}
               samples={displayedSamples}
               jetStreamSamples={jetStreamSamples}

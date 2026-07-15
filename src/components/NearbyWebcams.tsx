@@ -12,6 +12,7 @@ import {
   Typography
 } from '@mui/material'
 import { useEffect, useState } from 'react'
+import { useI18n } from '../i18n/I18nContext'
 import { fetchNearbyWebcams } from '../services/webcams'
 import type { NearbyWebcam, NearbyWebcams, WeatherLocation } from '../types/weather'
 import { usePageVisibility } from '../hooks/usePageVisibility'
@@ -23,6 +24,7 @@ export function NearbyWebcams({ location }: { location: WeatherLocation | null }
   const [loading, setLoading] = useState(false)
   const [unavailable, setUnavailable] = useState(false)
   const pageVisible = usePageVisibility()
+  const { t } = useI18n()
 
   useEffect(() => {
     setExpanded(false)
@@ -61,24 +63,24 @@ export function NearbyWebcams({ location }: { location: WeatherLocation | null }
       >
         <VideocamIcon />
         <span>
-          <strong>Live webcams</strong>
-          <small>Visually check nearby weather</small>
+          <strong>{t('webcam.liveWebcams')}</strong>
+          <small>{t('webcam.checkWeather')}</small>
         </span>
         <ExpandMoreIcon className="nearby-webcams-expand" />
       </button>
 
       {expanded && (
         <Box className="nearby-webcams-content">
-          {loading && <Typography variant="caption">Finding nearby cameras…</Typography>}
-          {unavailable && <Typography variant="caption">Webcams unavailable</Typography>}
+          {loading && <Typography variant="caption">{t('webcam.finding')}</Typography>}
+          {unavailable && <Typography variant="caption">{t('webcam.unavailable')}</Typography>}
           {result?.configured === false && (
             <Typography variant="caption">
-              Add WINDY_KEY on the server to enable cameras.
+              {t('webcam.configure')}
             </Typography>
           )}
           {result?.configured && result.webcams.length === 0 && (
             <Typography variant="caption">
-              No public webcams within {result.radiusKm} km.
+              {t('webcam.noneNearby', { distance: result.radiusKm })}
             </Typography>
           )}
           {result?.webcams.map(webcam => (
@@ -93,7 +95,7 @@ export function NearbyWebcams({ location }: { location: WeatherLocation | null }
                 <small>{webcam.city} · {webcam.distanceKm} km</small>
               </span>
               <span className="nearby-webcam-live">
-                {webcam.live ? 'Live' : 'Today'}
+                {webcam.live ? t('webcam.live') : t('webcam.today')}
               </span>
             </button>
           ))}
@@ -113,6 +115,8 @@ function WebcamDialog({
   webcam: NearbyWebcam | null
   onClose: () => void
 }) {
+  const { t } = useI18n()
+
   return (
     <Dialog
       open={Boolean(webcam)}
@@ -127,10 +131,13 @@ function WebcamDialog({
             <Box>
               <Typography component="h2">{webcam.title}</Typography>
               <Typography variant="caption">
-                {webcam.city} · {webcam.distanceKm} km away
+                {t('webcam.distanceAway', {
+                  city: webcam.city,
+                  distance: webcam.distanceKm
+                })}
               </Typography>
             </Box>
-            <IconButton aria-label="Close webcam" onClick={onClose}>
+            <IconButton aria-label={t('webcam.close')} onClick={onClose}>
               <CloseIcon />
             </IconButton>
           </DialogTitle>
@@ -138,14 +145,14 @@ function WebcamDialog({
             <iframe
               className="webcam-player"
               src={webcam.playerUrl}
-              title={`Live webcam: ${webcam.title}`}
+              title={t('webcam.playerTitle', { title: webcam.title })}
               allow="autoplay; fullscreen"
               referrerPolicy="no-referrer"
             />
             <Box className="webcam-dialog-footer">
               <WindyAttribution />
               <Link href={webcam.detailUrl} target="_blank" rel="noreferrer">
-                Open on Windy <OpenInNewIcon />
+                {t('webcam.openWindy')} <OpenInNewIcon />
               </Link>
             </Box>
           </DialogContent>
@@ -156,15 +163,17 @@ function WebcamDialog({
 }
 
 function WindyAttribution() {
+  const { t } = useI18n()
+
   return (
     <Typography variant="caption" className="windy-attribution">
-      Webcams provided by{' '}
+      {t('webcam.providedBy')}{' '}
       <Link href="https://www.windy.com/" target="_blank" rel="noreferrer">
         windy.com
       </Link>
       {' · '}
       <Link href="https://www.windy.com/webcams/add" target="_blank" rel="noreferrer">
-        add new webcam
+        {t('webcam.add')}
       </Link>
     </Typography>
   )

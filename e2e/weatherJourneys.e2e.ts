@@ -371,6 +371,33 @@ test('shows nearby webcams', async ({ page }) => {
   await expect(page.getByText('Webcams provided by')).toBeVisible()
 })
 
+test('changes and remembers the dialog language', async ({ page }) => {
+  await page.goto('/')
+
+  await page.getByRole('button', { name: 'Setup' }).click()
+  await page.getByRole('radio', { name: 'French' }).check()
+
+  await expect(page.getByRole('heading', { name: 'Réglages' })).toBeVisible()
+  await expect(page.getByRole('radio', { name: 'Français' })).toBeChecked()
+  await page.getByRole('button', {
+    name: 'Fermer la fenêtre des réglages'
+  }).click()
+
+  await page.getByRole('button', { name: 'À propos d’Aether' }).click()
+  await expect(page.getByRole('heading', { name: 'À propos' })).toBeVisible()
+  await expect(page.getByText('Sources de données')).toBeVisible()
+  await expect(page.getByText('Modèles et prévisions météorologiques')).toBeVisible()
+
+  await expect.poll(() => page.evaluate(() => (
+    window.localStorage.getItem('aether:language')
+  ))).toBe('fr')
+
+  await page.reload()
+  await expect(
+    page.getByRole('button', { name: 'À propos d’Aether' })
+  ).toBeVisible()
+})
+
 test('restores saved map overlays after reload', async ({ page }) => {
   await page.goto('/')
   await page.locator('.leaflet-control-layers').hover()
