@@ -159,6 +159,121 @@
   background: var(--app-surface);
 }
 
+.soil-moisture {
+  display: grid;
+  gap: 7px;
+  padding: 9px;
+  border: 1px solid var(--glass-line);
+  border-radius: 8px;
+  background: var(--app-surface);
+}
+
+.soil-moisture-heading,
+.soil-moisture-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.soil-moisture-heading > :first-child {
+  color: var(--app-text);
+  font-weight: 800;
+}
+
+.soil-moisture-heading > :last-child,
+.soil-moisture-status,
+.soil-moisture-detail,
+.soil-moisture-note {
+  color: var(--app-text-muted);
+  font-size: 9px !important;
+}
+
+.soil-moisture-category {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.soil-moisture-category > svg {
+  width: 21px;
+  height: 21px;
+}
+
+.soil-moisture-category.is-severe > svg,
+.soil-moisture-category.is-dry > svg {
+  color: #ff955f;
+}
+
+.soil-moisture-category.is-normal > svg {
+  color: #b7f5c7;
+}
+
+.soil-moisture-category.is-wet > svg {
+  color: #8fe5ff;
+}
+
+.soil-moisture-category .MuiTypography-body2 {
+  color: var(--app-text);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.soil-moisture-category .MuiTypography-caption,
+.soil-moisture-values span {
+  color: var(--app-text-muted);
+  font-size: 9px;
+  line-height: 1.25;
+}
+
+.soil-moisture-values {
+  display: grid;
+  justify-items: end;
+  gap: 2px;
+}
+
+.soil-moisture-values span {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  white-space: nowrap;
+}
+
+.soil-moisture-values svg {
+  width: 11px;
+  height: 11px;
+  color: #8fe5ff;
+}
+
+.soil-moisture-scale {
+  position: relative;
+  height: 7px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #a83f2f, #dc8a42 20%, #b7d79c 45%, #71b8ba 70%, #4689c9);
+}
+
+.soil-moisture-scale span {
+  position: absolute;
+  top: 50%;
+  width: 3px;
+  height: 13px;
+  border-radius: 2px;
+  background: #fff;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.65);
+  transform: translate(-50%, -50%);
+}
+
+.soil-moisture-detail,
+.soil-moisture-note {
+  line-height: 1.25 !important;
+}
+
+.soil-moisture-note {
+  opacity: 0.78;
+}
+
 .temperature-records-heading,
 .temperature-record-values {
   display: flex;

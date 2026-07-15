@@ -8,7 +8,8 @@ export function fetchCoalesced(
   url,
   userAgent,
   extraHeaders = {},
-  metricsRoute = key.split(':', 1)[0]
+  metricsRoute = key.split(':', 1)[0],
+  timeoutMs
 ) {
   const existing = pendingRequests.get(key)
 
@@ -18,13 +19,17 @@ export function fetchCoalesced(
 
   logCacheMetric(metricsRoute, 'upstream')
 
-  const request = fetchWithTimeout(url, {
-    headers: {
-      Accept: 'application/json',
-      'User-Agent': userAgent,
-      ...extraHeaders
-    }
-  })
+  const request = fetchWithTimeout(
+    url,
+    {
+      headers: {
+        Accept: 'application/json',
+        'User-Agent': userAgent,
+        ...extraHeaders
+      }
+    },
+    timeoutMs
+  )
     .then(async response => {
       const rateLimit = readRateLimit(response.headers)
 

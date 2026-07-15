@@ -22,6 +22,20 @@ export type TemperatureRecords = {
   longitude: number
 }
 
+export type SoilMoistureReading = {
+  date: string
+  rootZonePercent: number
+  surfacePercent: number
+  percentile: number
+  category: string
+  trend: number
+  model: string
+  resolution: string
+  baseline: string
+  latitude: number
+  longitude: number
+}
+
 export type WeatherViewport = {
   north: number
   south: number
