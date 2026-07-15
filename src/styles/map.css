@@ -57,6 +57,52 @@
   accent-color: #8fe5ff;
 }
 
+.leaflet-layer-info-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 22px;
+  align-items: center;
+  gap: 5px;
+}
+
+.leaflet-layer-info-row label {
+  min-width: 0;
+  margin: 0;
+}
+
+.leaflet-layer-info-button {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid var(--glass-line);
+  border-radius: 50%;
+  background: var(--app-surface-soft);
+  color: var(--app-link);
+  font: 800 11px/1 "Inter", system-ui, sans-serif;
+  cursor: pointer;
+}
+
+.leaflet-layer-info-button:hover,
+.leaflet-layer-info-button:focus-visible,
+.leaflet-layer-info-button[aria-expanded="true"] {
+  border-color: rgba(143, 229, 255, 0.7);
+  background: rgba(143, 229, 255, 0.16);
+  outline: none;
+}
+
+.leaflet-layer-info-popover {
+  max-width: 260px;
+  margin: 3px 0 7px;
+  padding: 8px 9px;
+  border: 1px solid rgba(143, 229, 255, 0.32);
+  border-radius: 7px;
+  background: rgba(4, 11, 16, 0.96);
+  color: var(--app-text-muted);
+  font-size: 10px;
+  line-height: 1.4;
+}
+
 .leaflet-control-layers-section-title {
   margin: 7px 0 3px;
   padding-top: 7px;

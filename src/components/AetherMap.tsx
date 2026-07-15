@@ -24,6 +24,7 @@ import {
   prefersReducedMotion
 } from '../utils/motion'
 import { renderWeatherBadge } from '../map/weatherBadge'
+import { addLayerControlInfo } from '../map/layerControlInfo'
 import type {
   AirQualityMapSample,
   JetStreamSample,
@@ -296,61 +297,6 @@ export function AetherMap({
         position: 'topright'
       }
     ).addTo(map)
-    const overlayInputs = Array.from(
-      tileControl.getContainer()?.querySelectorAll<HTMLInputElement>(
-        'input.leaflet-control-layers-selector[type="checkbox"]'
-      ) ?? []
-    )
-    const volcanoLayerInput = overlayInputs[0]
-    const heatLayerInput = overlayInputs[1]
-    const africaFireInput = overlayInputs[2]
-    const europeFireInput = overlayInputs[3]
-    const reportedFireInput = overlayInputs[4]
-
-    addLayerControlHeading(volcanoLayerInput, 'Volcanoes')
-    addLayerControlHeading(heatLayerInput, 'Satellite detections')
-    addLayerControlHeading(reportedFireInput, 'Reported incidents')
-
-    heatLayerInput?.closest('label')?.setAttribute(
-      'title',
-      FIRE_LAYER_DESCRIPTION
-    )
-    volcanoLayerInput?.closest('label')?.setAttribute(
-      'title',
-      'Preliminary worldwide activity reported this week by the Smithsonian Global Volcanism Program and USGS.'
-    )
-    volcanoLayerInput?.setAttribute(
-      'aria-label',
-      'Worldwide weekly volcano activity from Smithsonian GVP and USGS. Reports are preliminary and not comprehensive.'
-    )
-    heatLayerInput?.setAttribute(
-      'aria-label',
-      `Worldwide heat detections from the last 24 hours. ${FIRE_LAYER_DESCRIPTION}`
-    )
-    reportedFireInput?.closest('label')?.setAttribute(
-      'title',
-      'Open wildfire incidents from NIFC in the USA, CWFIS in Canada, and NASA EONET elsewhere. Coverage is incomplete and status can lag.'
-    )
-    reportedFireInput?.setAttribute(
-      'aria-label',
-      'Reported open wildfires from NIFC, CWFIS, and NASA EONET. Coverage is incomplete and status can lag.'
-    )
-    africaFireInput?.closest('label')?.setAttribute(
-      'title',
-      'Copernicus EFFIS filtered VIIRS detections from today and yesterday across Africa. These are not confirmed incident reports.'
-    )
-    africaFireInput?.setAttribute(
-      'aria-label',
-      'Copernicus Africa fire detections from today and yesterday. These are not confirmed incident reports.'
-    )
-    europeFireInput?.closest('label')?.setAttribute(
-      'title',
-      'Copernicus EFFIS filtered VIIRS detections from today and yesterday across Europe. These are not confirmed incident reports.'
-    )
-    europeFireInput?.setAttribute(
-      'aria-label',
-      'Copernicus Europe fire detections from today and yesterday. These are not confirmed incident reports.'
-    )
     let firmsConfigured: boolean | null = null
     let firmsLoadedTiles = 0
     let africaLoadedTiles = 0
@@ -518,6 +464,7 @@ export function AetherMap({
     for (const layerId of loadEnabledMapOverlays()) {
       mapOverlayLayers[layerId].addTo(map)
     }
+    const layerInfoCleanups = decorateLayerControl(tileControl)
 
     const emitViewport = () => {
       const bounds = map.getBounds()
@@ -727,6 +674,9 @@ export function AetherMap({
       mapElement.removeEventListener('mouseleave', clearPointerWeather)
       pointerRefreshRef.current = () => {}
       pointerCallbackRef.current(null)
+      for (const cleanupLayerInfo of layerInfoCleanups) {
+        cleanupLayerInfo()
+      }
       animation.destroy()
       radar.destroy()
       reportedFires.destroy()
@@ -869,6 +819,72 @@ export function AetherMap({
       <FireLayerStatus statuses={fireLayerStatuses} />
     </>
   )
+}
+
+function decorateLayerControl(tileControl: L.Control.Layers) {
+  const overlayInputs = Array.from(
+    tileControl.getContainer()?.querySelectorAll<HTMLInputElement>(
+      'input.leaflet-control-layers-selector[type="checkbox"]'
+    ) ?? []
+  )
+  const volcanoLayerInput = overlayInputs[0]
+  const heatLayerInput = overlayInputs[1]
+  const africaFireInput = overlayInputs[2]
+  const europeFireInput = overlayInputs[3]
+  const reportedFireInput = overlayInputs[4]
+
+  addLayerControlHeading(volcanoLayerInput, 'Volcanoes')
+  addLayerControlHeading(heatLayerInput, 'Satellite detections')
+  addLayerControlHeading(reportedFireInput, 'Reported incidents')
+
+  volcanoLayerInput?.setAttribute(
+    'aria-label',
+    'Worldwide weekly volcano activity from Smithsonian GVP and USGS. Reports are preliminary and not comprehensive.'
+  )
+  heatLayerInput?.setAttribute(
+    'aria-label',
+    `Worldwide heat detections from the last 24 hours. ${FIRE_LAYER_DESCRIPTION}`
+  )
+  reportedFireInput?.setAttribute(
+    'aria-label',
+    'Reported open wildfires from NIFC, CWFIS, and NASA EONET. Coverage is incomplete and status can lag.'
+  )
+  africaFireInput?.setAttribute(
+    'aria-label',
+    'Copernicus Africa fire detections from today and yesterday. These are not confirmed incident reports.'
+  )
+  europeFireInput?.setAttribute(
+    'aria-label',
+    'Copernicus Europe fire detections from today and yesterday. These are not confirmed incident reports.'
+  )
+
+  return [
+    addLayerControlInfo(volcanoLayerInput, {
+      id: 'volcanoes',
+      label: 'worldwide weekly volcano activity',
+      detail: 'Preliminary worldwide activity reported this week by the Smithsonian Global Volcanism Program and USGS.'
+    }),
+    addLayerControlInfo(heatLayerInput, {
+      id: 'worldwide-heat',
+      label: 'worldwide heat detections',
+      detail: FIRE_LAYER_DESCRIPTION
+    }),
+    addLayerControlInfo(africaFireInput, {
+      id: 'africa-fire',
+      label: 'Africa fire detections',
+      detail: 'Copernicus EFFIS filtered VIIRS detections from today and yesterday across Africa. These are not confirmed incident reports.'
+    }),
+    addLayerControlInfo(europeFireInput, {
+      id: 'europe-fire',
+      label: 'Europe fire detections',
+      detail: 'Copernicus EFFIS filtered VIIRS detections from today and yesterday across Europe. These are not confirmed incident reports.'
+    }),
+    addLayerControlInfo(reportedFireInput, {
+      id: 'reported-fires',
+      label: 'reported open wildfires',
+      detail: 'Open wildfire incidents from NIFC in the USA, CWFIS in Canada, and NASA EONET elsewhere. Coverage is incomplete and status can lag.'
+    })
+  ]
 }
 
 function getFireLayerId(

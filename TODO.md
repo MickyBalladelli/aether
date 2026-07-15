@@ -3,7 +3,6 @@
 ## Priority 1 — Fire data and controls
 
 - [ ] Deduplicate reported fires using source incident IDs instead of rounded coordinates.
-- [ ] Replace native `title` tooltips with keyboard- and touch-friendly information popovers.
 
 ## Priority 2 — Architecture and performance
 
