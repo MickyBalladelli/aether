@@ -29,6 +29,7 @@ export class WeatherMapAnimation {
   private motionQuery = window.matchMedia(REDUCED_MOTION_QUERY)
   private reducedMotion = this.motionQuery.matches
   private running = false
+  private clearBeforeNextRender = false
   private motionChangeHandler = (event: MediaQueryListEvent) => {
     this.reducedMotion = event.matches
     window.cancelAnimationFrame(this.animationFrame)
@@ -104,7 +105,7 @@ export class WeatherMapAnimation {
 
     if (mode !== this.mode || activeDataChanged) {
       this.particleRenderer.reset()
-      this.context.clearRect(0, 0, this.width, this.height)
+      this.clearBeforeNextRender = true
     }
 
     this.samples = samples
@@ -122,7 +123,7 @@ export class WeatherMapAnimation {
   invalidate() {
     this.particleRenderer.reset()
     this.fieldRenderer.invalidate()
-    this.context.clearRect(0, 0, this.width, this.height)
+    this.clearBeforeNextRender = true
 
     if (this.reducedMotion) {
       this.resize()
@@ -185,8 +186,9 @@ export class WeatherMapAnimation {
   }
 
   private render(deltaTime: number, time: number) {
-    if (this.mode !== 'ocean-current') {
+    if (this.clearBeforeNextRender || this.mode !== 'ocean-current') {
       this.context.clearRect(0, 0, this.width, this.height)
+      this.clearBeforeNextRender = false
     }
 
     if (this.mode === 'air-quality') {

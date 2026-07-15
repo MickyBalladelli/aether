@@ -626,8 +626,21 @@ export default function App() {
 
   function handleMapClick(location: WeatherLocation) {
     cancelPendingReverseGeocode()
+    const cachedPlace = hoverPlaceCacheRef.current.get(
+      getHoverPlaceKey(location.latitude, location.longitude)
+    )
+    const selectedLocation = cachedPlace
+      ? { ...location, label: cachedPlace }
+      : location
+
     setSelectedForecastReady(false)
-    setSelectedLocation(location)
+    setSelectedLocation(selectedLocation)
+
+    if (cachedPlace) {
+      setStatus('Reading sky')
+      return
+    }
+
     setStatus('Locating')
 
     const requestId = reverseGeocodeRequestRef.current
@@ -648,10 +661,12 @@ export default function App() {
 
         reverseGeocodeAbortRef.current = null
         setSelectedForecastReady(false)
-        setSelectedLocation(prev => ({
-          ...prev,
-          label
-        }))
+        setSelectedLocation(current => (
+          current.latitude === location.latitude &&
+          current.longitude === location.longitude
+            ? { ...current, label }
+            : current
+        ))
       } catch {
         return
       }
