@@ -110,6 +110,11 @@ export default function App() {
   const [selectedLocation, setSelectedLocation] = useState<WeatherLocation>(
     loadInitialLocation
   )
+  const dashboardLocation = useMemo<WeatherLocation>(() => ({
+    latitude: selectedLocation.latitude,
+    longitude: selectedLocation.longitude,
+    label: selectedLocation.label
+  }), [selectedLocation.latitude, selectedLocation.longitude])
   const [selectedForecastReady, setSelectedForecastReady] = useState(false)
   const [weatherMode, setWeatherMode] = useState<WeatherMode>(readUrlMode)
   const mapWeatherMode = useDeferredValue(weatherMode)
@@ -772,7 +777,7 @@ export default function App() {
               onEcmwfPlaybackChange={setEcmwfPlaybackTime}
               airQuality={selectedAirQuality}
               officialHeatAlerts={officialHeatAlerts}
-              location={selectedForecastReady ? selectedLocation : null}
+              location={dashboardLocation}
               mode={weatherMode}
               onModeChange={setWeatherMode}
             />
