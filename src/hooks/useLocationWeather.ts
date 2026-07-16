@@ -59,7 +59,11 @@ export function useLocationWeather(location: WeatherLocation) {
           forceRefresh,
           controller.signal
         )
-        const nextWeather = translateWeather(forecast.payload, location)
+        const nextWeather = translateWeather(
+          forecast.payload,
+          location,
+          forecast.refreshedAt
+        )
 
         cacheWeatherSample(location, nextWeather)
 

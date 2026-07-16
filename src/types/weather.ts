@@ -4,6 +4,17 @@ export type WeatherLocation = {
   label: string
 }
 
+export type DataProvenance = {
+  observedAt: string | number | null
+  refreshedAt: string | number | null
+  source: string
+  resolution: string
+}
+
+export type WeatherModeProvenance = Partial<
+  Record<WeatherMode, DataProvenance>
+>
+
 export type TemperatureRecord = {
   temperature: number
   date: string
@@ -86,6 +97,7 @@ export type WeatherViewport = {
 }
 
 export type OpenMeteoCurrent = {
+  time?: string
   temperature_2m: number
   relative_humidity_2m: number
   rain: number
@@ -128,6 +140,7 @@ export type OpenMeteoResponse = {
 }
 
 export type OpenMeteoAirQualityCurrent = {
+  time?: string
   european_aqi: number
   pm2_5: number
   pm10: number
@@ -199,6 +212,7 @@ export type WeatherConfig = {
   sunrise: string | null
   sunset: string | null
   heatRisk: HeatRisk | null
+  provenance: DataProvenance
 }
 
 export type WeatherMapSample = {
@@ -206,6 +220,7 @@ export type WeatherMapSample = {
   latitude: number
   longitude: number
   updatedAt?: number
+  observedAt?: string
   showBadge?: boolean
   estimated?: boolean
   evolution?: WeatherEvolutionFrame[]
@@ -226,6 +241,7 @@ export type AirQualityMapSample = {
   latitude: number
   longitude: number
   updatedAt: number
+  observedAt: string
   europeanAqi: number
   pm2_5: number
   pm10: number
@@ -237,6 +253,7 @@ export type JetStreamSample = {
   latitude: number
   longitude: number
   updatedAt: number
+  observedAt: string
   speed: number
   angle: number
   eastward: number
@@ -271,6 +288,7 @@ export type OceanCurrentData = {
   stride: number
   oceanSampleCount: number
   samples: OceanCurrentSample[]
+  refreshedAt: number
 }
 
 export type OceanCurrentReading = {
@@ -280,7 +298,7 @@ export type OceanCurrentReading = {
   seaSurfaceTemperatureAnomaly: number
 }
 
-export type AirQualityReading = Omit<AirQualityMapSample, 'updatedAt'>
+export type AirQualityReading = AirQualityMapSample
 
 export type MapFirePointer = {
   title: string
@@ -318,4 +336,5 @@ export type MapWeatherPointer = {
   seaSurfaceTemperatureAnomaly?: number
   radarRain?: RadarRainReading
   fire?: MapFirePointer
+  provenance?: DataProvenance
 }

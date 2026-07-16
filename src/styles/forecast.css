@@ -144,6 +144,11 @@
   white-space: nowrap;
 }
 
+.metric > .data-provenance {
+  grid-column: 1 / -1;
+  width: 100%;
+}
+
 .sun-times {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

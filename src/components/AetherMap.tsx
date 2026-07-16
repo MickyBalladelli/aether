@@ -32,6 +32,7 @@ import type {
   WeatherLocation,
   WeatherMapSample,
   WeatherMode,
+  WeatherModeProvenance,
   WeatherViewport
 } from '../types/weather'
 import { useI18n } from '../i18n/I18nContext'
@@ -62,6 +63,7 @@ type AetherMapProps = {
   jetStreamSamples: JetStreamSample[]
   airQualitySamples: AirQualityMapSample[]
   oceanCurrentSamples: OceanCurrentSample[]
+  provenance: WeatherModeProvenance
   radarOpacity: number
   animationQuality: AnimationQuality
   onViewportChange: (viewport: WeatherViewport) => void
@@ -77,6 +79,7 @@ export function AetherMap({
   jetStreamSamples,
   airQualitySamples,
   oceanCurrentSamples,
+  provenance,
   radarOpacity,
   animationQuality,
   onViewportChange,
@@ -96,6 +99,7 @@ export function AetherMap({
   const airQualitySamplesRef = useRef(airQualitySamples)
   const oceanCurrentSamplesRef = useRef(oceanCurrentSamples)
   const modeRef = useRef(mode)
+  const provenanceRef = useRef(provenance)
   const pointerCallbackRef = useRef(onPointerWeatherChange)
   const clickCallbackRef = useRef(onMapClick)
   const clickedLatRef = useRef(0)
@@ -140,8 +144,9 @@ export function AetherMap({
 
   useEffect(() => {
     modeRef.current = mode
+    provenanceRef.current = provenance
     pointerRefreshRef.current()
-  }, [mode])
+  }, [mode, provenance])
 
   useEffect(() => {
     pointerCallbackRef.current = onPointerWeatherChange
@@ -275,8 +280,9 @@ export function AetherMap({
         ...(airQuality ?? {}),
         ...(oceanCurrent ?? {}),
         ...(fire ? { fire } : {}),
-        screenX: Math.max(12, Math.min(pointer.x + 16, size.x - 206)),
-        screenY: Math.max(12, Math.min(pointer.y + 16, size.y - 206))
+        provenance: provenanceRef.current[modeRef.current],
+        screenX: Math.max(12, Math.min(pointer.x + 16, size.x - 236)),
+        screenY: Math.max(12, Math.min(pointer.y + 16, size.y - 330))
       })
     }
     const handleMouseMove = (event: MouseEvent) => {

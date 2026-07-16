@@ -10,6 +10,7 @@ import WavesIcon from '@mui/icons-material/Waves'
 import type { MapWeatherPointer } from '../types/weather'
 import { useI18n } from '../i18n/I18nContext'
 import type { TranslationKey } from '../i18n/translations'
+import { DataProvenance } from './DataProvenance'
 
 type MapWeatherTooltipProps = {
   reading: MapWeatherPointer | null
@@ -128,6 +129,8 @@ export function MapWeatherTooltip({ reading }: MapWeatherTooltipProps) {
           <span>{reading.fire.detail}</span>
         </div>
       )}
+
+      <DataProvenance value={reading.provenance} compact />
     </aside>
   )
 }

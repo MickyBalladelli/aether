@@ -88,6 +88,7 @@ export async function fetchJetStreamSamples(
       const sample: JetStreamSample = {
         ...point,
         updatedAt,
+        observedAt: current.time ?? new Date(updatedAt).toISOString(),
         speed,
         angle,
         eastward: -speed * Math.sin(angle),

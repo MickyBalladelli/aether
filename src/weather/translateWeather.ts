@@ -3,7 +3,11 @@ import { clamp, degreesToRadians } from '../utils/geo'
 import { mapCurrentWeather } from './mapCurrentWeather'
 import { describeWeatherCode, THUNDERSTORM_CODES } from './weatherCode'
 
-export function translateWeather(payload: OpenMeteoResponse, location: WeatherLocation): WeatherConfig {
+export function translateWeather(
+  payload: OpenMeteoResponse,
+  location: WeatherLocation,
+  refreshedAt = Date.now()
+): WeatherConfig {
   const current = payload.current
   const hourlyPrecip = payload.hourly?.precipitation?.[0] ?? 0
   const mapped = mapCurrentWeather(current, hourlyPrecip)
@@ -20,7 +24,13 @@ export function translateWeather(payload: OpenMeteoResponse, location: WeatherLo
     ),
     sunrise: payload.daily?.sunrise?.[0] ?? null,
     sunset: payload.daily?.sunset?.[0] ?? null,
-    heatRisk: buildHeatRisk(payload)
+    heatRisk: buildHeatRisk(payload),
+    provenance: {
+      observedAt: current.time ?? refreshedAt,
+      refreshedAt,
+      source: 'Open-Meteo',
+      resolution: 'Model-dependent grid'
+    }
   }
 }
 

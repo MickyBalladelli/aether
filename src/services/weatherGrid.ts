@@ -129,7 +129,10 @@ export function cacheWeatherSample(location: WeatherLocation, weather: WeatherCo
     label: location.label,
     latitude: location.latitude,
     longitude: location.longitude,
-    updatedAt: Date.now(),
+    updatedAt: Number(weather.provenance.refreshedAt) || Date.now(),
+    observedAt: weather.provenance.observedAt
+      ? new Date(weather.provenance.observedAt).toISOString()
+      : undefined,
     showBadge: true,
     evolution: weather.evolution,
     sunrise: weather.sunrise,
@@ -181,7 +184,13 @@ export async function getCachedWeatherForLocation(location: WeatherLocation): Pr
     evolution: nearbySample.evolution ?? [],
     sunrise: nearbySample.sunrise ?? null,
     sunset: nearbySample.sunset ?? null,
-    heatRisk: null
+    heatRisk: null,
+    provenance: {
+      observedAt: nearbySample.observedAt ?? nearbySample.updatedAt ?? null,
+      refreshedAt: nearbySample.updatedAt ?? null,
+      source: 'Open-Meteo',
+      resolution: 'Model-dependent grid'
+    }
   }
 }
 
@@ -318,6 +327,7 @@ function mapWeatherSample(point: GridPoint | undefined, payload: OpenMeteoRespon
     latitude: point.latitude,
     longitude: point.longitude,
     updatedAt,
+    observedAt: payload.current.time ?? new Date(updatedAt).toISOString(),
     showBadge: false,
     evolution: buildWeatherEvolution(
       payload.hourly,
@@ -456,6 +466,8 @@ function estimateSample(point: GridPoint): WeatherMapSample | null {
     longitude: point.longitude,
     showBadge: false,
     estimated: true,
+    updatedAt: nearest.updatedAt,
+    observedAt: nearest.observedAt,
     temperature: weighted(sample => sample.temperature),
     precipitation: weighted(sample => sample.precipitation),
     snowfall: weighted(sample => sample.snowfall),

@@ -51,7 +51,8 @@ export async function fetchOpenMeteoForecast(
   if (!forceRefresh && cachedForecast && cachedAge < FORECAST_FRESHNESS) {
     return {
       payload: cachedForecast.payload,
-      source: 'cached'
+      source: 'cached',
+      refreshedAt: cachedForecast.updatedAt
     }
   }
 
@@ -76,7 +77,8 @@ export async function fetchOpenMeteoForecast(
     if (cachedForecast && cachedAge < FORECAST_STALE_AGE) {
       return {
         payload: cachedForecast.payload,
-        source: 'stale'
+        source: 'stale',
+        refreshedAt: cachedForecast.updatedAt
       }
     }
 
@@ -87,7 +89,8 @@ export async function fetchOpenMeteoForecast(
     if (cachedForecast && cachedAge < FORECAST_STALE_AGE) {
       return {
         payload: cachedForecast.payload,
-        source: 'stale'
+        source: 'stale',
+        refreshedAt: cachedForecast.updatedAt
       }
     }
 
@@ -103,17 +106,21 @@ export async function fetchOpenMeteoForecast(
     throw new Error('Open-Meteo response has invalid data')
   }
 
-  writeCachedForecast(cacheKey, payload)
+  const refreshedAt = Date.now()
+
+  writeCachedForecast(cacheKey, payload, refreshedAt)
 
   return {
     payload,
-    source: getResponseSource(response)
+    source: getResponseSource(response),
+    refreshedAt
   }
 }
 
 type ForecastResult = {
   payload: OpenMeteoResponse
   source: Exclude<WeatherDataState, 'loading' | 'unavailable'>
+  refreshedAt: number
 }
 
 type ForecastCacheRecord = {
@@ -160,7 +167,11 @@ function readCachedForecast(cacheKey: string): ForecastCacheRecord | null {
   }
 }
 
-function writeCachedForecast(cacheKey: string, payload: OpenMeteoResponse) {
+function writeCachedForecast(
+  cacheKey: string,
+  payload: OpenMeteoResponse,
+  refreshedAt: number
+) {
   try {
     const cache = JSON.parse(
       window.localStorage.getItem(FORECAST_CACHE_KEY) ?? '{}'
@@ -168,7 +179,7 @@ function writeCachedForecast(cacheKey: string, payload: OpenMeteoResponse) {
     const records = Object.entries({
       ...cache,
       [cacheKey]: {
-        updatedAt: Date.now(),
+        updatedAt: refreshedAt,
         payload
       }
     })

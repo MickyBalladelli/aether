@@ -41,6 +41,7 @@ export type EcmwfResponse = {
 
 export type JetStreamResponse = {
   current: {
+    time?: string
     wind_speed_250hPa: number
     wind_direction_250hPa: number
   }

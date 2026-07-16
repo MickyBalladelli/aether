@@ -7,7 +7,7 @@ import WaterDropIcon from '@mui/icons-material/WaterDrop'
 import WavesIcon from '@mui/icons-material/Waves'
 import { Box, Stack, Typography } from '@mui/material'
 import { useMemo, type ReactNode } from 'react'
-import type { AirQualityReading, EcmwfForecast, HeatAlert, WeatherConfig, WeatherEvolutionFrame, WeatherMode } from '../types/weather'
+import type { AirQualityReading, DataProvenance as DataProvenanceValue, EcmwfForecast, HeatAlert, WeatherConfig, WeatherEvolutionFrame, WeatherMode, WeatherModeProvenance } from '../types/weather'
 import type { WeatherLocation } from '../types/weather'
 import { EcmwfForecastTimeline } from './EcmwfForecastTimeline'
 import { SevereWeatherAlerts } from './SevereWeatherAlerts'
@@ -17,6 +17,7 @@ import { SoilMoisture } from './SoilMoisture'
 import { NearbyWebcams } from './NearbyWebcams'
 import { StargazingIndex } from './StargazingIndex'
 import { useI18n } from '../i18n/I18nContext'
+import { DataProvenance } from './DataProvenance'
 
 type WeatherDashboardProps = {
   weather: WeatherConfig | null
@@ -28,6 +29,7 @@ type WeatherDashboardProps = {
   airQuality: AirQualityReading | null
   officialHeatAlerts: HeatAlert[]
   mode: WeatherMode
+  provenance: WeatherModeProvenance
   onModeChange: (mode: WeatherMode) => void
   location: WeatherLocation | null
 }
@@ -43,6 +45,7 @@ export function WeatherDashboard({
   officialHeatAlerts,
   location,
   mode,
+  provenance,
   onModeChange
 }: WeatherDashboardProps) {
   const { t } = useI18n()
@@ -77,6 +80,7 @@ export function WeatherDashboard({
             value={formatTemperature(weather)}
             selected={mode === 'temperature'}
             onClick={() => onModeChange('temperature')}
+            provenance={provenance.temperature}
           />
           <Metric
             icon={<AirIcon />}
@@ -84,6 +88,7 @@ export function WeatherDashboard({
             value={formatWind(weather)}
             selected={mode === 'wind'}
             onClick={() => onModeChange('wind')}
+            provenance={provenance.wind}
           />
           <Metric
             icon={<FlightIcon />}
@@ -91,6 +96,7 @@ export function WeatherDashboard({
             value="250 hPa"
             selected={mode === 'jet-stream'}
             onClick={() => onModeChange('jet-stream')}
+            provenance={provenance['jet-stream']}
           />
           <Metric
             icon={<WaterDropIcon />}
@@ -98,6 +104,7 @@ export function WeatherDashboard({
             value={formatPrecipitation(weather)}
             selected={mode === 'precipitation'}
             onClick={() => onModeChange('precipitation')}
+            provenance={provenance.precipitation}
           />
           <Metric
             icon={<ThunderstormIcon />}
@@ -105,6 +112,7 @@ export function WeatherDashboard({
             value={weather?.isThunderstorm ? t('common.yes') : t('common.no')}
             selected={mode === 'storm'}
             onClick={() => onModeChange('storm')}
+            provenance={provenance.storm}
           />
           <Metric
             icon={<BlurOnIcon />}
@@ -112,6 +120,7 @@ export function WeatherDashboard({
             value={formatAirQuality(airQuality)}
             selected={mode === 'air-quality'}
             onClick={() => onModeChange('air-quality')}
+            provenance={provenance['air-quality']}
           />
           <Metric
             icon={<WavesIcon />}
@@ -121,6 +130,7 @@ export function WeatherDashboard({
             onClick={() => onModeChange(
               mode === 'ocean-current' ? 'temperature' : 'ocean-current'
             )}
+            provenance={provenance['ocean-current']}
           />
         </Stack>
 
@@ -294,13 +304,15 @@ function Metric({
   label,
   value,
   selected,
-  onClick
+  onClick,
+  provenance
 }: {
   icon: ReactNode
   label: string
   value: string
   selected: boolean
   onClick: () => void
+  provenance?: DataProvenanceValue
 }) {
   return (
     <button
@@ -316,6 +328,7 @@ function Metric({
       <Typography variant="body2" className="metric-value">
         {value}
       </Typography>
+      <DataProvenance value={provenance} compact />
     </button>
   )
 }

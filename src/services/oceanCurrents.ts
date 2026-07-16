@@ -40,7 +40,10 @@ export async function fetchOceanCurrentData(
     'Ocean current response'
   )
 
-  return data
+  return {
+    ...data,
+    refreshedAt: Date.now()
+  }
 }
 
 export function interpolateOceanCurrentAt(

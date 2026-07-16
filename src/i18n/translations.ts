@@ -267,7 +267,11 @@ const english = {
   'volcano.eruption': 'Ongoing eruption',
   'volcano.newUnrest': 'New unrest',
   'volcano.unrest': 'Ongoing unrest',
-  'volcano.other': 'Other activity'
+  'volcano.other': 'Other activity',
+  'provenance.observed': 'Observed',
+  'provenance.refreshed': 'Refreshed',
+  'provenance.source': 'Source',
+  'provenance.resolution': 'Resolution'
 } as const
 
 export type TranslationKey = keyof typeof english
@@ -537,7 +541,11 @@ const french: Record<TranslationKey, string> = {
   'volcano.eruption': 'Éruption en cours',
   'volcano.newUnrest': 'Nouvelle agitation',
   'volcano.unrest': 'Agitation en cours',
-  'volcano.other': 'Autre activité'
+  'volcano.other': 'Autre activité',
+  'provenance.observed': 'Observé',
+  'provenance.refreshed': 'Actualisé',
+  'provenance.source': 'Source',
+  'provenance.resolution': 'Résolution'
 }
 
 const italian: Record<TranslationKey, string> = {
@@ -805,7 +813,11 @@ const italian: Record<TranslationKey, string> = {
   'volcano.eruption': 'Eruzione in corso',
   'volcano.newUnrest': 'Nuova attività anomala',
   'volcano.unrest': 'Attività anomala in corso',
-  'volcano.other': 'Altra attività'
+  'volcano.other': 'Altra attività',
+  'provenance.observed': 'Osservato',
+  'provenance.refreshed': 'Aggiornato',
+  'provenance.source': 'Fonte',
+  'provenance.resolution': 'Risoluzione'
 }
 
 export const TRANSLATIONS: Record<

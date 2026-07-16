@@ -117,9 +117,15 @@ export function interpolateAirQualityAt(
     ) / totalWeight
   )
 
+  const observedTimes = nearbySamples
+    .map(item => item.sample.observedAt)
+    .sort()
+
   return {
     latitude,
     longitude,
+    updatedAt: Math.max(...nearbySamples.map(item => item.sample.updatedAt)),
+    observedAt: observedTimes[observedTimes.length - 1] ?? new Date().toISOString(),
     europeanAqi: weighted(sample => sample.europeanAqi),
     pm2_5: weighted(sample => sample.pm2_5),
     pm10: weighted(sample => sample.pm10),
@@ -190,6 +196,7 @@ function mapAirQualitySample(
     latitude: point.latitude,
     longitude: point.longitude,
     updatedAt,
+    observedAt: current.time ?? new Date(updatedAt).toISOString(),
     europeanAqi: current.european_aqi,
     pm2_5: current.pm2_5,
     pm10: current.pm10,

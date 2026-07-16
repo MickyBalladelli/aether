@@ -26,10 +26,12 @@ import { getWeatherMapSamplesAtTime } from './services/weatherGrid'
 import { describeWeatherCode } from './weather/weatherCode'
 import type {
   AnimationQuality,
+  DataProvenance,
   WeatherConfig,
   WeatherEvolutionFrame,
   WeatherLocation,
   WeatherMode,
+  WeatherModeProvenance,
   WeatherViewport
 } from './types/weather'
 
@@ -128,6 +130,27 @@ export default function App() {
     ),
     [airQualitySamples, selectedLocation]
   )
+  const mapProvenance = useMemo(() => buildModeProvenance(
+    latestSurfaceProvenance(mapSamples),
+    latestSampleProvenance(
+      airQualitySamples,
+      'Open-Meteo CAMS',
+      '11–45 km model grid'
+    ),
+    latestSampleProvenance(
+      jetStreamSamples,
+      'Open-Meteo',
+      'Model grid · 250 hPa'
+    ),
+    oceanCurrentData
+      ? {
+          observedAt: oceanCurrentData.currentTime ?? oceanCurrentData.temperatureTime,
+          refreshedAt: oceanCurrentData.refreshedAt,
+          source: oceanCurrentData.source,
+          resolution: `${oceanCurrentData.stride}× sampled native grid`
+        }
+      : null
+  ), [airQualitySamples, jetStreamSamples, mapSamples, oceanCurrentData])
   const displayedWeather = useMemo(() => {
     if (
       !weather ||
@@ -138,8 +161,25 @@ export default function App() {
       return weather
     }
 
-    return weatherFromEvolutionFrame(weather, ecmwfFrame)
-  }, [ecmwfFrame, weather, weatherMode])
+    return weatherFromEvolutionFrame(
+      weather,
+      ecmwfFrame,
+      ecmwfForecast?.model ?? weather.provenance.source
+    )
+  }, [ecmwfForecast?.model, ecmwfFrame, weather, weatherMode])
+  const dashboardProvenance = useMemo(() => buildModeProvenance(
+    displayedWeather?.provenance ?? null,
+    selectedAirQuality
+      ? {
+          observedAt: selectedAirQuality.observedAt,
+          refreshedAt: selectedAirQuality.updatedAt,
+          source: 'Open-Meteo CAMS',
+          resolution: '11–45 km model grid'
+        }
+      : null,
+    mapProvenance['jet-stream'] ?? null,
+    mapProvenance['ocean-current'] ?? null
+  ), [displayedWeather, mapProvenance, selectedAirQuality])
   const displayedSamples = useMemo(
     () => getWeatherMapSamplesAtTime(mapSamples, ecmwfPlaybackTime),
     [ecmwfPlaybackTime, mapSamples]
@@ -179,6 +219,7 @@ export default function App() {
               jetStreamSamples={jetStreamSamples}
               airQualitySamples={airQualitySamples}
               oceanCurrentSamples={oceanCurrentData?.samples ?? []}
+              provenance={mapProvenance}
               radarOpacity={radarOpacity}
               animationQuality={animationQuality}
               onViewportChange={handleViewportChange}
@@ -229,6 +270,7 @@ export default function App() {
               officialHeatAlerts={officialHeatAlerts}
               location={dashboardLocation}
               mode={weatherMode}
+              provenance={dashboardProvenance}
               onModeChange={setWeatherMode}
             />
           </Suspense>
@@ -238,9 +280,63 @@ export default function App() {
   )
 }
 
+function buildModeProvenance(
+  surface: DataProvenance | null,
+  airQuality: DataProvenance | null,
+  jetStream: DataProvenance | null,
+  oceanCurrent: DataProvenance | null
+): WeatherModeProvenance {
+  return {
+    temperature: surface ?? undefined,
+    wind: surface ?? undefined,
+    precipitation: surface ?? undefined,
+    storm: surface ?? undefined,
+    'air-quality': airQuality ?? undefined,
+    'jet-stream': jetStream ?? undefined,
+    'ocean-current': oceanCurrent ?? undefined
+  }
+}
+
+function latestSurfaceProvenance(
+  samples: Array<{ observedAt?: string, updatedAt?: number }>
+): DataProvenance | null {
+  const latest = samples
+    .filter(sample => sample.updatedAt !== undefined)
+    .sort((first, second) => (second.updatedAt ?? 0) - (first.updatedAt ?? 0))[0]
+
+  return latest?.updatedAt
+    ? {
+        observedAt: latest.observedAt ?? latest.updatedAt,
+        refreshedAt: latest.updatedAt,
+        source: 'Open-Meteo',
+        resolution: 'Model-dependent grid'
+      }
+    : null
+}
+
+function latestSampleProvenance(
+  samples: Array<{ observedAt: string, updatedAt: number }>,
+  source: string,
+  resolution: string
+): DataProvenance | null {
+  const latest = [...samples].sort(
+    (first, second) => second.updatedAt - first.updatedAt
+  )[0]
+
+  return latest
+    ? {
+        observedAt: latest.observedAt,
+        refreshedAt: latest.updatedAt,
+        source,
+        resolution
+      }
+    : null
+}
+
 function weatherFromEvolutionFrame(
   weather: WeatherConfig,
-  frame: WeatherEvolutionFrame
+  frame: WeatherEvolutionFrame,
+  source: string
 ): WeatherConfig {
   return {
     ...weather,
@@ -254,6 +350,11 @@ function weatherFromEvolutionFrame(
     windAngle: frame.windAngle,
     rainDensity: Math.round(Math.min(12, Math.max(0, frame.precipitation)) * 42),
     isThunderstorm: frame.isThunderstorm,
-    cloudOpacity: frame.cloudOpacity
+    cloudOpacity: frame.cloudOpacity,
+    provenance: {
+      ...weather.provenance,
+      observedAt: frame.time,
+      source
+    }
   }
 }
