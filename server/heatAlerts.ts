@@ -1,5 +1,20 @@
 import { fetchCoalesced } from './coalescedFetch.js'
 
+export type OfficialHeatAlert = {
+  id: string
+  title: string
+  message: string
+  severity: 'warning' | 'error'
+  source: string
+}
+
+type Bounds = {
+  north: number
+  south: number
+  east: number
+  west: number
+}
+
 const NWS_ALERTS_ENDPOINT = 'https://api.weather.gov/alerts/active'
 const METEOGATE_WARNINGS_ENDPOINT = 'https://api.meteogate.eu/warnings/collections/warnings/locations/ALL'
 const HEAT_EVENT_PATTERN = /heat/i
@@ -7,7 +22,10 @@ const METEOGATE_HEAT_TYPE = '5'
 const METEOGATE_INTERVAL_MS = 23 * 60 * 60 * 1000
 const METEOGATE_BUCKET_MS = 10 * 60 * 1000
 
-export function parseHeatAlertCoordinates(latitudeValue, longitudeValue) {
+export function parseHeatAlertCoordinates(
+  latitudeValue: unknown,
+  longitudeValue: unknown
+): { latitude: number, longitude: number } | null {
   const latitude = Number(latitudeValue)
   const longitude = Number(longitudeValue)
 
@@ -28,7 +46,10 @@ export function parseHeatAlertCoordinates(latitudeValue, longitudeValue) {
   }
 }
 
-export async function getOfficialHeatAlerts(latitude, longitude) {
+export async function getOfficialHeatAlerts(
+  latitude: number,
+  longitude: number
+): Promise<OfficialHeatAlert[]> {
   if (isLikelyUnitedStates(latitude, longitude)) {
     return getNwsHeatAlerts(latitude, longitude)
   }
@@ -40,7 +61,10 @@ export async function getOfficialHeatAlerts(latitude, longitude) {
   return []
 }
 
-async function getNwsHeatAlerts(latitude, longitude) {
+async function getNwsHeatAlerts(
+  latitude: number,
+  longitude: number
+): Promise<OfficialHeatAlert[]> {
   const point = `${latitude.toFixed(3)},${longitude.toFixed(3)}`
   const url = new URL(NWS_ALERTS_ENDPOINT)
 
@@ -63,13 +87,17 @@ async function getNwsHeatAlerts(latitude, longitude) {
     throw new Error(`NWS alerts error ${response.status}`)
   }
 
-  const payload = JSON.parse(response.body)
+  const payload = JSON.parse(response.body) as {
+    features?: Array<{ properties?: Record<string, unknown> }>
+  }
   const features = Array.isArray(payload.features) ? payload.features : []
 
   return features
     .map(feature => feature?.properties)
-    .filter(properties => (
-      properties &&
+    .filter((properties): properties is Record<string, unknown> & {
+      event: string
+    } => (
+      Boolean(properties) &&
       typeof properties.event === 'string' &&
       HEAT_EVENT_PATTERN.test(properties.event)
     ))
@@ -82,7 +110,10 @@ async function getNwsHeatAlerts(latitude, longitude) {
     }))
 }
 
-async function getMeteoGateHeatAlerts(latitude, longitude) {
+async function getMeteoGateHeatAlerts(
+  latitude: number,
+  longitude: number
+): Promise<OfficialHeatAlert[]> {
   const bucketEnd = Math.floor(Date.now() / METEOGATE_BUCKET_MS) * METEOGATE_BUCKET_MS
   const bucketStart = bucketEnd - METEOGATE_INTERVAL_MS
   const interval = `${new Date(bucketStart).toISOString()}/${new Date(bucketEnd).toISOString()}`
@@ -111,9 +142,15 @@ async function getMeteoGateHeatAlerts(latitude, longitude) {
     throw new Error(`MeteoGate warnings error ${response.status}`)
   }
 
-  const payload = JSON.parse(response.body)
+  const payload = JSON.parse(response.body) as {
+    features?: Array<{
+      id?: unknown
+      geometry?: unknown
+      properties?: Record<string, unknown>
+    }>
+  }
   const features = Array.isArray(payload.features) ? payload.features : []
-  const alerts = new Map()
+  const alerts = new Map<string, OfficialHeatAlert>()
 
   for (const feature of features) {
     const properties = feature?.properties
@@ -140,7 +177,7 @@ async function getMeteoGateHeatAlerts(latitude, longitude) {
   return [...alerts.values()]
 }
 
-function getAlertMessage(properties) {
+function getAlertMessage(properties: Record<string, unknown>) {
   const headline = typeof properties.headline === 'string'
     ? properties.headline.trim()
     : ''
@@ -152,13 +189,16 @@ function getAlertMessage(properties) {
   return 'Official heat warning is active. Follow local safety guidance.'
 }
 
-function getAlertSeverity(properties) {
-  return properties.severity === 'Extreme' || /excessive/i.test(properties.event)
+function getAlertSeverity(
+  properties: Record<string, unknown>
+): OfficialHeatAlert['severity'] {
+  return properties.severity === 'Extreme' ||
+    (typeof properties.event === 'string' && /excessive/i.test(properties.event))
     ? 'error'
     : 'warning'
 }
 
-function isLikelyUnitedStates(latitude, longitude) {
+function isLikelyUnitedStates(latitude: number, longitude: number) {
   return (
     latitude >= 18 &&
     latitude <= 72 &&
@@ -167,7 +207,7 @@ function isLikelyUnitedStates(latitude, longitude) {
   )
 }
 
-function isLikelyEurope(latitude, longitude) {
+function isLikelyEurope(latitude: number, longitude: number) {
   return (
     latitude >= 20 &&
     latitude <= 75 &&
@@ -176,8 +216,12 @@ function isLikelyEurope(latitude, longitude) {
   )
 }
 
-function geometryContainsPoint(geometry, latitude, longitude) {
-  if (!geometry || !Array.isArray(geometry.coordinates)) {
+function geometryContainsPoint(
+  geometry: unknown,
+  latitude: number,
+  longitude: number
+) {
+  if (!isRecord(geometry) || !Array.isArray(geometry.coordinates)) {
     return false
   }
 
@@ -198,7 +242,7 @@ function geometryContainsPoint(geometry, latitude, longitude) {
   )
 }
 
-function collectBounds(coordinates, bounds) {
+function collectBounds(coordinates: unknown[], bounds: Bounds) {
   if (
     coordinates.length >= 2 &&
     typeof coordinates[0] === 'number' &&
@@ -220,8 +264,12 @@ function collectBounds(coordinates, bounds) {
   }
 }
 
-function normalizeCoordinate(value) {
+function normalizeCoordinate(value: number) {
   const rounded = Math.round(value * 1000) / 1000
 
   return Object.is(rounded, -0) ? 0 : rounded
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value)
 }

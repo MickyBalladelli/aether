@@ -12,4 +12,4 @@
 - [x] Add quota and backoff diagnostics for weather, air quality, radar, geocoding, NOAA, webcam, and astronomy providers.
 - [x] Make the base-map tile endpoint configurable and document a production alternative to the public OpenStreetMap tile server.
 - [ ] Show observation time, refresh time, source, and resolution consistently in map tooltips and dashboard cards.
-- [ ] Convert remaining server provider modules from JavaScript plus handwritten declarations to TypeScript.
+- [x] Convert remaining server provider modules from JavaScript plus handwritten declarations to TypeScript.

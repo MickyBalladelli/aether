@@ -1,4 +1,15 @@
 import { fetchCoalesced } from './coalescedFetch.js'
+import type { OpenMeteoResponse } from '../src/types/weather.js'
+
+export type EcmwfProviderResponse = OpenMeteoResponse & {
+  model: string
+}
+
+type ForecastAttempt = {
+  key: string
+  model: string
+  url: string
+}
 
 const OPEN_METEO_ENDPOINT = 'https://api.open-meteo.com/v1/forecast'
 const OPEN_METEO_CUSTOMER_ENDPOINT = 'https://customer-api.open-meteo.com/v1/forecast'
@@ -15,11 +26,11 @@ const HOURLY_FIELDS = [
 ]
 
 export async function fetchEcmwfForecast(
-  latitude,
-  longitude,
+  latitude: number,
+  longitude: number,
   forecastHours = 120
-) {
-  const baseParams = {
+): Promise<EcmwfProviderResponse> {
+  const baseParams: Record<string, string> = {
     latitude: String(latitude),
     longitude: String(longitude),
     hourly: HOURLY_FIELDS.join(','),
@@ -27,7 +38,7 @@ export async function fetchEcmwfForecast(
     timezone: 'auto'
   }
   const attempts = buildAttempts(latitude, longitude, forecastHours, baseParams)
-  const errors = []
+  const errors: string[] = []
 
   for (const attempt of attempts) {
     const upstream = await fetchCoalesced(
@@ -59,9 +70,14 @@ export async function fetchEcmwfForecast(
   throw new Error(`ECMWF provider unavailable: ${errors.join(', ')}`)
 }
 
-function buildAttempts(latitude, longitude, forecastHours, baseParams) {
+function buildAttempts(
+  latitude: number,
+  longitude: number,
+  forecastHours: number,
+  baseParams: Record<string, string>
+) {
   const coordinateKey = `${latitude.toFixed(3)}:${longitude.toFixed(3)}:${forecastHours}`
-  const attempts = []
+  const attempts: ForecastAttempt[] = []
   const key = process.env.ECMWF_KEY?.trim()
 
   if (key) {
@@ -100,9 +116,14 @@ function buildAttempts(latitude, longitude, forecastHours, baseParams) {
   return attempts
 }
 
-function isEcmwfForecast(payload) {
-  const hourly = payload?.hourly
-  const length = hourly?.time?.length
+function isEcmwfForecast(payload: unknown): payload is OpenMeteoResponse {
+  if (!isRecord(payload) || !isRecord(payload.hourly)) {
+    return false
+  }
+
+  const hourly = payload.hourly
+  const time = hourly.time
+  const length = Array.isArray(time) ? time.length : 0
 
   return (
     Number.isInteger(length) &&
@@ -112,4 +133,8 @@ function isEcmwfForecast(payload) {
       hourly[field].length === length
     ))
   )
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value)
 }

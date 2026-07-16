@@ -2,10 +2,6 @@ import {
   WEATHER_FRESH_CACHE_TTL,
   STALE_CACHE_TTL
 } from '../server/cachePolicy.js'
-import {
-  WEATHER_PARAMETER_CONFIG,
-  buildCanonicalOpenMeteoParams
-} from '../server/openMeteoParams.js'
 import { getCacheNamespace } from '../shared/cacheVersion.js'
 import { fetchWithTimeout } from '../shared/fetchTimeout.js'
 import {
@@ -132,7 +128,7 @@ async function warmWeatherCache() {
 }
 
 function getLocationParams(location) {
-  const input = new URLSearchParams({
+  return new URLSearchParams({
     latitude: String(location.latitude),
     longitude: String(location.longitude),
     current: CURRENT_FIELDS.join(','),
@@ -141,14 +137,4 @@ function getLocationParams(location) {
     forecast_days: '7',
     timezone: 'auto'
   })
-  const canonical = buildCanonicalOpenMeteoParams(
-    input,
-    WEATHER_PARAMETER_CONFIG
-  )
-
-  if (!canonical.params) {
-    throw new Error(canonical.error)
-  }
-
-  return canonical.params
 }

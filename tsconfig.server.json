@@ -13,8 +13,11 @@
   },
   "include": [
     "api/**/*.js",
+    "api/**/*.ts",
     "server/**/*.js",
+    "server/**/*.ts",
     "shared/**/*.js",
+    "shared/**/*.ts",
     "scripts/**/*.js"
   ]
 }

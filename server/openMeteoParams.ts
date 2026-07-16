@@ -1,6 +1,14 @@
 const COORDINATE_PATTERN = /^-?\d+(?:\.\d+)?(?:,-?\d+(?:\.\d+)?)*$/
 const MAX_COORDINATES = 40
 
+export type OpenMeteoParameterConfig = {
+  currentFields: Set<string>
+  hourlyFields?: Set<string>
+  dailyFields?: Set<string>
+  timezone?: boolean
+  maxForecastDays?: number
+}
+
 export const WEATHER_PARAMETER_CONFIG = {
   currentFields: new Set([
     'cloud_cover',
@@ -45,7 +53,10 @@ export const AIR_QUALITY_PARAMETER_CONFIG = {
   ])
 }
 
-export function buildCanonicalOpenMeteoParams(input, config) {
+export function buildCanonicalOpenMeteoParams(
+  input: URLSearchParams,
+  config: OpenMeteoParameterConfig
+): { params?: URLSearchParams, error?: string } {
   const allowedParameters = new Set(['latitude', 'longitude', 'current'])
 
   if (config.hourlyFields) {
@@ -151,7 +162,11 @@ export function buildCanonicalOpenMeteoParams(input, config) {
   }
 }
 
-function parseCoordinates(value, minimum, maximum) {
+function parseCoordinates(
+  value: string | null,
+  minimum: number,
+  maximum: number
+) {
   if (!value || !COORDINATE_PATTERN.test(value)) {
     return null
   }
@@ -162,7 +177,7 @@ function parseCoordinates(value, minimum, maximum) {
     return null
   }
 
-  const normalized = []
+  const normalized: string[] = []
 
   for (const coordinate of coordinates) {
     const number = Number(coordinate)
@@ -180,7 +195,7 @@ function parseCoordinates(value, minimum, maximum) {
   return normalized
 }
 
-function parseFields(value, allowedFields) {
+function parseFields(value: string | null, allowedFields: Set<string>) {
   if (!value) {
     return null
   }
@@ -197,7 +212,7 @@ function parseFields(value, allowedFields) {
   return [...new Set(fields)].sort()
 }
 
-function invalid(error) {
+function invalid(error: string) {
   return {
     error
   }
