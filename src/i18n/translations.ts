@@ -271,7 +271,9 @@ const english = {
   'provenance.observed': 'Observed',
   'provenance.refreshed': 'Refreshed',
   'provenance.source': 'Source',
-  'provenance.resolution': 'Resolution'
+  'provenance.resolution': 'Resolution',
+  'provenance.show': 'Show data details',
+  'provenance.hide': 'Hide data details'
 } as const
 
 export type TranslationKey = keyof typeof english
@@ -545,7 +547,9 @@ const french: Record<TranslationKey, string> = {
   'provenance.observed': 'Observé',
   'provenance.refreshed': 'Actualisé',
   'provenance.source': 'Source',
-  'provenance.resolution': 'Résolution'
+  'provenance.resolution': 'Résolution',
+  'provenance.show': 'Afficher les détails des données',
+  'provenance.hide': 'Masquer les détails des données'
 }
 
 const italian: Record<TranslationKey, string> = {
@@ -817,7 +821,9 @@ const italian: Record<TranslationKey, string> = {
   'provenance.observed': 'Osservato',
   'provenance.refreshed': 'Aggiornato',
   'provenance.source': 'Fonte',
-  'provenance.resolution': 'Risoluzione'
+  'provenance.resolution': 'Risoluzione',
+  'provenance.show': 'Mostra dettagli dei dati',
+  'provenance.hide': 'Nascondi dettagli dei dati'
 }
 
 export const TRANSLATIONS: Record<

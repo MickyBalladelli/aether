@@ -142,7 +142,7 @@
   background: rgba(4, 11, 16, 0.86);
   box-shadow: 0 12px 34px rgba(0, 0, 0, 0.34);
   color: #f7fcff;
-  pointer-events: none;
+  pointer-events: auto;
   backdrop-filter: blur(14px) saturate(135%);
 }
 

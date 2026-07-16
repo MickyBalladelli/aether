@@ -315,21 +315,23 @@ function Metric({
   provenance?: DataProvenanceValue
 }) {
   return (
-    <button
-      className={`metric ${selected ? 'metric-selected' : ''}`}
-      aria-label={`${label}: ${value}`}
-      aria-pressed={selected}
-      onClick={onClick}
-    >
-      <Box className="metric-icon">{icon}</Box>
-      <Typography variant="caption" className="metric-label">
-        {label}
-      </Typography>
-      <Typography variant="body2" className="metric-value">
-        {value}
-      </Typography>
+    <div className={`metric ${selected ? 'metric-selected' : ''}`}>
+      <button
+        className="metric-trigger"
+        aria-label={`${label}: ${value}`}
+        aria-pressed={selected}
+        onClick={onClick}
+      >
+        <Box className="metric-icon">{icon}</Box>
+        <Typography variant="caption" className="metric-label">
+          {label}
+        </Typography>
+        <Typography variant="body2" className="metric-value">
+          {value}
+        </Typography>
+      </button>
       <DataProvenance value={provenance} compact />
-    </button>
+    </div>
   )
 }
 

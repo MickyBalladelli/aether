@@ -48,6 +48,28 @@ body {
   line-height: 1.25;
 }
 
+.data-provenance-control {
+  display: grid;
+  justify-items: end;
+  min-width: 0;
+}
+
+.data-provenance-toggle {
+  width: 22px !important;
+  height: 22px !important;
+  padding: 3px !important;
+  color: var(--app-text-muted) !important;
+}
+
+.data-provenance-toggle svg {
+  width: 15px;
+  height: 15px;
+}
+
+.data-provenance-details {
+  width: 100%;
+}
+
 .data-provenance > div {
   min-width: 0;
 }

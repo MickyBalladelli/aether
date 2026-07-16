@@ -314,6 +314,18 @@ export function AetherMap({
       reportedFirePointerBlockedRef.current = false
       pointerCallbackRef.current(null)
     }
+    const handleMapMouseLeave = (event: MouseEvent) => {
+      const nextTarget = event.relatedTarget
+
+      if (
+        nextTarget instanceof Element &&
+        nextTarget.closest('.map-weather-tooltip')
+      ) {
+        return
+      }
+
+      clearPointerWeather()
+    }
     const handleWindowMouseMove = (event: MouseEvent) => {
       const target = event.target
 
@@ -374,7 +386,7 @@ export function AetherMap({
       capture: true,
       passive: true
     })
-    mapElement.addEventListener('mouseleave', clearPointerWeather)
+    mapElement.addEventListener('mouseleave', handleMapMouseLeave)
     window.addEventListener('resize', handleWindowResize)
     window.addEventListener('mousemove', handleWindowMouseMove, {
       capture: true,
@@ -399,7 +411,7 @@ export function AetherMap({
       map.off('click', handleMapClick)
       map.off('movestart zoomstart', clearPointerWeather)
       mapElement.removeEventListener('mousemove', handleMouseMove, true)
-      mapElement.removeEventListener('mouseleave', clearPointerWeather)
+      mapElement.removeEventListener('mouseleave', handleMapMouseLeave)
       pointerRefreshRef.current = () => {}
       pointerCallbackRef.current(null)
       animation.destroy()
