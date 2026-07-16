@@ -158,7 +158,14 @@ export type WeatherMode = 'temperature' | 'wind' | 'jet-stream' | 'precipitation
 
 export type AnimationQuality = 'low' | 'balanced' | 'high'
 
-export type WeatherDataState = 'loading' | 'live' | 'cached' | 'stale' | 'unavailable'
+export type WeatherDataStatus =
+  'loading' | 'live' | 'cached' | 'stale' | 'unavailable'
+
+export type WeatherDataState = {
+  status: WeatherDataStatus
+  lastSuccessAt: number | null
+  staleAgeMs: number | null
+}
 
 export type HeatRisk = {
   kind: 'high-heat' | 'extreme-heat' | 'heat-wave'

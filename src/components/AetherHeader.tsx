@@ -1,6 +1,6 @@
 import SearchIcon from '@mui/icons-material/Search'
 import { Box, IconButton, Stack, TextField, Tooltip, Typography } from '@mui/material'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import type {
   AnimationQuality,
@@ -36,12 +36,32 @@ export function AetherHeader({
   onWeatherRetry
 }: AetherHeaderProps) {
   const [query, setQuery] = useState('')
+  const [now, setNow] = useState(Date.now)
   const { t } = useI18n()
+
+  useEffect(() => {
+    if (dataState.lastSuccessAt === null && dataState.staleAgeMs === null) {
+      return
+    }
+
+    const interval = window.setInterval(() => setNow(Date.now()), 60_000)
+
+    return () => window.clearInterval(interval)
+  }, [dataState.lastSuccessAt, dataState.staleAgeMs === null])
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     onSearch(query)
   }
+
+  const stateStatus = dataState.status
+  const statusLabel = formatStatusLabel(status, dataState, now, t)
+  const lastSuccessAge = dataState.lastSuccessAt === null
+    ? t('common.unavailable')
+    : formatAge(now - dataState.lastSuccessAt, t)
+  const staleAge = dataState.staleAgeMs === null
+    ? t('common.unavailable')
+    : formatAge(dataState.staleAgeMs, t)
 
 const dataStateTooltip = (
   <dl className="data-state-legend">
@@ -53,6 +73,10 @@ const dataStateTooltip = (
     <dd>{t('data.staleDetail')}</dd>
     <dt>{t('data.unavailable')}</dt>
     <dd>{t('data.unavailableDetail')}</dd>
+    <dt>{t('data.lastSuccess')}</dt>
+    <dd>{lastSuccessAge}</dd>
+    <dt>{t('data.staleAge')}</dt>
+    <dd>{staleAge}</dd>
   </dl>
 ) as unknown as React.ReactNode
 
@@ -108,13 +132,13 @@ const dataStateTooltip = (
               <Typography
                 variant="caption"
                 role="status"
-                className={`search-status search-status-${dataState}`}
+                className={`search-status search-status-${stateStatus}`}
               >
-                {translateStatus(status, t)}
+                {statusLabel}
               </Typography>
             </Tooltip>
             <WeatherRetryButton
-              visible={dataState === 'stale' || dataState === 'unavailable'}
+              visible={stateStatus === 'stale' || stateStatus === 'unavailable'}
               onRetry={onWeatherRetry}
             />
           </Box>
@@ -129,9 +153,57 @@ const dataStateTooltip = (
   )
 }
 
+type Translator = ReturnType<typeof useI18n>['t']
+
+function formatStatusLabel(
+  status: string,
+  dataState: WeatherDataState,
+  now: number,
+  t: Translator
+) {
+  const label = translateStatus(status, t)
+
+  if (
+    (dataState.status === 'cached' || dataState.status === 'stale') &&
+    dataState.staleAgeMs !== null
+  ) {
+    return `${label} · ${formatAge(dataState.staleAgeMs, t)}`
+  }
+
+  if (dataState.status === 'unavailable' && dataState.lastSuccessAt !== null) {
+    return `${label} · ${t('data.lastSuccess')} ${formatAge(
+      now - dataState.lastSuccessAt,
+      t
+    )}`
+  }
+
+  return label
+}
+
+function formatAge(ageMs: number, t: Translator) {
+  const safeAge = Math.max(0, ageMs)
+  const minutes = Math.floor(safeAge / 60_000)
+
+  if (minutes < 1) {
+    return t('data.ageNow')
+  }
+
+  if (minutes < 60) {
+    return t('data.ageMinutes', { count: minutes })
+  }
+
+  const hours = Math.floor(minutes / 60)
+
+  if (hours < 24) {
+    return t('data.ageHours', { count: hours })
+  }
+
+  return t('data.ageDays', { count: Math.floor(hours / 24) })
+}
+
 function translateStatus(
   status: string,
-  t: (key: TranslationKey) => string
+  t: Translator
 ) {
   const statusKeys: Record<string, TranslationKey> = {
     'Reading sky': 'status.readingSky',

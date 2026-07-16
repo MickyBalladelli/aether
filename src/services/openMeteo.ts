@@ -1,5 +1,5 @@
 import type { OpenMeteoResponse, WeatherLocation } from '../types/weather'
-import type { WeatherDataState } from '../types/weather'
+import type { WeatherDataStatus } from '../types/weather'
 import { getClientCacheKey } from '../../shared/cacheVersion.js'
 import { fetchWithTimeout } from '../../shared/fetchTimeout.js'
 import { SOURCE_REFRESH_MS } from '../../shared/cachePolicy.js'
@@ -107,7 +107,7 @@ export async function fetchOpenMeteoForecast(
     throw new Error('Open-Meteo response has invalid data')
   }
 
-  const refreshedAt = Date.now()
+  const refreshedAt = getResponseRefreshedAt(response)
 
   writeCachedForecast(cacheKey, payload, refreshedAt)
 
@@ -120,7 +120,7 @@ export async function fetchOpenMeteoForecast(
 
 type ForecastResult = {
   payload: OpenMeteoResponse
-  source: Exclude<WeatherDataState, 'loading' | 'unavailable'>
+  source: Exclude<WeatherDataStatus, 'loading' | 'unavailable'>
   refreshedAt: number
 }
 
@@ -150,6 +150,14 @@ function getResponseSource(
   }
 
   return 'live'
+}
+
+function getResponseRefreshedAt(response: Response) {
+  const ageSeconds = Number(response.headers.get('age') ?? 0)
+
+  return Number.isFinite(ageSeconds) && ageSeconds > 0
+    ? Date.now() - ageSeconds * 1000
+    : Date.now()
 }
 
 function getLocationCacheKey(location: WeatherLocation) {

@@ -12,6 +12,7 @@ import type {
   HeatAlert,
   WeatherConfig,
   WeatherDataState,
+  WeatherDataStatus,
   WeatherEvolutionFrame,
   WeatherLocation
 } from '../types/weather'
@@ -22,7 +23,11 @@ export function useLocationWeather(location: WeatherLocation) {
   const [weather, setWeather] = useState<WeatherConfig | null>(null)
   const lastWeatherRef = useRef<WeatherConfig | null>(null)
   const [status, setStatus] = useState('Reading sky')
-  const [dataState, setDataState] = useState<WeatherDataState>('loading')
+  const [dataState, setDataState] = useState<WeatherDataState>({
+    status: 'loading',
+    lastSuccessAt: null,
+    staleAgeMs: null
+  })
   const [request, setRequest] = useState(0)
   const forceRefreshRef = useRef(false)
   const [forecastReady, setForecastReady] = useState(false)
@@ -50,7 +55,10 @@ export function useLocationWeather(location: WeatherLocation) {
 
       forceRefreshRef.current = false
       setForecastReady(false)
-      setDataState('loading')
+      setDataState(current => ({
+        ...current,
+        status: 'loading'
+      }))
 
       try {
         setStatus('Reading sky')
@@ -70,7 +78,13 @@ export function useLocationWeather(location: WeatherLocation) {
         if (!cancelled) {
           lastWeatherRef.current = nextWeather
           setWeather(nextWeather)
-          setDataState(forecast.source)
+          setDataState({
+            status: forecast.source,
+            lastSuccessAt: Date.now(),
+            staleAgeMs: forecast.source === 'live'
+              ? 0
+              : Math.max(0, Date.now() - forecast.refreshedAt)
+          })
           setStatus(formatDataState(forecast.source))
         }
       } catch {
@@ -81,10 +95,21 @@ export function useLocationWeather(location: WeatherLocation) {
 
           if (fallback) {
             setWeather(fallback)
-            setDataState('stale')
+            const refreshedAt = toTimestamp(fallback.provenance.refreshedAt)
+
+            setDataState(current => ({
+              status: 'stale',
+              lastSuccessAt: refreshedAt ?? current.lastSuccessAt,
+              staleAgeMs: refreshedAt === null
+                ? current.staleAgeMs
+                : Math.max(0, Date.now() - refreshedAt)
+            }))
             setStatus('Stale')
           } else {
-            setDataState('unavailable')
+            setDataState(current => ({
+              ...current,
+              status: 'unavailable'
+            }))
             setStatus('Unavailable')
           }
         }
@@ -102,6 +127,26 @@ export function useLocationWeather(location: WeatherLocation) {
       controller.abort()
     }
   }, [location, pageVisible, request])
+
+  useEffect(() => {
+    if (
+      dataState.staleAgeMs === null ||
+      (dataState.status !== 'cached' && dataState.status !== 'stale')
+    ) {
+      return
+    }
+
+    const interval = window.setInterval(() => {
+      setDataState(current => ({
+        ...current,
+        staleAgeMs: current.staleAgeMs === null
+          ? null
+          : current.staleAgeMs + 60_000
+      }))
+    }, 60_000)
+
+    return () => window.clearInterval(interval)
+  }, [dataState.staleAgeMs === null, dataState.status])
 
   useEffect(() => {
     if (!pageVisible) {
@@ -154,7 +199,10 @@ export function useLocationWeather(location: WeatherLocation) {
   const retry = useCallback(() => {
     forceRefreshRef.current = true
     setStatus('Reading sky')
-    setDataState('loading')
+    setDataState(current => ({
+      ...current,
+      status: 'loading'
+    }))
     setForecastReady(false)
     setRequest(current => current + 1)
   }, [])
@@ -176,7 +224,21 @@ export function useLocationWeather(location: WeatherLocation) {
 }
 
 function formatDataState(
-  state: Exclude<WeatherDataState, 'loading' | 'unavailable'>
+  state: Exclude<WeatherDataStatus, 'loading' | 'unavailable'>
 ) {
   return state.charAt(0).toUpperCase() + state.slice(1)
+}
+
+function toTimestamp(value: string | number | null) {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value
+  }
+
+  if (typeof value === 'string') {
+    const timestamp = Date.parse(value)
+
+    return Number.isFinite(timestamp) ? timestamp : null
+  }
+
+  return null
 }
