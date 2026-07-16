@@ -1,10 +1,15 @@
 import { useEffect, useRef } from 'react'
+import {
+  recordProviderRequestError,
+  type TelemetryProvider
+} from '../services/clientTelemetry'
 
 type PollingSchedulerOptions = {
   enabled: boolean
   intervalMs: number
   initialDelayMs?: number
   restartKey: string
+  telemetryProvider: TelemetryProvider
   task: (signal: AbortSignal) => Promise<void>
   onError?: (error: unknown) => void
 }
@@ -14,6 +19,7 @@ export function usePollingScheduler({
   intervalMs,
   initialDelayMs = 0,
   restartKey,
+  telemetryProvider,
   task,
   onError
 }: PollingSchedulerOptions) {
@@ -71,6 +77,12 @@ export function usePollingScheduler({
       try {
         await taskRef.current(controller.signal)
       } catch (error) {
+        recordProviderRequestError(
+          telemetryProvider,
+          error,
+          controller.signal
+        )
+
         if (!controller.signal.aborted) {
           errorRef.current?.(error)
         }
@@ -123,5 +135,5 @@ export function usePollingScheduler({
       window.removeEventListener('online', resume)
       window.removeEventListener('offline', pause)
     }
-  }, [enabled, initialDelayMs, intervalMs, restartKey])
+  }, [enabled, initialDelayMs, intervalMs, restartKey, telemetryProvider])
 }

@@ -98,6 +98,7 @@ export function useMapWeatherData({
     intervalMs: WEATHER_REFRESH_INTERVAL,
     initialDelayMs: 120,
     restartKey: `${mode}:${forecastReady}:${viewportKey}`,
+    telemetryProvider: 'map-weather',
     task: refreshVisibleWeather,
     onError: handleWeatherError
   })
@@ -142,6 +143,7 @@ export function useMapWeatherData({
     intervalMs: JET_STREAM_REFRESH_INTERVAL,
     initialDelayMs: 120,
     restartKey: `${location.latitude}:${location.longitude}:${viewportKey}`,
+    telemetryProvider: 'jet-stream',
     task: refreshJetStream
   })
 
@@ -168,6 +170,7 @@ export function useMapWeatherData({
     intervalMs: AIR_QUALITY_REFRESH_INTERVAL,
     initialDelayMs: 180,
     restartKey: viewportKey,
+    telemetryProvider: 'air-quality',
     task: refreshAirQuality
   })
 
@@ -192,6 +195,7 @@ export function useMapWeatherData({
     intervalMs: OCEAN_CURRENT_REFRESH_INTERVAL,
     initialDelayMs: 120,
     restartKey: `${mode}:${viewportKey}`,
+    telemetryProvider: 'ocean-currents',
     task: refreshOceanCurrents,
     onError: handleOceanCurrentError
   })

@@ -13,6 +13,7 @@ import type {
 import { usePageVisibility } from '../hooks/usePageVisibility'
 import { useI18n } from '../i18n/I18nContext'
 import type { TranslationKey } from '../i18n/translations'
+import { recordProviderRequestError } from '../services/clientTelemetry'
 
 const RATING_KEYS: Record<string, TranslationKey> = {
   Excellent: 'rating.excellent',
@@ -60,6 +61,7 @@ export function StargazingIndex({ location }: { location: WeatherLocation | null
     void fetchStargazingForecast(location, controller.signal)
       .then(setForecast)
       .catch(error => {
+        recordProviderRequestError('stargazing', error, controller.signal)
         if (error instanceof DOMException && error.name === 'AbortError') return
         setUnavailable(true)
       })

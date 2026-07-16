@@ -15,6 +15,7 @@ import { buildWeatherEvolution } from '../weather/translateWeather'
 import { describeWeatherCode } from '../weather/weatherCode'
 import { SOURCE_REFRESH_MS } from '../../shared/cachePolicy.js'
 import { openMeteoResponseSchema } from '../schemas/serverResponses'
+import { recordProviderRequestError } from './clientTelemetry'
 
 type GridPoint = WeatherLocation & {
   showBadge: false
@@ -100,6 +101,7 @@ export async function fetchWeatherMapSamples(
         throw error
       }
 
+      recordProviderRequestError('map-weather', error, signal)
       continue
     }
   }

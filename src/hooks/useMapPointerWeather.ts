@@ -7,6 +7,7 @@ import type {
   WeatherLocation
 } from '../types/weather'
 import { usePageVisibility } from './usePageVisibility'
+import { recordProviderRequestError } from '../services/clientTelemetry'
 
 const HOVER_GEOCODE_DEBOUNCE_MS = 650
 const HOVER_RADAR_DEBOUNCE_MS = 1000
@@ -163,7 +164,8 @@ export function useMapPointerWeather() {
             ? { ...current, placeLabel: place }
             : current)
         }
-      } catch {
+      } catch (error) {
+        recordProviderRequestError('geocoding', error, controller.signal)
         return
       } finally {
         if (geocodePendingKeyRef.current === key) {

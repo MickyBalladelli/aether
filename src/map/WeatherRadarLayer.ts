@@ -2,6 +2,7 @@ import L from 'leaflet'
 import type { WeatherMode } from '../types/weather'
 import { REDUCED_MOTION_QUERY } from '../utils/motion'
 import { fetchWithTimeout } from '../../shared/fetchTimeout.js'
+import { recordProviderFailure, recordProviderRequestError } from '../services/clientTelemetry'
 import {
   parseResponseJson,
   radarMetadataResponseSchema
@@ -112,6 +113,7 @@ export class WeatherRadarLayer {
       })
 
       if (!response.ok) {
+        recordProviderFailure('radar')
         return
       }
 
@@ -136,7 +138,8 @@ export class WeatherRadarLayer {
         this.showLatestFrame()
         this.startFrameLoop()
       }
-    } catch {
+    } catch (error) {
+      recordProviderRequestError('radar', error, controller.signal)
       return
     } finally {
       if (this.metadataController === controller) {

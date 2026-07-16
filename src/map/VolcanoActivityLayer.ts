@@ -1,5 +1,6 @@
 import L from 'leaflet'
 import { fetchWithTimeout } from '../../shared/fetchTimeout.js'
+import { recordProviderFailure, recordProviderRequestError } from '../services/clientTelemetry'
 import {
   parseResponseJson,
   volcanoActivityResponseSchema
@@ -94,6 +95,7 @@ export class VolcanoActivityLayer {
       )
 
       if (!response.ok) {
+        recordProviderFailure('volcanoes')
         return
       }
 
@@ -108,7 +110,8 @@ export class VolcanoActivityLayer {
       }
 
       this.render(payload)
-    } catch {
+    } catch (error) {
+      recordProviderRequestError('volcanoes', error, controller.signal)
       return
     } finally {
       if (this.abortController === controller) {

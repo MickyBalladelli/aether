@@ -7,6 +7,7 @@ import type { SoilMoistureReading, WeatherLocation } from '../types/weather'
 import { usePageVisibility } from '../hooks/usePageVisibility'
 import { useI18n } from '../i18n/I18nContext'
 import type { TranslationKey } from '../i18n/translations'
+import { recordProviderRequestError } from '../services/clientTelemetry'
 
 const DROUGHT_KEYS: Record<string, TranslationKey> = {
   'Exceptional drought': 'drought.exceptional',
@@ -44,6 +45,7 @@ export function SoilMoisture({ location }: { location: WeatherLocation | null })
     void fetchSoilMoisture(location, controller.signal)
       .then(setReading)
       .catch(error => {
+        recordProviderRequestError('soil-moisture', error, controller.signal)
         if (error instanceof DOMException && error.name === 'AbortError') return
         setUnavailable(true)
       })

@@ -4,6 +4,7 @@ import {
   heatAlertsResponseSchema,
   parseResponseJson
 } from '../schemas/serverResponses'
+import { recordProviderFailure } from './clientTelemetry'
 
 export async function fetchOfficialHeatAlerts(
   location: WeatherLocation,
@@ -19,6 +20,7 @@ export async function fetchOfficialHeatAlerts(
   )
 
   if (!response.ok) {
+    recordProviderFailure('heat-alerts')
     return []
   }
 

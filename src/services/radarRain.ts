@@ -5,6 +5,7 @@ import {
   radarMetadataResponseSchema
 } from '../schemas/serverResponses'
 import type { RadarFrame } from '../schemas/serverResponses'
+import { recordProviderFailure } from './clientTelemetry'
 
 type TilePoint = {
   z: number
@@ -88,6 +89,7 @@ async function readRadarRainAt(
       ? { status: 'dry', observedAt }
       : { status: 'no-coverage', observedAt }
   } catch {
+    recordProviderFailure('radar')
     return { status: 'unavailable' }
   }
 }

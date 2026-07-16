@@ -1,5 +1,6 @@
 import airQualityHandler from '../api/air-quality.js'
 import clientErrorHandler from '../api/client-error.js'
+import clientTelemetryHandler from '../api/client-telemetry.js'
 import ecmwfHandler from '../api/ecmwf.js'
 import effisFireTileHandler from '../api/effis-fire-tile.js'
 import fireLayerStatusHandler from '../api/fire-layer-status.js'
@@ -16,6 +17,7 @@ const MAX_BODY_BYTES = 64 * 1024
 const handlers = new Map([
   ['/api/air-quality', airQualityHandler],
   ['/api/client-error', clientErrorHandler],
+  ['/api/client-telemetry', clientTelemetryHandler],
   ['/api/ecmwf', ecmwfHandler],
   ['/api/effis-fire-tile', effisFireTileHandler],
   ['/api/fire-layer-status', fireLayerStatusHandler],

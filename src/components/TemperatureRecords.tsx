@@ -6,6 +6,7 @@ import { fetchTemperatureRecords } from '../services/temperatureRecords'
 import type { TemperatureRecords as TemperatureRecordsData, WeatherLocation } from '../types/weather'
 import { usePageVisibility } from '../hooks/usePageVisibility'
 import { useI18n } from '../i18n/I18nContext'
+import { recordProviderRequestError } from '../services/clientTelemetry'
 
 export function TemperatureRecords({ location }: { location: WeatherLocation | null }) {
   const [records, setRecords] = useState<TemperatureRecordsData | null>(null)
@@ -33,6 +34,11 @@ export function TemperatureRecords({ location }: { location: WeatherLocation | n
     void fetchTemperatureRecords(location, controller.signal)
       .then(setRecords)
       .catch(error => {
+        recordProviderRequestError(
+          'temperature-records',
+          error,
+          controller.signal
+        )
         if (error instanceof DOMException && error.name === 'AbortError') return
         setUnavailable(true)
       })

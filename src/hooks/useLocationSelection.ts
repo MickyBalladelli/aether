@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
 import { reverseGeocode, searchCity } from '../services/geocoding'
 import type { WeatherLocation } from '../types/weather'
+import { recordProviderRequestError } from '../services/clientTelemetry'
 
 const REVERSE_GEOCODE_DEBOUNCE_MS = 350
 
@@ -72,7 +73,8 @@ export function useLocationSelection({
             ? { ...current, label }
             : current
         ))
-      } catch {
+      } catch (error) {
+        recordProviderRequestError('geocoding', error, controller.signal)
         return
       }
     }, REVERSE_GEOCODE_DEBOUNCE_MS)
@@ -94,6 +96,7 @@ export function useLocationSelection({
       setForecastReady(false)
       setLocation(nextLocation)
     } catch (error) {
+      recordProviderRequestError('geocoding', error)
       setStatus(error instanceof Error ? error.message : 'City search failed')
     }
   }, [cancelPendingReverseGeocode, setForecastReady, setLocation, setStatus])

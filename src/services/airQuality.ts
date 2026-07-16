@@ -14,6 +14,7 @@ import { fetchWithTimeout } from '../../shared/fetchTimeout.js'
 import { SOURCE_REFRESH_MS } from '../../shared/cachePolicy.js'
 import { airQualityResponseSchema } from '../schemas/serverResponses'
 import { isAirQualityMapSample } from '../schemas/cachePayloads'
+import { recordProviderRequestError } from './clientTelemetry'
 
 const AIR_QUALITY_ENDPOINT = '/api/air-quality'
 const CURRENT_FIELDS = [
@@ -75,6 +76,7 @@ export async function fetchAirQualityMapSamples(
         throw error
       }
 
+      recordProviderRequestError('air-quality', error, signal)
       continue
     }
   }

@@ -16,6 +16,7 @@ import { useI18n } from '../i18n/I18nContext'
 import { fetchNearbyWebcams } from '../services/webcams'
 import type { NearbyWebcam, NearbyWebcams, WeatherLocation } from '../types/weather'
 import { usePageVisibility } from '../hooks/usePageVisibility'
+import { recordProviderRequestError } from '../services/clientTelemetry'
 
 export function NearbyWebcams({ location }: { location: WeatherLocation | null }) {
   const [expanded, setExpanded] = useState(false)
@@ -42,6 +43,7 @@ export function NearbyWebcams({ location }: { location: WeatherLocation | null }
     void fetchNearbyWebcams(location, controller.signal)
       .then(setResult)
       .catch(error => {
+        recordProviderRequestError('webcams', error, controller.signal)
         if (error instanceof DOMException && error.name === 'AbortError') return
         setUnavailable(true)
       })

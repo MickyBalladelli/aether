@@ -1,5 +1,6 @@
 import L from 'leaflet'
 import { fetchWithTimeout } from '../../shared/fetchTimeout.js'
+import { recordProviderFailure, recordProviderRequestError } from '../services/clientTelemetry'
 import type { FireLayerStatusPatch } from './fireLayerStatus'
 import type { MapFirePointer } from '../types/weather'
 import { createReportedFireIcon } from './reportedFireMarker'
@@ -110,6 +111,7 @@ export class ReportedFireLayer {
       )
 
       if (!response.ok) {
+        recordProviderFailure('reported-fires')
         this.onStatusChange({ state: 'unavailable' })
         return
       }
@@ -132,7 +134,8 @@ export class ReportedFireLayer {
         lastUpdated: Date.now(),
         itemCount
       })
-    } catch {
+    } catch (error) {
+      recordProviderRequestError('reported-fires', error, controller.signal)
       if (!controller.signal.aborted) {
         this.onStatusChange({ state: 'unavailable' })
       }

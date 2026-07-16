@@ -15,6 +15,7 @@ import {
 import { fetchWithTimeout } from '../../shared/fetchTimeout.js'
 import { SOURCE_REFRESH_MS } from '../../shared/cachePolicy.js'
 import { jetStreamResponseSchema } from '../schemas/serverResponses'
+import { recordProviderFailure } from './clientTelemetry'
 
 const OPEN_METEO_ENDPOINT = '/api/weather'
 const CURRENT_FIELDS = 'wind_speed_250hPa,wind_direction_250hPa'
@@ -64,6 +65,7 @@ export async function fetchJetStreamSamples(
     observeUpstreamBudget(response)
 
     if (!response.ok) {
+      recordProviderFailure('jet-stream')
       continue
     }
 

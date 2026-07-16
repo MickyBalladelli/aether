@@ -18,6 +18,10 @@ import type {
 } from '../types/weather'
 import { translateWeather } from '../weather/translateWeather'
 import { usePageVisibility } from './usePageVisibility'
+import {
+  recordProviderFailure,
+  recordProviderRequestError
+} from '../services/clientTelemetry'
 
 export function useLocationWeather(location: WeatherLocation) {
   const [weather, setWeather] = useState<WeatherConfig | null>(null)
@@ -75,6 +79,10 @@ export function useLocationWeather(location: WeatherLocation) {
 
         cacheWeatherSample(location, nextWeather)
 
+        if (forecast.source === 'stale') {
+          recordProviderFailure('weather')
+        }
+
         if (!cancelled) {
           lastWeatherRef.current = nextWeather
           setWeather(nextWeather)
@@ -87,7 +95,8 @@ export function useLocationWeather(location: WeatherLocation) {
           })
           setStatus(formatDataState(forecast.source))
         }
-      } catch {
+      } catch (error) {
+        recordProviderRequestError('weather', error, controller.signal)
         const cachedWeather = await getCachedWeatherForLocation(location)
 
         if (!cancelled) {
@@ -164,7 +173,8 @@ export function useLocationWeather(location: WeatherLocation) {
           setEcmwfForecast(forecast)
         }
       })
-      .catch(() => {
+      .catch(error => {
+        recordProviderRequestError('ecmwf', error, controller.signal)
         if (!controller.signal.aborted) {
           setEcmwfForecast(null)
         }
@@ -191,7 +201,9 @@ export function useLocationWeather(location: WeatherLocation) {
       if (!controller.signal.aborted) {
         setOfficialHeatAlerts(alerts)
       }
-    }).catch(() => {})
+    }).catch(error => {
+      recordProviderRequestError('heat-alerts', error, controller.signal)
+    })
 
     return () => controller.abort()
   }, [location, pageVisible])

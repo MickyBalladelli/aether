@@ -16,6 +16,7 @@ import type {
   ProjectedSample
 } from './weatherAnimationTypes'
 import { AnimationPerformanceController } from './AnimationPerformanceController'
+import { recordAnimationFrame } from '../services/clientTelemetry'
 import {
   isPageVisible,
   subscribeToPageVisibility
@@ -205,6 +206,8 @@ export class WeatherMapAnimation {
     }
 
     const frameTime = this.lastTime > 0 ? time - this.lastTime : 16.7
+
+    recordAnimationFrame(frameTime)
     const qualityChanged = this.performanceController.recordFrame(frameTime)
     const deltaTime = Math.min(frameTime / 1000, 1 / 30)
 
