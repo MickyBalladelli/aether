@@ -197,8 +197,10 @@ function createEarthquakeMarker(
     {
       pane: 'markerPane',
       radius: Math.min(14, Math.max(4, 3 + (earthquake.magnitude - 2.5) * 2.2)),
-      color: earthquake.tsunamiProduct ? '#fff2b2' : '#e9f8ff',
-      weight: earthquake.tsunamiProduct ? 2.5 : 1.25,
+      color: earthquake.tsunamiProduct
+        ? '#5de1ff'
+        : earthquakeOutlineColor(earthquake),
+      weight: earthquake.tsunamiProduct || earthquake.alert ? 2.5 : 1.25,
       fillColor: earthquakeColor(earthquake),
       fillOpacity: 0.88,
       bubblingMouseEvents: false
@@ -218,14 +220,19 @@ function createEarthquakeMarker(
 }
 
 function earthquakeColor(earthquake: EarthquakeEvent) {
+  if (earthquake.magnitude >= 6) return '#d946ef'
+  if (earthquake.magnitude >= 4.5) return '#8b5cf6'
+
+  return '#3b82f6'
+}
+
+function earthquakeOutlineColor(earthquake: EarthquakeEvent) {
   if (earthquake.alert === 'red') return '#ef3340'
   if (earthquake.alert === 'orange') return '#ff7a18'
   if (earthquake.alert === 'yellow') return '#ffd84f'
   if (earthquake.alert === 'green') return '#56c271'
-  if (earthquake.magnitude >= 6) return '#ff5d3a'
-  if (earthquake.magnitude >= 4.5) return '#ffb13b'
 
-  return '#43b9e6'
+  return '#e8e3ff'
 }
 
 function createTsunamiMarker(
