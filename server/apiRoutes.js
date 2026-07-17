@@ -44,6 +44,7 @@ export async function dispatchApiRequest(request, response) {
   const route = first(query[ROUTE_QUERY_KEY])
 
   delete query[ROUTE_QUERY_KEY]
+  delete query.route
   request.query = query
 
   const handler = typeof route === 'string'
