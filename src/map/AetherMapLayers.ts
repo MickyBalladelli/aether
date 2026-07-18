@@ -27,6 +27,7 @@ import {
   maskTileToBounds
 } from './regionalTileClip'
 import { VolcanoActivityLayer } from './VolcanoActivityLayer'
+import { TropicalCycloneLayer } from './TropicalCycloneLayer'
 import { WeatherRadarLayer } from './WeatherRadarLayer'
 import type { TranslationKey } from '../i18n/translations'
 
@@ -84,6 +85,7 @@ export function createAetherMapLayers({
   )
   const volcanoActivity = new VolcanoActivityLayer(map, t)
   const seismicActivity = new SeismicActivityLayer(map, t)
+  const tropicalCyclones = new TropicalCycloneLayer(map, mapLanguage, t)
   const fireTiles = L.tileLayer(
     '/api/fire-tile?z={z}&x={x}&y={y}',
     {
@@ -129,8 +131,10 @@ export function createAetherMapLayers({
   )
   const volcanoLayer = volcanoActivity.getLeafletLayer()
   const seismicLayer = seismicActivity.getLeafletLayer()
+  const tropicalCycloneLayer = tropicalCyclones.getLeafletLayer()
   const reportedFireLayer = reportedFires.getLeafletLayer()
   const mapOverlayLayers: Record<MapOverlayId, L.Layer> = {
+    'tropical-cyclones': tropicalCycloneLayer,
     'volcano-activity': volcanoLayer,
     'seismic-activity': seismicLayer,
     'heat-detections': fireTiles,
@@ -144,6 +148,7 @@ export function createAetherMapLayers({
   const layerControl = L.control.layers(
     {},
     {
+      [t('layers.cycloneName')]: tropicalCycloneLayer,
       [t('layers.volcanoName')]: volcanoLayer,
       [t('layers.seismicName')]: seismicLayer,
       [t('layers.heatName')]: fireTiles,
@@ -165,6 +170,10 @@ export function createAetherMapLayers({
   let europeLoadedTiles = 0
 
   const getOverlayId = (layer: L.Layer): MapOverlayId | null => {
+    if (layer === tropicalCycloneLayer) {
+      return 'tropical-cyclones'
+    }
+
     if (layer === volcanoLayer) {
       return 'volcano-activity'
     }
@@ -333,6 +342,7 @@ export function createAetherMapLayers({
   reportedFires.start()
   volcanoActivity.start()
   seismicActivity.start()
+  tropicalCyclones.start()
 
   for (const layerId of loadEnabledMapOverlays()) {
     mapOverlayLayers[layerId].addTo(map)
@@ -361,7 +371,10 @@ export function createAetherMapLayers({
       },
       { layer: fireTiles, info: firmsPointerInfo }
     ]),
-    setMapLanguage: baseMap.setLanguage,
+    setMapLanguage: language => {
+      baseMap.setLanguage(language)
+      tropicalCyclones.setLanguage(language)
+    },
     setWeatherMode: (mode, radarOpacity, precipitationPlayback) => {
       radar.setPlayback(precipitationPlayback)
       radar.setMode(mode)
@@ -391,6 +404,7 @@ export function createAetherMapLayers({
       reportedFires.destroy()
       volcanoActivity.destroy()
       seismicActivity.destroy()
+      tropicalCyclones.destroy()
       layerControl.remove()
     }
   }
@@ -405,17 +419,23 @@ function decorateLayerControl(
       'input.leaflet-control-layers-selector[type="checkbox"]'
     ) ?? []
   )
-  const volcanoLayerInput = overlayInputs[0]
-  const seismicLayerInput = overlayInputs[1]
-  const heatLayerInput = overlayInputs[2]
-  const africaFireInput = overlayInputs[3]
-  const europeFireInput = overlayInputs[4]
-  const reportedFireInput = overlayInputs[5]
+  const cycloneLayerInput = overlayInputs[0]
+  const volcanoLayerInput = overlayInputs[1]
+  const seismicLayerInput = overlayInputs[2]
+  const heatLayerInput = overlayInputs[3]
+  const africaFireInput = overlayInputs[4]
+  const europeFireInput = overlayInputs[5]
+  const reportedFireInput = overlayInputs[6]
 
+  addLayerControlHeading(cycloneLayerInput, t('layers.meteorological'))
   addLayerControlHeading(volcanoLayerInput, t('layers.geological'))
   addLayerControlHeading(heatLayerInput, t('layers.satellite'))
   addLayerControlHeading(reportedFireInput, t('layers.reported'))
 
+  cycloneLayerInput?.setAttribute(
+    'aria-label',
+    t('layers.cycloneDetail')
+  )
   volcanoLayerInput?.setAttribute(
     'aria-label',
     t('layers.volcanoDetail')
@@ -442,6 +462,12 @@ function decorateLayerControl(
   )
 
   return [
+    addLayerControlInfo(cycloneLayerInput, {
+      id: 'tropical-cyclones',
+      label: t('layers.cycloneName'),
+      detail: t('layers.cycloneDetail'),
+      aboutLabel: t('layers.about', { layer: t('layers.cycloneShort') })
+    }),
     addLayerControlInfo(volcanoLayerInput, {
       id: 'volcanoes',
       label: t('layers.volcanoName'),

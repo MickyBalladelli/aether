@@ -86,6 +86,11 @@ const DATA_SOURCES: Array<{
     url: 'https://www.tsunami.gov/'
   },
   {
+    name: 'NOAA NHC + JTWC via Esri',
+    kind: 'source.tropicalCyclones',
+    url: 'https://www.arcgis.com/home/item.html?id=248e7b5827a34b248647afb012c58787'
+  },
+  {
     name: 'NASA FIRMS',
     kind: 'source.worldHeat',
     url: 'https://firms.modaps.eosdis.nasa.gov/'

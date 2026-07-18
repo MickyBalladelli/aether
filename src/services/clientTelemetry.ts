@@ -13,6 +13,7 @@ export type TelemetryProvider =
   'stargazing' |
   'temperature-records' |
   'temperature-anomaly' |
+  'tropical-cyclones' |
   'volcanoes' |
   'weather' |
   'webcams'

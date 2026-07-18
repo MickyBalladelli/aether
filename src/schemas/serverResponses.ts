@@ -135,6 +135,52 @@ export type SeismicEventsResponse = {
   tsunamiWarnings: TsunamiWarning[]
 }
 
+export type TropicalCycloneTrackPoint = {
+  latitude: number
+  longitude: number
+  validAt: string
+  hours: number
+  windKnots: number
+  gustKnots: number | null
+  pressureHpa: number | null
+  category: number
+  development: string | null
+  movementDegrees: number | null
+  movementKnots: number | null
+}
+
+export type TropicalCycloneObservedPoint = {
+  latitude: number
+  longitude: number
+  observedAt: string
+  windKnots: number
+}
+
+export type TropicalCycloneGeometry = {
+  type: 'Polygon' | 'MultiPolygon'
+  coordinates: unknown[]
+}
+
+export type TropicalCyclone = {
+  id: string
+  name: string
+  basin: string
+  advisoryAt: string
+  advisoryNumber: string | null
+  current: TropicalCycloneTrackPoint
+  observedTrack: TropicalCycloneObservedPoint[]
+  forecast: TropicalCycloneTrackPoint[]
+  cone: TropicalCycloneGeometry | null
+}
+
+export type TropicalCyclonesResponse = {
+  generatedAt: string
+  cacheState: 'live' | 'grace'
+  source: string
+  sourceUrl: string
+  storms: TropicalCyclone[]
+}
+
 export type RadarFrame = {
   time: number
   path: string
@@ -420,6 +466,41 @@ export const seismicEventsResponseSchema = createSchema<SeismicEventsResponse>(
     ))
 )
 
+export const tropicalCyclonesResponseSchema = createSchema<TropicalCyclonesResponse>(
+  value => isRecord(value) &&
+    isString(value.generatedAt) &&
+    (value.cacheState === 'live' || value.cacheState === 'grace') &&
+    isString(value.source) &&
+    isString(value.sourceUrl) &&
+    Array.isArray(value.storms) &&
+    value.storms.every(storm => (
+      isRecord(storm) &&
+      isString(storm.id) &&
+      isString(storm.name) &&
+      isString(storm.basin) &&
+      isString(storm.advisoryAt) &&
+      nullable(storm.advisoryNumber, isString) &&
+      isTropicalCyclonePoint(storm.current) &&
+      Array.isArray(storm.observedTrack) &&
+      storm.observedTrack.every(point => (
+        isRecord(point) &&
+        isFiniteNumber(point.latitude) &&
+        isFiniteNumber(point.longitude) &&
+        isString(point.observedAt) &&
+        isFiniteNumber(point.windKnots)
+      )) &&
+      Array.isArray(storm.forecast) &&
+      storm.forecast.every(isTropicalCyclonePoint) &&
+      (
+        storm.cone === null || (
+          isRecord(storm.cone) &&
+          (storm.cone.type === 'Polygon' || storm.cone.type === 'MultiPolygon') &&
+          Array.isArray(storm.cone.coordinates)
+        )
+      )
+    ))
+)
+
 export const radarMetadataResponseSchema = createSchema<RadarMetadataResponse>(
   value => isRecord(value) &&
     Array.isArray(value.frames) &&
@@ -452,6 +533,7 @@ export const runtimeResponseSchemas = {
   reportedFires: reportedFiresResponseSchema,
   volcanoActivity: volcanoActivityResponseSchema,
   seismicEvents: seismicEventsResponseSchema,
+  tropicalCyclones: tropicalCyclonesResponseSchema,
   radarMetadata: radarMetadataResponseSchema,
   fireLayerStatus: fireLayerStatusResponseSchema
 } as const
@@ -572,6 +654,21 @@ function isWarningGeometry(value: unknown) {
   return isRecord(value) &&
     (value.type === 'Polygon' || value.type === 'MultiPolygon') &&
     Array.isArray(value.coordinates)
+}
+
+function isTropicalCyclonePoint(value: unknown) {
+  return isRecord(value) &&
+    isFiniteNumber(value.latitude) &&
+    isFiniteNumber(value.longitude) &&
+    isString(value.validAt) &&
+    isFiniteNumber(value.hours) &&
+    isFiniteNumber(value.windKnots) &&
+    nullable(value.gustKnots, isFiniteNumber) &&
+    nullable(value.pressureHpa, isFiniteNumber) &&
+    isFiniteNumber(value.category) &&
+    nullable(value.development, isString) &&
+    nullable(value.movementDegrees, isFiniteNumber) &&
+    nullable(value.movementKnots, isFiniteNumber)
 }
 
 function isTemperatureRecord(value: unknown) {

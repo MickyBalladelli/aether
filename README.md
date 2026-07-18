@@ -36,6 +36,7 @@ Aether is a full-screen weather and environmental map built with React, TypeScri
 - Forecast playback updates the temperature, wind, precipitation, and storm map layers
 - Official NWS and MeteoAlarm-member warnings for storms, floods, wind, snow, fire weather, extreme temperatures, air quality, and other issued hazards
 - Warning polygons with severity, certainty, effective/expiry times, instructions, source, update age, and a visible 15-minute stale grace state
+- Worldwide current hurricanes, typhoons, and cyclones with observed tracks, official forecast points, and NHC forecast cones or JTWC danger areas
 - Deduplicated official updates, shown separately from Aether forecast notices for heat, thunderstorms, heavy rain, and snow
 - Dismissible severe-weather alerts
 
@@ -48,6 +49,7 @@ Aether is a full-screen weather and environmental map built with React, TypeScri
 - Persistent radar-opacity control
 - Persistent fire-overlay choices
 - Persistent worldwide volcano-activity overlay
+- Persistent worldwide tropical-cyclone overlay
 - One weather-and-quake popup for overlapping earthquake reports
 - Combined weather and activity details when clicking a volcano
 - Live, cached, stale, and unavailable data status
@@ -115,6 +117,7 @@ The weekly report is preliminary and intentionally not comprehensive. Rapidly de
 | [MeteoAlarm](https://api.meteoalarm.org/) | CAP and GeoJSON warnings issued by European member services |
 | [USGS Earthquake Hazards Program](https://earthquake.usgs.gov/earthquakes/feed/) | Real-time magnitude 2.5+ earthquake GeoJSON for the past day |
 | [NOAA Tsunami Warning Centers](https://www.tsunami.gov/?page=productRetrieval) | Official NTWC and PTWC tsunami CAP messages |
+| [NOAA NHC + JTWC via Esri Living Atlas](https://www.arcgis.com/home/item.html?id=248e7b5827a34b248647afb012c58787) | Current worldwide tropical cyclones, observed tracks, official forecast points, and forecast cones or danger areas |
 | [NASA FIRMS](https://firms.modaps.eosdis.nasa.gov/) | Global VIIRS heat and thermal-anomaly detections |
 | [NIFC WFIGS](https://www.nifc.gov/) | Reported US wildfire incidents |
 | [NRCan CWFIS](https://cwfis.cfs.nrcan.gc.ca/en/) | Reported Canadian active fires |
@@ -178,6 +181,12 @@ The volcano overlay uses the Smithsonian / USGS Weekly Volcanic Activity Report 
 The seismic overlay shows USGS earthquakes of magnitude 2.5 or greater from the past day. Marker size follows magnitude; USGS alert colors and tsunami-product flags remain visible in details. A tsunami product flag is not treated as an active warning.
 
 Official tsunami warnings, advisories, watches, and threat messages come from the NOAA National and Pacific Tsunami Warning Centers' CAP feeds. Information and final messages are excluded. Stale or newly expired official messages remain visibly marked for no more than 15 minutes, then disappear.
+
+### Tropical cyclones
+
+The tropical-cyclone overlay uses the public Esri Living Atlas feed assembled from NOAA National Hurricane Center and Joint Typhoon Warning Center advisories. It covers the Atlantic, Pacific, and Indian Ocean basins and refreshes every 15 minutes. Aether shows the observed path, current forecast center, official forecast positions, and the NHC forecast-error cone or JTWC danger area when supplied.
+
+The connecting forecast line is only a visual link between official forecast points. It is not an exact path prediction. Dangerous wind, rain, surge, and waves can extend far beyond the center line and cone. Saved stale data disappears after 18 hours, and official agency guidance remains authoritative.
 
 ## Requirements
 

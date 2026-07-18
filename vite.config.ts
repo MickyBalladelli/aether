@@ -154,7 +154,8 @@ export default defineConfig(({ mode }) => {
                 url.origin === self.location.origin &&
                 (
                   url.pathname === '/api/warnings' ||
-                  url.pathname === '/api/seismic-events'
+                  url.pathname === '/api/seismic-events' ||
+                  url.pathname === '/api/tropical-cyclones'
                 )
               ),
               handler: 'NetworkOnly'
@@ -167,6 +168,7 @@ export default defineConfig(({ mode }) => {
                   '/api/fire-tile',
                   '/api/effis-fire-tile',
                   '/api/seismic-events',
+                  '/api/tropical-cyclones',
                   '/api/warnings'
                 ].includes(url.pathname) &&
                 !(
