@@ -3,6 +3,7 @@ import { fetchWithTimeout } from '../../shared/fetchTimeout.js'
 import type {
   MapEarthquakePointer,
   MapFirePointer,
+  MapVolcanoPointer,
   WeatherMode
 } from '../types/weather'
 import {
@@ -45,6 +46,7 @@ export type AetherMapLayers = {
   destroy: () => void
   findEarthquakesAtPoint: (point: L.Point) => MapEarthquakePointer[]
   findFireAtPoint: (point: L.Point) => MapFirePointer | null
+  findVolcanoesAtPoint: (point: L.Point) => MapVolcanoPointer[]
   setMapLanguage: (language: string) => void
   setWeatherMode: (mode: WeatherMode, radarOpacity: number) => void
 }
@@ -337,6 +339,9 @@ export function createAetherMapLayers({
     badgeLayer,
     findEarthquakesAtPoint: point => (
       seismicActivity.findEarthquakesAtPoint(point)
+    ),
+    findVolcanoesAtPoint: point => (
+      volcanoActivity.findVolcanoesAtPoint(point)
     ),
     findFireAtPoint: point => findFireTileAtPoint(map, point, [
       {

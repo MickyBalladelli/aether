@@ -3,6 +3,7 @@ import BlurOnIcon from '@mui/icons-material/BlurOn'
 import DeviceThermostatIcon from '@mui/icons-material/DeviceThermostat'
 import FlightIcon from '@mui/icons-material/Flight'
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment'
+import LandscapeIcon from '@mui/icons-material/Landscape'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
 import RadarIcon from '@mui/icons-material/Radar'
 import SensorsIcon from '@mui/icons-material/Sensors'
@@ -59,7 +60,7 @@ export function MapWeatherTooltip({ reading }: MapWeatherTooltipProps) {
   return (
     <aside
       ref={tooltipRef}
-      className={`map-weather-tooltip ${reading.earthquakes?.length ? 'has-earthquakes' : ''}`}
+      className={`map-weather-tooltip ${reading.earthquakes?.length || reading.volcanoes?.length ? 'has-event-details' : ''}`}
       style={{
         left: reading.screenX,
         top: reading.screenY
@@ -229,6 +230,49 @@ export function MapWeatherTooltip({ reading }: MapWeatherTooltipProps) {
         </section>
       )}
 
+      {reading.volcanoes && reading.volcanoes.length > 0 && (
+        <section className="map-weather-tooltip-volcanoes">
+          <div className="map-weather-tooltip-row">
+            <LandscapeIcon />
+            <strong>
+              {t('volcano.reportCount', {
+                count: reading.volcanoes.length
+              })}
+            </strong>
+          </div>
+          {reading.volcanoes.map(volcano => (
+            <article
+              className="map-weather-tooltip-volcano"
+              key={volcano.id}
+            >
+              <strong>{volcano.name}</strong>
+              <span>{volcano.country}</span>
+              <span className={`map-weather-tooltip-volcano-status is-${volcano.activity}`}>
+                {t(volcanoActivityKey(volcano.activity))}
+              </span>
+              <span>
+                {t('volcano.reportFor', { period: volcano.reportPeriod })}
+                {volcano.publishedAt && (
+                  ` · ${t('volcano.published', {
+                    date: new Date(volcano.publishedAt).toLocaleDateString()
+                  })}`
+                )}
+              </span>
+              <p>{volcano.summary}</p>
+              <div className="map-weather-tooltip-volcano-links">
+                <a href={volcano.reportUrl} target="_blank" rel="noopener noreferrer">
+                  {t('volcano.weeklyReport')}
+                </a>
+                <a href={volcano.profileUrl} target="_blank" rel="noopener noreferrer">
+                  {t('volcano.profile')}
+                </a>
+              </div>
+              <small>{volcano.notice}</small>
+            </article>
+          ))}
+        </section>
+      )}
+
       <DataProvenance value={reading.provenance} compact />
     </aside>
   )
@@ -244,6 +288,20 @@ function formatWindDirection(angle: number) {
 
 function formatAnomaly(anomaly: number) {
   return `${anomaly >= 0 ? '+' : ''}${anomaly.toFixed(1)}°C`
+}
+
+function volcanoActivityKey(
+  activity: NonNullable<MapWeatherPointer['volcanoes']>[number]['activity']
+): TranslationKey {
+  const keys: Record<typeof activity, TranslationKey> = {
+    'new-eruption': 'volcano.newEruption',
+    eruption: 'volcano.eruption',
+    'new-unrest': 'volcano.newUnrest',
+    unrest: 'volcano.unrest',
+    other: 'volcano.other'
+  }
+
+  return keys[activity]
 }
 
 function formatRadarRainKey(

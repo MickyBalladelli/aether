@@ -286,6 +286,10 @@ export function AetherMap({
       const earthquakes = layers.findEarthquakesAtPoint(
         L.point(pointer.x, pointer.y)
       )
+      const volcanoes = layers.findVolcanoesAtPoint(
+        L.point(pointer.x, pointer.y)
+      )
+      const hasEventDetails = earthquakes.length > 0 || volcanoes.length > 0
 
       pointerCallbackRef.current({
         ...reading,
@@ -302,14 +306,15 @@ export function AetherMap({
           : {}),
         ...(fire ? { fire } : {}),
         ...(earthquakes.length > 0 ? { earthquakes } : {}),
+        ...(volcanoes.length > 0 ? { volcanoes } : {}),
         provenance: provenanceRef.current[modeRef.current],
         screenX: Math.max(12, Math.min(
           pointer.x + 16,
-          size.x - (earthquakes.length > 0 ? 316 : 236)
+          size.x - (hasEventDetails ? 316 : 236)
         )),
         screenY: Math.max(12, Math.min(
           pointer.y + 16,
-          size.y - (earthquakes.length > 0 ? 480 : 330)
+          size.y - (hasEventDetails ? 480 : 330)
         ))
       })
     }

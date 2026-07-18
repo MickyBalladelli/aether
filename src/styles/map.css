@@ -220,7 +220,7 @@
   backdrop-filter: blur(14px) saturate(135%);
 }
 
-.map-weather-tooltip.has-earthquakes {
+.map-weather-tooltip.has-event-details {
   width: min(300px, calc(100vw - 24px));
 }
 
@@ -871,6 +871,67 @@
 
 .map-weather-tooltip-earthquake-notice {
   color: #91e9ff;
+}
+
+.map-weather-tooltip-volcanoes {
+  display: grid;
+  gap: 7px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 176, 79, 0.32);
+}
+
+.map-weather-tooltip-volcanoes > .map-weather-tooltip-row,
+.map-weather-tooltip-volcanoes > .map-weather-tooltip-row svg {
+  color: #ffca7a;
+}
+
+.map-weather-tooltip-volcano {
+  display: grid;
+  gap: 4px;
+  padding: 8px;
+  border: 1px solid rgba(255, 176, 79, 0.25);
+  border-radius: 6px;
+  background: rgba(57, 31, 18, 0.58);
+  color: rgba(255, 235, 214, 0.78);
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.map-weather-tooltip-volcano > strong {
+  color: #fff3df;
+  font-size: 13px;
+}
+
+.map-weather-tooltip-volcano p {
+  margin: 2px 0;
+}
+
+.map-weather-tooltip-volcano-status {
+  width: fit-content;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(255, 176, 79, 0.2);
+  color: #ffca7a;
+  font-weight: 900;
+}
+
+.map-weather-tooltip-volcano-status.is-new-eruption {
+  color: #ff8a70;
+}
+
+.map-weather-tooltip-volcano-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 10px;
+}
+
+.map-weather-tooltip-volcano a {
+  color: #ffca7a;
+  font-weight: 800;
+}
+
+.map-weather-tooltip-volcano small {
+  color: rgba(255, 235, 214, 0.58);
 }
 
 .weather-badge-marker {

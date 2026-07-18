@@ -402,6 +402,21 @@ export type MapEarthquakePointer = {
   sourceUrl: string
 }
 
+export type MapVolcanoPointer = {
+  id: string
+  name: string
+  country: string
+  reportPeriod: string
+  activity: 'new-eruption' | 'eruption' | 'new-unrest' | 'unrest' | 'other'
+  latitude: number
+  longitude: number
+  summary: string
+  publishedAt: string | null
+  reportUrl: string
+  profileUrl: string
+  notice: string
+}
+
 export type RadarRainReading = {
   status: 'checking' | 'rain' | 'dry' | 'no-coverage' | 'unavailable'
   observedAt?: string
@@ -436,5 +451,6 @@ export type MapWeatherPointer = {
   radarRain?: RadarRainReading
   fire?: MapFirePointer
   earthquakes?: MapEarthquakePointer[]
+  volcanoes?: MapVolcanoPointer[]
   provenance?: DataProvenance
 }

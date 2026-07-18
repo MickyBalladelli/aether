@@ -15,14 +15,7 @@ import {
   subscribeToPageVisibility
 } from '../utils/pageVisibility'
 import type { TranslationKey } from '../i18n/translations'
-
-const ACTIVITY_KEYS: Record<VolcanoActivity, TranslationKey> = {
-  'new-eruption': 'volcano.newEruption',
-  eruption: 'volcano.eruption',
-  'new-unrest': 'volcano.newUnrest',
-  unrest: 'volcano.unrest',
-  other: 'volcano.other'
-}
+import type { MapVolcanoPointer } from '../types/weather'
 
 const REFRESH_INTERVAL_MS = 6 * 60 * 60 * 1000
 const REQUEST_TIMEOUT_MS = 10000
@@ -56,6 +49,42 @@ export class VolcanoActivityLayer {
 
   getLeafletLayer() {
     return this.layer
+  }
+
+  findVolcanoesAtPoint(point: L.Point): MapVolcanoPointer[] {
+    if (!this.payload || !this.map.hasLayer(this.layer)) {
+      return []
+    }
+
+    return this.payload.volcanoes.filter(volcano => {
+      const markerPoint = this.map.latLngToContainerPoint([
+        volcano.latitude,
+        volcano.longitude
+      ])
+
+      if (this.compactMarkers) {
+        const radius = volcano.activity.startsWith('new-') ? 5 : 4
+
+        return markerPoint.distanceTo(point) <= radius + 3
+      }
+
+      const offset = point.subtract(markerPoint)
+
+      return Math.abs(offset.x) <= 20 && offset.y >= -32 && offset.y <= 8
+    }).map(volcano => ({
+      id: volcano.id,
+      name: volcano.name,
+      country: volcano.country,
+      reportPeriod: volcano.reportPeriod,
+      activity: volcano.activity,
+      latitude: volcano.latitude,
+      longitude: volcano.longitude,
+      summary: volcano.summary,
+      publishedAt: volcano.publishedAt ?? this.payload?.reportPublishedAt ?? null,
+      reportUrl: volcano.reportUrl,
+      profileUrl: volcano.profileUrl,
+      notice: this.payload?.notice ?? this.t('volcano.preliminary')
+    }))
   }
 
   start() {
@@ -152,6 +181,7 @@ export class VolcanoActivityLayer {
             [volcano.latitude, volcano.longitude],
             {
               icon: createVolcanoIcon(volcano.activity),
+              bubblingMouseEvents: true,
               riseOnHover: true,
               riseOffset: 600,
               title: `${volcano.name}: ${volcano.activityLabel}`
@@ -162,10 +192,6 @@ export class VolcanoActivityLayer {
         `${volcano.name} · ${volcano.activityLabel}`,
         { direction: 'top', offset: [0, this.compactMarkers ? -6 : -12] }
       )
-      marker.bindPopup(buildPopup(volcano, payload, this.t), {
-        maxHeight: 320,
-        maxWidth: 340
-      })
       marker.addTo(this.layer)
     }
   }
@@ -206,8 +232,7 @@ function createCompactVolcanoMarker(volcano: VolcanoReport) {
     color: '#fff0d7',
     weight: 1.25,
     fillColor: ACTIVITY_COLORS[volcano.activity],
-    fillOpacity: 0.95,
-    bubblingMouseEvents: false
+    fillOpacity: 0.95
   })
 }
 
@@ -227,75 +252,4 @@ function createVolcanoIcon(activity: VolcanoActivity) {
     popupAnchor: [0, -25],
     tooltipAnchor: [0, -18]
   })
-}
-
-function buildPopup(
-  volcano: VolcanoReport,
-  payload: VolcanoActivityResponse,
-  t: VolcanoActivityLayer['t']
-) {
-  const container = document.createElement('article')
-
-  container.className = 'volcano-activity-popup'
-
-  const heading = document.createElement('strong')
-
-  heading.textContent = volcano.name
-  container.append(heading)
-
-  const location = document.createElement('span')
-
-  location.className = 'volcano-activity-popup-location'
-  location.textContent = volcano.country
-  container.append(location)
-
-  const status = document.createElement('span')
-
-  status.className = `volcano-activity-popup-status is-${volcano.activity}`
-  status.textContent = t(ACTIVITY_KEYS[volcano.activity])
-  container.append(status)
-
-  const period = document.createElement('p')
-  const publishedAt = volcano.publishedAt ?? payload.reportPublishedAt
-
-  period.className = 'volcano-activity-popup-period'
-  period.textContent = [
-    t('volcano.reportFor', { period: volcano.reportPeriod }),
-    publishedAt
-      ? t('volcano.published', { date: new Date(publishedAt).toLocaleDateString() })
-      : null
-  ].filter(Boolean).join(' · ')
-  container.append(period)
-
-  const summary = document.createElement('p')
-
-  summary.textContent = volcano.summary
-  container.append(summary)
-
-  const links = document.createElement('div')
-
-  links.className = 'volcano-activity-popup-links'
-  links.append(
-    createLink(volcano.reportUrl, t('volcano.weeklyReport')),
-    createLink(volcano.profileUrl, t('volcano.profile'))
-  )
-  container.append(links)
-
-  const notice = document.createElement('small')
-
-  notice.textContent = payload.notice ?? t('volcano.preliminary')
-  container.append(notice)
-
-  return container
-}
-
-function createLink(url: string, label: string) {
-  const link = document.createElement('a')
-
-  link.href = url
-  link.target = '_blank'
-  link.rel = 'noreferrer'
-  link.textContent = label
-
-  return link
 }
