@@ -51,6 +51,7 @@ const REGIONAL_VIEW_BOUNDS = L.latLngBounds(
   [72, 40]
 )
 const ABSOLUTE_MIN_ZOOM = 2
+const CITY_MAX_ZOOM = 12
 type AetherMapProps = {
   location: WeatherLocation
   mapLanguage: string
@@ -197,6 +198,7 @@ export function AetherMap({
       attributionControl: false,
       keyboard: true,
       keyboardPanDelta: 80,
+      maxZoom: CITY_MAX_ZOOM,
       maxBounds: WORLD_BOUNDS,
       maxBoundsViscosity: 1,
       worldCopyJump: false
