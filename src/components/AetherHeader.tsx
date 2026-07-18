@@ -213,13 +213,13 @@ function translateStatus(
     Cached: 'data.cached',
     Stale: 'data.stale',
     Unavailable: 'data.unavailable',
+    'City not found': 'status.cityNotFound',
     'City search failed': 'status.cityFailed',
     'Map weather failed': 'status.mapFailed',
     'Ocean currents failed': 'status.oceanFailed'
   }
 
   if (statusKeys[status]) return t(statusKeys[status])
-  if (/city|geocod/i.test(status)) return t('status.cityFailed')
   if (/ocean/i.test(status)) return t('status.oceanFailed')
   if (/map|weather/i.test(status)) return t('status.mapFailed')
   return status

@@ -323,6 +323,7 @@
   "status.locating": "Localizzazione",
   "status.searchingCity": "Ricerca città",
   "status.cityFailed": "Ricerca città non riuscita",
+  "status.cityNotFound": "Città non trovata",
   "status.mapFailed": "Meteo della mappa non disponibile",
   "status.oceanFailed": "Correnti oceaniche non disponibili",
   "report.reportedAt": "Segnalato il {{date}}",

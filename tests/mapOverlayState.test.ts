@@ -10,6 +10,7 @@ describe('map overlay lifecycle', () => {
     const storage = new MemoryStorage()
 
     expect([...loadEnabledMapOverlays(storage)]).toEqual([
+      'tropical-cyclones',
       'volcano-activity',
       'seismic-activity'
     ])
@@ -35,11 +36,25 @@ describe('map overlay lifecycle', () => {
     ])
 
     storage.setItem(
-      'aether:map-overlays:v2',
+      'aether:map-overlays:v3',
       JSON.stringify(['volcano-activity', 'unknown-layer'])
     )
 
     expect([...loadEnabledMapOverlays(storage)]).toEqual([
+      'volcano-activity'
+    ])
+  })
+
+  test('adds tropical cyclones when migrating old overlay settings', () => {
+    const storage = new MemoryStorage()
+
+    storage.setItem(
+      'aether:map-overlays:v2',
+      JSON.stringify(['volcano-activity'])
+    )
+
+    expect([...loadEnabledMapOverlays(storage)]).toEqual([
+      'tropical-cyclones',
       'volcano-activity'
     ])
   })

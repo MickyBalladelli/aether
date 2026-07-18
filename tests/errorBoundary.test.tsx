@@ -1,5 +1,7 @@
 import { expect, test, vi } from 'vitest'
+import { renderToStaticMarkup } from 'react-dom/server'
 import { WeatherErrorBoundary } from '../src/components/WeatherErrorBoundary'
+import { I18nProvider } from '../src/i18n/I18nContext'
 
 test('renders a map fallback with reload recovery after an error', () => {
   const boundary = new WeatherErrorBoundary({
@@ -10,13 +12,14 @@ test('renders a map fallback with reload recovery after an error', () => {
 
   boundary.state = WeatherErrorBoundary.getDerivedStateFromError()
   const fallback = boundary.render()
+  const markup = renderToStaticMarkup(
+    <I18nProvider>{fallback}</I18nProvider>
+  )
 
-  expect(fallback).toMatchObject({
-    props: {
-      className: 'render-error render-error-map',
-      role: 'alert'
-    }
-  })
+  expect(markup).toContain('class="render-error render-error-map"')
+  expect(markup).toContain('role="alert"')
+  expect(markup).toContain('Map could not render')
+  expect(markup).toContain('Reload')
 })
 
 test('reports rendering failures with their area', () => {

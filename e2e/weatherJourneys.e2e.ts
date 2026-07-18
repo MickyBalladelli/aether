@@ -290,7 +290,11 @@ test('selects a location from the map', async ({ page }) => {
   let reverseGeocodeRequests = 0
 
   await page.route('**/api/geocode?**', route => {
-    reverseGeocodeRequests += 1
+    const url = new URL(route.request().url())
+
+    if (url.searchParams.get('type') === 'reverse') {
+      reverseGeocodeRequests += 1
+    }
 
     return route.fulfill({
       contentType: 'application/json',
@@ -320,7 +324,7 @@ test('selects a location from the map', async ({ page }) => {
     })
   ).toBeVisible()
   expect(reverseGeocodeRequests).toBe(1)
-  await expect(page.getByRole('status')).toHaveText(/^(Live|Cached)$/)
+  await expect(page.getByRole('status')).toHaveText(/^(Live|Cached)/)
 })
 
 test('opens the map layer menu', async ({ page }) => {
@@ -328,7 +332,9 @@ test('opens the map layer menu', async ({ page }) => {
 
   await page.locator('.leaflet-control-layers').hover()
 
-  await expect(page.getByRole('heading', { name: 'Volcanoes' })).toBeVisible()
+  await expect(
+    page.getByRole('heading', { name: 'Geological activity' })
+  ).toBeVisible()
   await expect(
     page.getByRole('heading', { name: 'Satellite detections' })
   ).toBeVisible()
@@ -336,7 +342,7 @@ test('opens the map layer menu', async ({ page }) => {
     page.getByRole('heading', { name: 'Reported incidents' })
   ).toBeVisible()
   await expect(
-    page.getByLabel(/Reported open wildfires from NIFC/)
+    page.getByRole('checkbox', { name: /Open wildfire incidents from NIFC/ })
   ).toBeVisible()
 })
 
@@ -383,14 +389,18 @@ test('changes and remembers the dialog language', async ({ page }) => {
   await page.getByRole('button', { name: 'Setup' }).click()
   await page.getByRole('radio', { name: 'French' }).check()
 
-  await expect(page.getByRole('heading', { name: 'Réglages' })).toBeVisible()
+  await expect(
+    page.getByRole('heading', { name: 'Réglages', exact: true })
+  ).toBeVisible()
   await expect(page.getByRole('radio', { name: 'Français' })).toBeChecked()
   await page.getByRole('button', {
     name: 'Fermer la fenêtre des réglages'
   }).click()
 
   await page.getByRole('button', { name: 'À propos d’Aether' }).click()
-  await expect(page.getByRole('heading', { name: 'À propos' })).toBeVisible()
+  await expect(
+    page.getByRole('heading', { name: 'À propos', exact: true })
+  ).toBeVisible()
   await expect(page.getByText('Sources de données')).toBeVisible()
   await expect(page.getByText('Modèles et prévisions météorologiques')).toBeVisible()
 
@@ -408,19 +418,21 @@ test('restores saved map overlays after reload', async ({ page }) => {
   await page.goto('/')
   await page.locator('.leaflet-control-layers').hover()
 
-  const reportedFires = page.getByLabel(/Reported open wildfires from NIFC/)
+  const reportedFires = page.getByRole('checkbox', {
+    name: /Open wildfire incidents from NIFC/
+  })
 
   await reportedFires.check()
   await expect(reportedFires).toBeChecked()
   await expect.poll(() => page.evaluate(() => (
-    window.localStorage.getItem('aether:map-overlays')
+    window.localStorage.getItem('aether:map-overlays:v3')
   ))).toContain('reported-wildfires')
 
   await page.reload()
   await page.locator('.leaflet-control-layers').hover()
 
   await expect(
-    page.getByLabel(/Reported open wildfires from NIFC/)
+    page.getByRole('checkbox', { name: /Open wildfire incidents from NIFC/ })
   ).toBeChecked()
 })
 

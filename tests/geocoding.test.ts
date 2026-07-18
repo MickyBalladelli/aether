@@ -70,4 +70,18 @@ describe('geocoding client', () => {
       'City search error 502'
     )
   })
+
+  test('preserves a useful JSON error from the server', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(
+      JSON.stringify({ error: 'City not found' }),
+      {
+        status: 502,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    )))
+
+    await expect(searchCity('not-a-city')).rejects.toThrow('City not found')
+  })
 })
