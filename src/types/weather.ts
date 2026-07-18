@@ -423,7 +423,7 @@ export type RadarRainReading = {
 }
 
 export type PrecipitationPlayback =
-  | { kind: 'automatic' }
+  | { kind: 'latest' }
   | { kind: 'radar'; path: string; time: string }
   | { kind: 'forecast'; time: string }
 

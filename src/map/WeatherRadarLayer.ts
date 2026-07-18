@@ -1,6 +1,5 @@
 import L from 'leaflet'
 import type { PrecipitationPlayback, WeatherMode } from '../types/weather'
-import { REDUCED_MOTION_QUERY } from '../utils/motion'
 import { fetchWithTimeout } from '../../shared/fetchTimeout.js'
 import { recordProviderFailure, recordProviderRequestError } from '../services/clientTelemetry'
 import {
@@ -15,11 +14,9 @@ import {
 
 const METADATA_URL = '/api/radar'
 const METADATA_REFRESH = 5 * 60 * 1000
-const FRAME_DURATION = 1100
 const FRAME_COUNT = 6
 const PANE_NAME = 'weather-radar-pane'
 const MIN_NATIVE_ZOOM = 2
-const MIN_ANIMATED_ZOOM = 2
 
 export class WeatherRadarLayer {
   private map: L.Map
@@ -27,28 +24,15 @@ export class WeatherRadarLayer {
   private frameIndex = 0
   private currentLayer: L.TileLayer | null = null
   private loadingLayer: L.TileLayer | null = null
-  private frameInterval = 0
   private metadataInterval = 0
   private metadataController: AbortController | null = null
   private visible = false
-  private playback: PrecipitationPlayback = { kind: 'automatic' }
+  private playback: PrecipitationPlayback = { kind: 'latest' }
   private zooming = false
   private pageVisible = isPageVisible()
   private destroyed = false
   private unsubscribeVisibility: (() => void) | null = null
   private opacity = 0.58
-  private motionQuery = window.matchMedia(REDUCED_MOTION_QUERY)
-  private reducedMotion = this.motionQuery.matches
-  private motionChangeHandler = (event: MediaQueryListEvent) => {
-    this.reducedMotion = event.matches
-
-    if (this.reducedMotion) {
-      this.stopFrameLoop()
-      this.showPlaybackFrame()
-    } else if (this.visible && this.pageVisible) {
-      this.startFrameLoop()
-    }
-  }
 
   constructor(map: L.Map) {
     this.map = map
@@ -61,7 +45,6 @@ export class WeatherRadarLayer {
   }
 
   start() {
-    this.motionQuery.addEventListener('change', this.motionChangeHandler)
     this.map.on('zoomstart', this.handleZoomStart)
     this.map.on('zoomend', this.handleZoomEnd)
     this.unsubscribeVisibility = subscribeToPageVisibility(
@@ -84,7 +67,6 @@ export class WeatherRadarLayer {
       return
     }
 
-    this.stopFrameLoop()
     this.removeLayers()
   }
 
@@ -100,7 +82,6 @@ export class WeatherRadarLayer {
     }
 
     this.playback = playback
-    this.stopFrameLoop()
     this.loadingLayer?.remove()
     this.loadingLayer = null
 
@@ -123,9 +104,7 @@ export class WeatherRadarLayer {
 
   destroy() {
     this.destroyed = true
-    this.stopFrameLoop()
     this.stopMetadataRefresh()
-    this.motionQuery.removeEventListener('change', this.motionChangeHandler)
     this.map.off('zoomstart', this.handleZoomStart)
     this.map.off('zoomend', this.handleZoomEnd)
     this.unsubscribeVisibility?.()
@@ -186,7 +165,6 @@ export class WeatherRadarLayer {
     this.pageVisible = visible
 
     if (!visible) {
-      this.stopFrameLoop()
       this.stopMetadataRefresh()
       this.loadingLayer?.remove()
       this.loadingLayer = null
@@ -225,34 +203,6 @@ export class WeatherRadarLayer {
 
     this.frameIndex = this.frames.length - 1
     this.showFrame(this.frames[this.frameIndex])
-  }
-
-  private startFrameLoop() {
-    if (
-      this.reducedMotion ||
-      this.zooming ||
-      this.map.getZoom() < MIN_ANIMATED_ZOOM ||
-      this.playback.kind !== 'automatic' ||
-      !this.pageVisible ||
-      this.frameInterval ||
-      this.frames.length < 2
-    ) {
-      return
-    }
-
-    this.frameInterval = window.setInterval(() => {
-      if (this.loadingLayer || this.frames.length === 0) {
-        return
-      }
-
-      this.frameIndex = (this.frameIndex + 1) % this.frames.length
-      this.showFrame(this.frames[this.frameIndex])
-    }, FRAME_DURATION)
-  }
-
-  private stopFrameLoop() {
-    window.clearInterval(this.frameInterval)
-    this.frameInterval = 0
   }
 
   private showFrame(frame: RadarFrame) {
@@ -330,7 +280,6 @@ export class WeatherRadarLayer {
     }
 
     this.showLatestFrame()
-    this.startFrameLoop()
   }
 
   private removeLayers() {
@@ -346,7 +295,6 @@ export class WeatherRadarLayer {
     }
 
     this.zooming = true
-    this.stopFrameLoop()
     this.loadingLayer?.remove()
     this.loadingLayer = null
   }
@@ -362,7 +310,7 @@ export class WeatherRadarLayer {
       !this.visible ||
       !this.pageVisible ||
       this.playback.kind === 'forecast' ||
-      (this.playback.kind === 'automatic' && this.frames.length === 0)
+      (this.playback.kind === 'latest' && this.frames.length === 0)
     ) {
       return
     }
@@ -372,14 +320,6 @@ export class WeatherRadarLayer {
       return
     }
 
-    if (this.currentLayer.isLoading()) {
-      this.currentLayer.once('load', () => {
-        if (!this.destroyed && this.visible && this.pageVisible) {
-          this.startFrameLoop()
-        }
-      })
-    } else {
-      this.startFrameLoop()
-    }
+    this.currentLayer.setOpacity(this.opacity)
   }
 }

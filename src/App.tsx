@@ -89,7 +89,7 @@ export default function App() {
   const [ecmwfPlaybackTime, setEcmwfPlaybackTime] = useState<string | null>(null)
   const [precipitationPlayback, setPrecipitationPlayback] = useState<
     PrecipitationPlayback
-  >({ kind: 'automatic' })
+  >({ kind: 'latest' })
   const [weatherMode, setWeatherMode] = useState<WeatherMode>(readUrlMode)
   const mapWeatherMode = useDeferredValue(weatherMode)
   const [viewport, setViewport] = useState<WeatherViewport | null>(null)
@@ -241,7 +241,7 @@ export default function App() {
 
     if (weatherMode !== 'precipitation') {
       setPrecipitationPlayback(current => (
-        current.kind === 'automatic' ? current : { kind: 'automatic' }
+        current.kind === 'latest' ? current : { kind: 'latest' }
       ))
     }
   }, [weatherMode])

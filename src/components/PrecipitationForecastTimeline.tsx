@@ -49,7 +49,7 @@ export function PrecipitationForecastTimeline({
   const [radarFrames, setRadarFrames] = useState<RadarFrame[]>([])
   const [radarLoading, setRadarLoading] = useState(true)
   const [frameIndex, setFrameIndex] = useState(0)
-  const [playing, setPlaying] = useState(() => !prefersReducedMotion())
+  const [playing, setPlaying] = useState<TimelineItem['kind'] | null>(null)
   const items = useMemo(
     () => buildTimeline(radarFrames, forecast?.frames ?? []),
     [forecast, radarFrames]
@@ -94,7 +94,7 @@ export function PrecipitationForecastTimeline({
     )
 
     setFrameIndex(Math.max(0, lastObservedIndex))
-    setPlaying(!prefersReducedMotion())
+    setPlaying(null)
   }, [items])
 
   useEffect(() => {
@@ -130,25 +130,37 @@ export function PrecipitationForecastTimeline({
   useEffect(() => () => {
     onFrameChange?.(null)
     onPlaybackChange(null)
-    onPrecipitationPlaybackChange({ kind: 'automatic' })
+    onPrecipitationPlaybackChange({ kind: 'latest' })
   }, [onFrameChange, onPlaybackChange, onPrecipitationPlaybackChange])
 
   useEffect(() => {
     if (
       !pageVisible ||
       !playing ||
-      items.length < 2 ||
       prefersReducedMotion()
     ) {
       return
     }
 
+    const firstIndex = playing === 'radar' ? 0 : radarCount
+    const lastIndex = playing === 'radar'
+      ? radarCount - 1
+      : items.length - 1
+
+    if (lastIndex <= firstIndex) {
+      return
+    }
+
     const interval = window.setInterval(() => {
-      setFrameIndex(current => (current + 1) % items.length)
+      setFrameIndex(current => (
+        current < firstIndex || current >= lastIndex
+          ? firstIndex
+          : current + 1
+      ))
     }, 1400)
 
     return () => window.clearInterval(interval)
-  }, [items.length, pageVisible, playing])
+  }, [items.length, pageVisible, playing, radarCount])
 
   if (radarLoading) {
     return <Box className="ecmwf-forecast">{t('precipitation.loading')}</Box>
@@ -181,16 +193,6 @@ export function PrecipitationForecastTimeline({
             {formatTimelineTime(selected.time, language)}
           </Typography>
         </Box>
-        <IconButton
-          size="small"
-          aria-label={t(playing
-            ? 'precipitation.pause'
-            : 'precipitation.play')}
-          onClick={() => setPlaying(current => !current)}
-          disabled={prefersReducedMotion()}
-        >
-          {playing ? <PauseIcon /> : <PlayArrowIcon />}
-        </IconButton>
       </Box>
 
       <Box className="ecmwf-forecast-values">
@@ -206,16 +208,60 @@ export function PrecipitationForecastTimeline({
         )}
       </Box>
 
-      <Box className="precipitation-timeline-scale" aria-hidden="true">
+      <Box className="precipitation-timeline-scale">
         {radarCount > 0 && (
-          <span style={{ flex: radarCount }}>
-            {t('precipitation.past')}
-          </span>
+          <Box
+            className="precipitation-timeline-segment is-radar"
+            style={{ flex: radarCount }}
+          >
+            <span>{t('precipitation.past')}</span>
+            <IconButton
+              className="precipitation-segment-play"
+              size="small"
+              aria-label={t(playing === 'radar'
+                ? 'precipitation.pauseRadar'
+                : 'precipitation.playRadar')}
+              onClick={() => {
+                const nextPlaying = playing === 'radar' ? null : 'radar'
+
+                setPlaying(nextPlaying)
+
+                if (nextPlaying) {
+                  setFrameIndex(0)
+                }
+              }}
+              disabled={radarCount < 2 || prefersReducedMotion()}
+            >
+              {playing === 'radar' ? <PauseIcon /> : <PlayArrowIcon />}
+            </IconButton>
+          </Box>
         )}
         {forecastCount > 0 && (
-          <span style={{ flex: forecastCount }}>
-            {t('precipitation.nextTwelveHours')}
-          </span>
+          <Box
+            className="precipitation-timeline-segment is-forecast"
+            style={{ flex: forecastCount }}
+          >
+            <span>{t('precipitation.nextTwelveHours')}</span>
+            <IconButton
+              className="precipitation-segment-play"
+              size="small"
+              aria-label={t(playing === 'forecast'
+                ? 'precipitation.pauseForecast'
+                : 'precipitation.playForecast')}
+              onClick={() => {
+                const nextPlaying = playing === 'forecast' ? null : 'forecast'
+
+                setPlaying(nextPlaying)
+
+                if (nextPlaying) {
+                  setFrameIndex(radarCount)
+                }
+              }}
+              disabled={forecastCount < 2 || prefersReducedMotion()}
+            >
+              {playing === 'forecast' ? <PauseIcon /> : <PlayArrowIcon />}
+            </IconButton>
+          </Box>
         )}
       </Box>
 
@@ -227,7 +273,7 @@ export function PrecipitationForecastTimeline({
         value={frameIndex}
         aria-label={t('precipitation.timeAria')}
         onChange={event => {
-          setPlaying(false)
+          setPlaying(null)
           setFrameIndex(Number(event.target.value))
         }}
       />
