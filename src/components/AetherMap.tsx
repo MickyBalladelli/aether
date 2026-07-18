@@ -283,6 +283,9 @@ export function AetherMap({
           )
         : null
       const fire = layers.findFireAtPoint(L.point(pointer.x, pointer.y))
+      const earthquakes = layers.findEarthquakesAtPoint(
+        L.point(pointer.x, pointer.y)
+      )
 
       pointerCallbackRef.current({
         ...reading,
@@ -298,9 +301,16 @@ export function AetherMap({
             }
           : {}),
         ...(fire ? { fire } : {}),
+        ...(earthquakes.length > 0 ? { earthquakes } : {}),
         provenance: provenanceRef.current[modeRef.current],
-        screenX: Math.max(12, Math.min(pointer.x + 16, size.x - 236)),
-        screenY: Math.max(12, Math.min(pointer.y + 16, size.y - 330))
+        screenX: Math.max(12, Math.min(
+          pointer.x + 16,
+          size.x - (earthquakes.length > 0 ? 316 : 236)
+        )),
+        screenY: Math.max(12, Math.min(
+          pointer.y + 16,
+          size.y - (earthquakes.length > 0 ? 480 : 330)
+        ))
       })
     }
     const clearPointerWeather = () => {

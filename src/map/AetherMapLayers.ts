@@ -1,6 +1,10 @@
 import L from 'leaflet'
 import { fetchWithTimeout } from '../../shared/fetchTimeout.js'
-import type { MapFirePointer, WeatherMode } from '../types/weather'
+import type {
+  MapEarthquakePointer,
+  MapFirePointer,
+  WeatherMode
+} from '../types/weather'
 import {
   fireLayerStatusResponseSchema,
   parseResponseJson
@@ -39,6 +43,7 @@ type AetherMapLayersOptions = {
 export type AetherMapLayers = {
   badgeLayer: L.LayerGroup
   destroy: () => void
+  findEarthquakesAtPoint: (point: L.Point) => MapEarthquakePointer[]
   findFireAtPoint: (point: L.Point) => MapFirePointer | null
   setMapLanguage: (language: string) => void
   setWeatherMode: (mode: WeatherMode, radarOpacity: number) => void
@@ -330,6 +335,9 @@ export function createAetherMapLayers({
 
   return {
     badgeLayer,
+    findEarthquakesAtPoint: point => (
+      seismicActivity.findEarthquakesAtPoint(point)
+    ),
     findFireAtPoint: point => findFireTileAtPoint(map, point, [
       {
         layer: africaFireTiles,

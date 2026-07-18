@@ -247,7 +247,7 @@ export default function App() {
       <main className="app-shell">
         <WeatherErrorBoundary
           area="map"
-          resetKey={`${selectedLocation.latitude}:${selectedLocation.longitude}:${mapWeatherMode}`}
+          resetKey={`${selectedLocation.latitude}:${selectedLocation.longitude}:${mapWeatherMode}:${import.meta.env.VITE_AETHER_BUILD_VERSION}`}
         >
           <Suspense fallback={<div className="map-loading">{t('app.loadingMap')}</div>}>
             <AetherMap

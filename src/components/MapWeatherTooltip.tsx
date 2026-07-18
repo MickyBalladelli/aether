@@ -5,8 +5,10 @@ import FlightIcon from '@mui/icons-material/Flight'
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
 import RadarIcon from '@mui/icons-material/Radar'
+import SensorsIcon from '@mui/icons-material/Sensors'
 import WaterDropIcon from '@mui/icons-material/WaterDrop'
 import WavesIcon from '@mui/icons-material/Waves'
+import { useLayoutEffect, useRef } from 'react'
 import type { MapWeatherPointer } from '../types/weather'
 import { useI18n } from '../i18n/I18nContext'
 import type { TranslationKey } from '../i18n/translations'
@@ -18,6 +20,37 @@ type MapWeatherTooltipProps = {
 
 export function MapWeatherTooltip({ reading }: MapWeatherTooltipProps) {
   const { t } = useI18n()
+  const tooltipRef = useRef<HTMLElement | null>(null)
+
+  useLayoutEffect(() => {
+    const tooltip = tooltipRef.current
+
+    if (!reading || !tooltip) {
+      return
+    }
+
+    const updatePosition = () => {
+      const margin = 12
+      const bounds = tooltip.getBoundingClientRect()
+      const left = Math.max(
+        margin,
+        Math.min(reading.screenX, window.innerWidth - bounds.width - margin)
+      )
+      const top = Math.max(
+        margin,
+        Math.min(reading.screenY, window.innerHeight - bounds.height - margin)
+      )
+
+      tooltip.style.left = `${left}px`
+      tooltip.style.top = `${top}px`
+    }
+    updatePosition()
+    window.addEventListener('resize', updatePosition)
+
+    return () => {
+      window.removeEventListener('resize', updatePosition)
+    }
+  }, [reading])
 
   if (!reading) {
     return null
@@ -25,7 +58,8 @@ export function MapWeatherTooltip({ reading }: MapWeatherTooltipProps) {
 
   return (
     <aside
-      className="map-weather-tooltip"
+      ref={tooltipRef}
+      className={`map-weather-tooltip ${reading.earthquakes?.length ? 'has-earthquakes' : ''}`}
       style={{
         left: reading.screenX,
         top: reading.screenY
@@ -146,6 +180,53 @@ export function MapWeatherTooltip({ reading }: MapWeatherTooltipProps) {
           <span>{reading.fire.source}</span>
           <span>{reading.fire.detail}</span>
         </div>
+      )}
+
+      {reading.earthquakes && reading.earthquakes.length > 0 && (
+        <section className="map-weather-tooltip-earthquakes">
+          <div className="map-weather-tooltip-row">
+            <SensorsIcon />
+            <strong>
+              {t('seismic.reportCount', {
+                count: reading.earthquakes.length
+              })}
+            </strong>
+          </div>
+          {reading.earthquakes.map(earthquake => (
+            <article
+              className="map-weather-tooltip-earthquake"
+              key={earthquake.id}
+            >
+              <strong>
+                {t('seismic.earthquakeTitle', {
+                  magnitude: earthquake.magnitude.toFixed(1)
+                })}
+              </strong>
+              <span>{earthquake.place}</span>
+              <span>
+                {t('seismic.depth', {
+                  value: earthquake.depthKm.toFixed(1)
+                })}
+                {' · '}
+                {t('seismic.occurred', {
+                  date: new Date(earthquake.occurredAt).toLocaleString()
+                })}
+              </span>
+              {earthquake.tsunamiProduct && (
+                <span className="map-weather-tooltip-earthquake-notice">
+                  {t('seismic.tsunamiProduct')}
+                </span>
+              )}
+              <a
+                href={earthquake.sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t('seismic.openEarthquake')}
+              </a>
+            </article>
+          ))}
+        </section>
       )}
 
       <DataProvenance value={reading.provenance} compact />

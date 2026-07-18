@@ -48,6 +48,7 @@ Aether is a full-screen weather and environmental map built with React, TypeScri
 - Persistent radar-opacity control
 - Persistent fire-overlay choices
 - Persistent worldwide volcano-activity overlay
+- One weather-and-quake popup for overlapping earthquake reports
 - Live, cached, stale, and unavailable data status
 - Manual retry for stale or unavailable weather
 - Keyboard map selection and responsive controls

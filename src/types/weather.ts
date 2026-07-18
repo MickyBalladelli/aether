@@ -386,6 +386,22 @@ export type MapFirePointer = {
   detail: string
 }
 
+export type MapEarthquakePointer = {
+  id: string
+  magnitude: number
+  place: string
+  occurredAt: string
+  updatedAt: string
+  latitude: number
+  longitude: number
+  depthKm: number
+  tsunamiProduct: boolean
+  alert: 'green' | 'yellow' | 'orange' | 'red' | null
+  status: string
+  source: string
+  sourceUrl: string
+}
+
 export type RadarRainReading = {
   status: 'checking' | 'rain' | 'dry' | 'no-coverage' | 'unavailable'
   observedAt?: string
@@ -419,5 +435,6 @@ export type MapWeatherPointer = {
   temperatureBaseline?: string
   radarRain?: RadarRainReading
   fire?: MapFirePointer
+  earthquakes?: MapEarthquakePointer[]
   provenance?: DataProvenance
 }

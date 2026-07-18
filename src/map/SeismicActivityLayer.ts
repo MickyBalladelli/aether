@@ -18,11 +18,14 @@ import {
   subscribeToPageVisibility
 } from '../utils/pageVisibility'
 import type { TranslationKey } from '../i18n/translations'
+import type { MapEarthquakePointer } from '../types/weather'
 
 const REFRESH_INTERVAL_MS = 60 * 1000
 const REQUEST_TIMEOUT_MS = 15 * 1000
 const MAX_VISIBLE_AGE_MS = 16 * 60 * 1000
 const WARNING_GRACE_MS = 15 * 60 * 1000
+const EARTHQUAKE_HIT_PADDING = 3
+const EARTHQUAKE_OVERLAP_PADDING = 3
 
 const WARNING_KEYS: Record<TsunamiWarning['level'], TranslationKey> = {
   warning: 'tsunami.warning',
@@ -51,6 +54,48 @@ export class SeismicActivityLayer {
 
   getLeafletLayer() {
     return this.layer
+  }
+
+  findEarthquakesAtPoint(point: L.Point): MapEarthquakePointer[] {
+    if (!this.payload || !this.map.hasLayer(this.layer)) {
+      return []
+    }
+
+    const projected = this.payload.earthquakes.map(earthquake => ({
+      earthquake,
+      point: this.map.latLngToContainerPoint([
+        earthquake.latitude,
+        earthquake.longitude
+      ]),
+      radius: earthquakeMarkerRadius(earthquake)
+    }))
+    const cluster = projected.filter(item => (
+      item.point.distanceTo(point) <= item.radius + EARTHQUAKE_HIT_PADDING
+    ))
+
+    if (cluster.length === 0) {
+      return []
+    }
+
+    for (let index = 0; index < cluster.length; index += 1) {
+      const current = cluster[index]
+
+      for (const candidate of projected) {
+        if (
+          cluster.includes(candidate) ||
+          current.point.distanceTo(candidate.point) >
+            current.radius + candidate.radius + EARTHQUAKE_OVERLAP_PADDING
+        ) {
+          continue
+        }
+
+        cluster.push(candidate)
+      }
+    }
+
+    return cluster
+      .map(item => item.earthquake)
+      .sort((first, second) => second.magnitude - first.magnitude)
   }
 
   start() {
@@ -196,14 +241,13 @@ function createEarthquakeMarker(
     [earthquake.latitude, earthquake.longitude],
     {
       pane: 'markerPane',
-      radius: Math.min(14, Math.max(4, 3 + (earthquake.magnitude - 2.5) * 2.2)),
+      radius: earthquakeMarkerRadius(earthquake),
       color: earthquake.tsunamiProduct
         ? '#5de1ff'
         : earthquakeOutlineColor(earthquake),
       weight: earthquake.tsunamiProduct || earthquake.alert ? 2.5 : 1.25,
       fillColor: earthquakeColor(earthquake),
-      fillOpacity: 0.88,
-      bubblingMouseEvents: false
+      fillOpacity: 0.88
     }
   )
 
@@ -211,12 +255,12 @@ function createEarthquakeMarker(
     direction: 'top',
     offset: [0, -5]
   })
-  marker.bindPopup(buildEarthquakePopup(earthquake, t), {
-    maxHeight: 340,
-    maxWidth: 360
-  })
 
   return marker
+}
+
+function earthquakeMarkerRadius(earthquake: EarthquakeEvent) {
+  return Math.min(14, Math.max(4, 3 + (earthquake.magnitude - 2.5) * 2.2))
 }
 
 function earthquakeColor(earthquake: EarthquakeEvent) {
@@ -271,61 +315,6 @@ function createTsunamiIcon(warning: TsunamiWarning) {
     popupAnchor: [0, -21],
     tooltipAnchor: [0, -21]
   })
-}
-
-function buildEarthquakePopup(
-  earthquake: EarthquakeEvent,
-  t: SeismicActivityLayer['t']
-) {
-  const container = document.createElement('article')
-
-  container.className = 'seismic-popup'
-  appendText(
-    container,
-    'strong',
-    t('seismic.earthquakeTitle', {
-      magnitude: earthquake.magnitude.toFixed(1)
-    })
-  )
-  appendText(container, 'span', earthquake.place, 'seismic-popup-location')
-  appendText(
-    container,
-    'span',
-    t('seismic.depth', { value: earthquake.depthKm.toFixed(1) }),
-    'seismic-popup-meta'
-  )
-  appendText(
-    container,
-    'span',
-    t('seismic.occurred', { date: formatDate(earthquake.occurredAt) }),
-    'seismic-popup-meta'
-  )
-  appendText(
-    container,
-    'span',
-    t('seismic.updated', { date: formatDate(earthquake.updatedAt) }),
-    'seismic-popup-meta'
-  )
-  appendText(
-    container,
-    'span',
-    t('seismic.status', { status: earthquake.status }),
-    'seismic-popup-meta'
-  )
-
-  if (earthquake.tsunamiProduct) {
-    appendText(
-      container,
-      'p',
-      t('seismic.tsunamiProduct'),
-      'seismic-popup-notice'
-    )
-  }
-
-  appendLink(container, earthquake.sourceUrl, t('seismic.openEarthquake'))
-  appendText(container, 'small', earthquake.source)
-
-  return container
 }
 
 function buildTsunamiPopup(
