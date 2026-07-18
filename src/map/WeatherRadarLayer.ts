@@ -18,7 +18,6 @@ const METADATA_REFRESH = 5 * 60 * 1000
 const FRAME_DURATION = 1100
 const FRAME_COUNT = 6
 const PANE_NAME = 'weather-radar-pane'
-const TILE_HOST = 'https://tilecache.rainviewer.com'
 const MIN_NATIVE_ZOOM = 2
 const MIN_ANIMATED_ZOOM = 2
 
@@ -239,7 +238,11 @@ export class WeatherRadarLayer {
       return
     }
 
-    const url = `${TILE_HOST}${frame.path}/256/{z}/{x}/{y}/2/1_1.png`
+    const url = [
+      '/api/radar',
+      `?path=${encodeURIComponent(frame.path)}`,
+      '&z={z}&x={x}&y={y}'
+    ].join('')
     let tileErrorCount = 0
     const nextLayer = L.tileLayer(url, {
       pane: PANE_NAME,
