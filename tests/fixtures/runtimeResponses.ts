@@ -235,6 +235,52 @@ export const validRuntimeResponseFixtures = {
       state: 'active'
     }]
   },
+  tropicalCyclones: {
+    generatedAt: '2026-07-17T10:00:00Z',
+    cacheState: 'live',
+    source: 'NOAA NHC and JTWC via Esri Living Atlas',
+    sourceUrl: 'https://www.arcgis.com/',
+    storms: [{
+      id: 'storm-1',
+      name: 'TEST',
+      basin: 'North Atlantic',
+      advisoryAt: '2026-07-17T09:00:00Z',
+      advisoryNumber: '4',
+      current: {
+        latitude: 20,
+        longitude: -60,
+        validAt: '2026-07-17T09:00:00Z',
+        hours: 0,
+        windKnots: 55,
+        gustKnots: 65,
+        pressureHpa: 995,
+        category: 0,
+        development: 'Tropical storm',
+        movementDegrees: 285,
+        movementKnots: 12
+      },
+      observedTrack: [{
+        latitude: 19.5,
+        longitude: -59,
+        observedAt: '2026-07-17T03:00:00Z',
+        windKnots: 50
+      }],
+      forecast: [{
+        latitude: 21,
+        longitude: -62,
+        validAt: '2026-07-18T09:00:00Z',
+        hours: 24,
+        windKnots: 60,
+        gustKnots: 75,
+        pressureHpa: 990,
+        category: 0,
+        development: 'Tropical storm',
+        movementDegrees: 285,
+        movementKnots: 12
+      }],
+      cone: null
+    }]
+  },
   radarMetadata: {
     frames: [{ time: 1784203200, path: '/v2/radar/1784203200' }]
   },
@@ -259,6 +305,7 @@ export const invalidRuntimeResponseFixtures = {
   reportedFires: { fires: [{ id: 1 }] },
   volcanoActivity: { volcanoes: [{ activity: 'unknown' }] },
   seismicEvents: { earthquakes: [{ magnitude: 'strong' }] },
+  tropicalCyclones: { storms: [{ current: null }] },
   radarMetadata: { frames: [{ time: 'now', path: null }] },
   fireLayerStatus: { firmsConfigured: 'true' }
 } satisfies Record<RuntimeResponseSchemaName, unknown>

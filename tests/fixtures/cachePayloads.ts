@@ -3,12 +3,12 @@ export const validWeatherMapSampleFixture = {
   latitude: 48.8566,
   longitude: 2.3522,
   updatedAt: 1_700_000_000_000,
-  observedAt: '2026-07-16T12:00',
+  observedAt: '2026-07-16T12:00:00.000Z',
   showBadge: true,
   estimated: false,
   evolution: [
     {
-      time: '2026-07-16T12:00',
+      time: '2026-07-16T12:00:00.000Z',
       temperature: 24,
       precipitation: 0,
       snowfall: 0,
@@ -20,8 +20,8 @@ export const validWeatherMapSampleFixture = {
       isThunderstorm: false
     }
   ],
-  sunrise: '2026-07-16T04:05',
-  sunset: '2026-07-16T19:48',
+  sunrise: '2026-07-16T04:05:00.000Z',
+  sunset: '2026-07-16T19:48:00.000Z',
   temperature: 24,
   precipitation: 0,
   snowfall: 0,
@@ -42,7 +42,7 @@ export const validAirQualityMapSampleFixture = {
   latitude: 48.8566,
   longitude: 2.3522,
   updatedAt: 1_700_000_000_000,
-  observedAt: '2026-07-16T12:00',
+  observedAt: '2026-07-16T12:00:00.000Z',
   europeanAqi: 32,
   pm2_5: 8,
   pm10: 14,

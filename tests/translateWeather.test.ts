@@ -18,8 +18,8 @@ describe('translateWeather', () => {
     expect(weather.cloudOpacity).toBe(1)
     expect(weather.rainDensity).toBe(168)
     expect(weather.isThunderstorm).toBe(true)
-    expect(weather.sunrise).toBe('2026-06-29T05:00')
-    expect(weather.sunset).toBe('2026-06-29T22:00')
+    expect(weather.sunrise).toBe('2026-06-29T05:00:00.000Z')
+    expect(weather.sunset).toBe('2026-06-29T22:00:00.000Z')
     expect(weather.evolution).toHaveLength(2)
     expect(weather.evolution[1]).toMatchObject({
       weatherCode: 71,

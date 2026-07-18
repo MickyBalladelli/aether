@@ -256,11 +256,12 @@ npm run dev       # Development server
 npm run build     # TypeScript and Vite production build
 npm run preview   # Preview the production build
 npm test          # Unit tests
+npm run test:regression # Fast tests for high-risk feature contracts
 npm run test:e2e  # Browser journeys against an existing server
 npm run verify    # Type checks, tests, build, and PWA verification
 ```
 
-The production output is written to `dist/`. Set `E2E_BASE_URL` when browser journeys should use a non-default server URL.
+Pull requests and pushes to `main` run `verify` plus browser journeys in GitHub Actions. The production output is written to `dist/`. Set `E2E_BASE_URL` when browser journeys should use a non-default server URL.
 
 ## Caching and offline behavior
 

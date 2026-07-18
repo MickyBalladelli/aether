@@ -1,7 +1,7 @@
 {
   "name": "aether",
   "private": true,
-  "version": "0.3.29",
+  "version": "0.3.30",
   "type": "module",
   "engines": {
     "node": ">=20.19.0"
@@ -13,6 +13,7 @@
     "postbuild": "node scripts/warmWeatherCache.js",
     "preview": "vite preview",
     "test": "vitest run",
+    "test:regression": "vitest run tests/regression",
     "test:e2e": "playwright test",
     "translations:check": "node scripts/checkTranslationCatalogs.mjs",
     "verify": "npm run translations:check && tsc -p tsconfig.verify.json && tsc -p tsconfig.server.json && npm test && vite build && node scripts/verifyPwa.js"

@@ -41,6 +41,11 @@ import type {
   WeatherViewport
 } from '../types/weather'
 import { useI18n } from '../i18n/I18nContext'
+import {
+  CITY_FOCUS_ZOOM,
+  MAX_MAP_ZOOM,
+  needsCityFocus
+} from '../map/mapZoomPolicy'
 
 const WORLD_BOUNDS = L.latLngBounds(
   [-85.05112878, -180],
@@ -51,8 +56,6 @@ const REGIONAL_VIEW_BOUNDS = L.latLngBounds(
   [72, 40]
 )
 const ABSOLUTE_MIN_ZOOM = 2
-const CITY_FOCUS_ZOOM = 12
-const MAX_MAP_ZOOM = 16
 type AetherMapProps = {
   location: WeatherLocation
   locationFocusToken: number
@@ -441,12 +444,12 @@ export function AetherMap({
     const latDelta = Math.abs(currentCenter.lat - location.latitude)
     const lngDelta = Math.abs(currentCenter.lng - location.longitude)
 
-    if (
-      latDelta < 0.1 &&
-      lngDelta < 0.1 &&
-      map.getZoom() >= CITY_FOCUS_ZOOM &&
-      !cityFocusRequested
-    ) {
+    if (!needsCityFocus({
+      latitudeDelta: latDelta,
+      longitudeDelta: lngDelta,
+      currentZoom: map.getZoom(),
+      focusRequested: cityFocusRequested
+    })) {
       return
     }
 

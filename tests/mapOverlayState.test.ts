@@ -47,6 +47,7 @@ describe('map overlay lifecycle', () => {
 
 function createLayers() {
   return {
+    'tropical-cyclones': Symbol('tropical-cyclones'),
     'volcano-activity': Symbol('volcano-activity'),
     'seismic-activity': Symbol('seismic-activity'),
     'heat-detections': Symbol('heat-detections'),
