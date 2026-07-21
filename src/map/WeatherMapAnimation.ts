@@ -375,7 +375,13 @@ export class WeatherMapAnimation {
 
     if (this.mode === 'wind') {
       this.particleRenderer.drawWind(projectedSamples, deltaTime)
-      this.pressureRenderer.draw(projectedSamples)
+      const pressureAnchor = this.map.latLngToContainerPoint([0, 0])
+
+      this.pressureRenderer.draw(
+        projectedSamples,
+        pressureAnchor.x,
+        pressureAnchor.y
+      )
       return
     }
 

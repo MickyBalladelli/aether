@@ -23,6 +23,9 @@ export class PressureFieldRenderer {
   private height = 1
   private pixelRatio = 1
   private dirty = true
+  private hasData = false
+  private renderAnchorX = 0
+  private renderAnchorY = 0
 
   constructor(
     private readonly targetContext: CanvasRenderingContext2D,
@@ -64,10 +67,10 @@ export class PressureFieldRenderer {
     this.dirty = true
   }
 
-  draw(samples: ProjectedSample[]) {
+  draw(samples: ProjectedSample[], anchorX: number, anchorY: number) {
     try {
       if (this.dirty) {
-        this.render(samples)
+        this.render(samples, anchorX, anchorY)
       }
 
       this.targetContext.save()
@@ -76,20 +79,29 @@ export class PressureFieldRenderer {
       this.targetContext.clip()
       this.targetContext.drawImage(
         this.canvas,
-        0,
-        0,
+        anchorX - this.renderAnchorX,
+        anchorY - this.renderAnchorY,
         this.width,
         this.height
       )
       this.targetContext.restore()
+
+      if (this.hasData) {
+        this.drawCaption(this.targetContext)
+      }
     } catch {
       this.targetContext.restore()
       this.context.clearRect(0, 0, this.width, this.height)
+      this.hasData = false
       this.dirty = false
     }
   }
 
-  private render(samples: ProjectedSample[]) {
+  private render(
+    samples: ProjectedSample[],
+    anchorX: number,
+    anchorY: number
+  ) {
     this.canvas.width = Math.max(1, Math.round(this.width * this.pixelRatio))
     this.canvas.height = Math.max(1, Math.round(this.height * this.pixelRatio))
     this.context.setTransform(
@@ -110,21 +122,30 @@ export class PressureFieldRenderer {
     ))
 
     if (pressureSamples.length < 2) {
+      this.hasData = false
       this.dirty = false
       return
     }
 
-    const columns = Math.max(3, Math.ceil(this.width / GRID_SPACING) + 1)
-    const rows = Math.max(3, Math.ceil(this.height / GRID_SPACING) + 1)
-    const stepX = this.width / (columns - 1)
-    const stepY = this.height / (rows - 1)
+    this.renderAnchorX = anchorX
+    this.renderAnchorY = anchorY
+    const firstX = positiveModulo(anchorX, GRID_SPACING) - GRID_SPACING
+    const firstY = positiveModulo(anchorY, GRID_SPACING) - GRID_SPACING
+    const columns = Math.max(
+      3,
+      Math.ceil((this.width - firstX) / GRID_SPACING) + 1
+    )
+    const rows = Math.max(
+      3,
+      Math.ceil((this.height - firstY) / GRID_SPACING) + 1
+    )
     const grid = Array.from({ length: rows }, (_, row) => (
       Array.from({ length: columns }, (_, column) => ({
-        x: column * stepX,
-        y: row * stepY,
+        x: firstX + column * GRID_SPACING,
+        y: firstY + row * GRID_SPACING,
         value: interpolateNearestFour(
-          column * stepX,
-          row * stepY,
+          firstX + column * GRID_SPACING,
+          firstY + row * GRID_SPACING,
           pressureSamples
         )
       }))
@@ -139,7 +160,7 @@ export class PressureFieldRenderer {
       this.drawCenters(findPressureCenters(grid, this.width))
     }
 
-    this.drawCaption()
+    this.hasData = true
     this.dirty = false
   }
 
@@ -259,28 +280,32 @@ export class PressureFieldRenderer {
     }
   }
 
-  private drawCaption() {
+  private drawCaption(context: CanvasRenderingContext2D) {
     const text = this.legendLabel
 
-    this.context.save()
-    this.context.font = '700 10px Inter, system-ui, sans-serif'
-    this.context.textAlign = 'center'
-    this.context.textBaseline = 'middle'
+    context.save()
+    context.font = '700 10px Inter, system-ui, sans-serif'
+    context.textAlign = 'center'
+    context.textBaseline = 'middle'
     const width = Math.min(
       Math.max(1, this.width - 24),
-      this.context.measureText(text).width + 24
+      context.measureText(text).width + 24
     )
     const x = this.width / 2
     const y = 18
 
-    this.context.fillStyle = 'rgba(4, 18, 27, 0.78)'
-    this.context.beginPath()
-    this.context.roundRect(x - width / 2, y - 11, width, 22, 7)
-    this.context.fill()
-    this.context.fillStyle = 'rgba(239, 249, 255, 0.92)'
-    this.context.fillText(text, x, y + 0.5, Math.max(1, width - 12))
-    this.context.restore()
+    context.fillStyle = 'rgba(4, 18, 27, 0.78)'
+    context.beginPath()
+    context.roundRect(x - width / 2, y - 11, width, 22, 7)
+    context.fill()
+    context.fillStyle = 'rgba(239, 249, 255, 0.92)'
+    context.fillText(text, x, y + 0.5, Math.max(1, width - 12))
+    context.restore()
   }
+}
+
+function positiveModulo(value: number, divisor: number) {
+  return ((value % divisor) + divisor) % divisor
 }
 
 function getPressureLevels(minimum: number, maximum: number) {
