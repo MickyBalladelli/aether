@@ -3,6 +3,24 @@ import type { ProjectedSample } from './weatherAnimationTypes'
 const GRID_SPACING = 44
 const ISOBAR_INTERVAL = 4
 const CENTER_SPACING = 180
+const COLOR_FIELD_SCALE = 4
+const PRESSURE_BAND_START = 984
+const PRESSURE_BAND_COLORS: Array<[number, number, number]> = [
+  [174, 45, 73],
+  [205, 53, 70],
+  [232, 73, 73],
+  [244, 103, 79],
+  [245, 137, 88],
+  [232, 171, 99],
+  [174, 177, 105],
+  [92, 169, 142],
+  [67, 173, 181],
+  [66, 166, 216],
+  [72, 143, 231],
+  [79, 116, 220],
+  [88, 91, 196],
+  [112, 78, 180]
+]
 
 type GridPoint = {
   x: number
@@ -18,7 +36,9 @@ type PressureCenter = GridPoint & {
 
 export class PressureFieldRenderer {
   private readonly canvas = document.createElement('canvas')
+  private readonly colorCanvas = document.createElement('canvas')
   private readonly context: CanvasRenderingContext2D
+  private readonly colorContext: CanvasRenderingContext2D
   private width = 1
   private height = 1
   private pixelRatio = 1
@@ -34,12 +54,14 @@ export class PressureFieldRenderer {
     private readonly lowLabel: string
   ) {
     const context = this.canvas.getContext('2d')
+    const colorContext = this.colorCanvas.getContext('2d')
 
-    if (!context) {
+    if (!context || !colorContext) {
       throw new Error('Pressure field canvas unavailable')
     }
 
     this.context = context
+    this.colorContext = colorContext
   }
 
   setViewport(width: number, height: number, pixelRatio: number) {
@@ -154,6 +176,7 @@ export class PressureFieldRenderer {
     const minimum = Math.min(...values)
     const maximum = Math.max(...values)
 
+    this.drawPressureColors(grid)
     this.drawIsobars(grid, minimum, maximum)
 
     if (maximum - minimum >= 0.25) {
@@ -162,6 +185,63 @@ export class PressureFieldRenderer {
 
     this.hasData = true
     this.dirty = false
+  }
+
+  private drawPressureColors(grid: GridPoint[][]) {
+    const colorWidth = Math.max(1, Math.ceil(this.width / COLOR_FIELD_SCALE))
+    const colorHeight = Math.max(1, Math.ceil(this.height / COLOR_FIELD_SCALE))
+
+    this.colorCanvas.width = colorWidth
+    this.colorCanvas.height = colorHeight
+
+    const image = this.colorContext.createImageData(colorWidth, colorHeight)
+    const firstX = grid[0][0].x
+    const firstY = grid[0][0].y
+    const maximumColumn = grid[0].length - 2
+    const maximumRow = grid.length - 2
+
+    for (let row = 0; row < colorHeight; row += 1) {
+      const y = (row + 0.5) * COLOR_FIELD_SCALE
+      const gridY = (y - firstY) / GRID_SPACING
+      const gridRow = Math.max(0, Math.min(maximumRow, Math.floor(gridY)))
+      const yRatio = Math.max(0, Math.min(1, gridY - gridRow))
+
+      for (let column = 0; column < colorWidth; column += 1) {
+        const x = (column + 0.5) * COLOR_FIELD_SCALE
+        const gridX = (x - firstX) / GRID_SPACING
+        const gridColumn = Math.max(
+          0,
+          Math.min(maximumColumn, Math.floor(gridX))
+        )
+        const xRatio = Math.max(0, Math.min(1, gridX - gridColumn))
+        const pressure = bilinearPressure(
+          grid,
+          gridRow,
+          gridColumn,
+          xRatio,
+          yRatio
+        )
+        const color = pressureBandColor(pressure)
+        const index = (row * colorWidth + column) * 4
+
+        image.data[index] = color[0]
+        image.data[index + 1] = color[1]
+        image.data[index + 2] = color[2]
+        image.data[index + 3] = color[3]
+      }
+    }
+
+    this.colorContext.putImageData(image, 0, 0)
+    this.context.save()
+    this.context.imageSmoothingEnabled = true
+    this.context.drawImage(
+      this.colorCanvas,
+      0,
+      0,
+      this.width,
+      this.height
+    )
+    this.context.restore()
   }
 
   private drawIsobars(
@@ -306,6 +386,46 @@ export class PressureFieldRenderer {
 
 function positiveModulo(value: number, divisor: number) {
   return ((value % divisor) + divisor) % divisor
+}
+
+function bilinearPressure(
+  grid: GridPoint[][],
+  row: number,
+  column: number,
+  xRatio: number,
+  yRatio: number
+) {
+  const top = interpolateValue(
+    grid[row][column].value,
+    grid[row][column + 1].value,
+    xRatio
+  )
+  const bottom = interpolateValue(
+    grid[row + 1][column].value,
+    grid[row + 1][column + 1].value,
+    xRatio
+  )
+
+  return interpolateValue(top, bottom, yRatio)
+}
+
+function pressureBandColor(value: number): [number, number, number, number] {
+  const band = Math.floor(value / ISOBAR_INTERVAL) * ISOBAR_INTERVAL
+  const unclampedIndex = Math.floor(
+    (band - PRESSURE_BAND_START) / ISOBAR_INTERVAL
+  )
+  const index = Math.max(
+    0,
+    Math.min(PRESSURE_BAND_COLORS.length - 1, unclampedIndex)
+  )
+  const color = PRESSURE_BAND_COLORS[index]
+  const alpha = index % 2 === 0 ? 96 : 78
+
+  return [color[0], color[1], color[2], alpha]
+}
+
+function interpolateValue(first: number, second: number, ratio: number) {
+  return first + (second - first) * ratio
 }
 
 function getPressureLevels(minimum: number, maximum: number) {
