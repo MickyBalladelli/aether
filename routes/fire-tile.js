@@ -22,7 +22,8 @@ import {
   setRequestLimitHeaders
 } from '../server/requestRateLimit.js'
 
-const FIRE_TILE_TIMEOUT_MS = 8000
+// Low-zoom worldwide tiles often need >8s from FIRMS MapServer.
+const FIRE_TILE_TIMEOUT_MS = 20000
 const FIRE_TILE_RATE_LIMIT = 240
 const FIRE_TILE_RATE_WINDOW_MS = 60 * 1000
 const FRESH_CACHE_TTL = SOURCE_REFRESH_SECONDS
@@ -71,7 +72,7 @@ export default async function handler(request, response) {
   }
 
   const cache = getSharedCache(getCacheNamespace('fire-tiles'))
-  const cacheKey = `tsd-6:${tile.z}:${tile.x}:${tile.y}`
+  const cacheKey = `tsd-7:${tile.z}:${tile.x}:${tile.y}`
   let providerFailures = 0
   let quota = null
 

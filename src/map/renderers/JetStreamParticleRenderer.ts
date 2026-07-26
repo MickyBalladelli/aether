@@ -27,6 +27,10 @@ export class JetStreamParticleRenderer extends ParticleModeRenderer {
     this.vectorGrid = null
   }
 
+  override invalidateCachedFields() {
+    this.vectorGrid = null
+  }
+
   draw(samples: JetStreamSample[], deltaTime: number) {
     if (samples.length === 0) {
       return

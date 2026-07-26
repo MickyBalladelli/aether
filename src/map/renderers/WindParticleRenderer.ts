@@ -24,6 +24,10 @@ export class WindParticleRenderer extends ParticleModeRenderer {
     this.vectorGrid = null
   }
 
+  override invalidateCachedFields() {
+    this.vectorGrid = null
+  }
+
   draw(samples: ProjectedSample[], deltaTime: number) {
     const averageWind = samples.reduce(
       (sum, { sample }) => sum + sample.rawWindSpeed,

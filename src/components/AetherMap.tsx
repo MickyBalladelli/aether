@@ -382,7 +382,8 @@ export function AetherMap({
       }
     }
     map.on('moveend zoomend resize', scheduleViewport)
-    map.on('moveend zoomend resize', animation.invalidate, animation)
+    map.on('moveend zoomend resize', animation.handleViewChange, animation)
+    map.on('zoomstart', animation.handleZoomStart, animation)
     map.on('resize', updateMinimumZoom)
     map.on('click', handleMapClick)
     map.on('movestart zoomstart', clearPointerWeather)
@@ -396,7 +397,8 @@ export function AetherMap({
       window.removeEventListener('resize', handleWindowResize)
       motionQuery.removeEventListener('change', handleMotionPreferenceChange)
       map.off('moveend zoomend resize', scheduleViewport)
-      map.off('moveend zoomend resize', animation.invalidate, animation)
+      map.off('moveend zoomend resize', animation.handleViewChange, animation)
+      map.off('zoomstart', animation.handleZoomStart, animation)
       map.off('resize', updateMinimumZoom)
       map.off('click', handleMapClick)
       map.off('movestart zoomstart', clearPointerWeather)

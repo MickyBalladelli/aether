@@ -57,6 +57,10 @@ export class WeatherMapAnimation {
   private pageVisible = isPageVisible()
   private unsubscribeVisibility: (() => void) | null = null
   private clearBeforeNextRender = false
+  private zooming = false
+  private viewZoom: number | null = null
+  private viewSize: { x: number, y: number } | null = null
+  private viewAnchor: L.LatLng | null = null
   private motionChangeHandler = (event: MediaQueryListEvent) => {
     this.reducedMotion = event.matches
     window.cancelAnimationFrame(this.animationFrame)
@@ -226,17 +230,53 @@ export class WeatherMapAnimation {
   }
 
   invalidate() {
+    this.captureViewState()
     this.particleRenderer.reset()
     this.fieldRenderer.invalidate()
     this.pressureRenderer.invalidate()
     this.invalidateProjectedSamples()
     this.clearBeforeNextRender = true
+    this.renderIfReducedMotion()
+  }
 
-    if (this.reducedMotion && this.pageVisible) {
-      this.resize()
-      this.syncRenderers()
-      this.render(0, 0)
+  handleZoomStart() {
+    this.zooming = true
+  }
+
+  /**
+   * Pan can reuse the pressure canvas via its geographic anchor. Zoom/resize
+   * still need a full rebuild because screen projections change non-uniformly.
+   */
+  handleViewChange() {
+    this.zooming = false
+
+    const size = this.map.getSize()
+    const zoom = this.map.getZoom()
+    const corner = this.map.containerPointToLatLng([0, 0])
+    const sizeChanged = this.viewSize !== null &&
+      (this.viewSize.x !== size.x || this.viewSize.y !== size.y)
+    const zoomChanged = this.viewZoom !== null &&
+      Math.abs(this.viewZoom - zoom) > 1e-6
+
+    if (
+      this.viewSize === null ||
+      this.viewZoom === null ||
+      this.viewAnchor === null ||
+      sizeChanged ||
+      zoomChanged
+    ) {
+      this.invalidate()
+      return
     }
+
+    const shift = this.map.latLngToContainerPoint(this.viewAnchor)
+
+    this.viewAnchor = corner
+    this.particleRenderer.shift(shift.x, shift.y)
+    this.fieldRenderer.invalidate()
+    this.invalidateProjectedSamples()
+    this.clearBeforeNextRender = true
+    this.renderIfReducedMotion()
   }
 
   private tick(time: number) {
@@ -331,6 +371,10 @@ export class WeatherMapAnimation {
   }
 
   private render(deltaTime: number, time: number) {
+    if (this.zooming) {
+      return
+    }
+
     if (this.clearBeforeNextRender || this.mode !== 'ocean-current') {
       this.context.clearRect(0, 0, this.width, this.height)
       this.clearBeforeNextRender = false
@@ -477,5 +521,21 @@ export class WeatherMapAnimation {
     this.projectedAirQualitySamples = null
     this.projectedOceanCurrentSamples = null
     this.projectedTemperatureAnomalySamples = null
+  }
+
+  private captureViewState() {
+    const size = this.map.getSize()
+
+    this.viewSize = { x: size.x, y: size.y }
+    this.viewZoom = this.map.getZoom()
+    this.viewAnchor = this.map.containerPointToLatLng([0, 0])
+  }
+
+  private renderIfReducedMotion() {
+    if (this.reducedMotion && this.pageVisible) {
+      this.resize()
+      this.syncRenderers()
+      this.render(0, 0)
+    }
   }
 }

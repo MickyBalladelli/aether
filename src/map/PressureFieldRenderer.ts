@@ -304,8 +304,6 @@ export class PressureFieldRenderer {
       this.context.strokeStyle = emphasized
         ? 'rgba(238, 249, 255, 0.72)'
         : 'rgba(218, 239, 250, 0.46)'
-      this.context.shadowColor = 'rgba(0, 13, 22, 0.85)'
-      this.context.shadowBlur = 2
       this.context.stroke(path)
       this.context.restore()
 
@@ -608,22 +606,72 @@ function interpolateNearestFour(
   y: number,
   samples: GridPoint[]
 ) {
-  const nearest = samples
-    .map(sample => ({
-      distance: (sample.x - x) ** 2 + (sample.y - y) ** 2,
-      value: sample.value
-    }))
-    .sort((first, second) => first.distance - second.distance)
-    .slice(0, 4)
+  let firstDistance = Number.POSITIVE_INFINITY
+  let secondDistance = Number.POSITIVE_INFINITY
+  let thirdDistance = Number.POSITIVE_INFINITY
+  let fourthDistance = Number.POSITIVE_INFINITY
+  let firstValue = 0
+  let secondValue = 0
+  let thirdValue = 0
+  let fourthValue = 0
 
-  if (nearest[0].distance < 1) {
-    return nearest[0].value
+  for (const sample of samples) {
+    const distance = (sample.x - x) ** 2 + (sample.y - y) ** 2
+
+    if (distance < firstDistance) {
+      fourthDistance = thirdDistance
+      fourthValue = thirdValue
+      thirdDistance = secondDistance
+      thirdValue = secondValue
+      secondDistance = firstDistance
+      secondValue = firstValue
+      firstDistance = distance
+      firstValue = sample.value
+      continue
+    }
+
+    if (distance < secondDistance) {
+      fourthDistance = thirdDistance
+      fourthValue = thirdValue
+      thirdDistance = secondDistance
+      thirdValue = secondValue
+      secondDistance = distance
+      secondValue = sample.value
+      continue
+    }
+
+    if (distance < thirdDistance) {
+      fourthDistance = thirdDistance
+      fourthValue = thirdValue
+      thirdDistance = distance
+      thirdValue = sample.value
+      continue
+    }
+
+    if (distance < fourthDistance) {
+      fourthDistance = distance
+      fourthValue = sample.value
+    }
   }
 
+  if (firstDistance < 1) {
+    return firstValue
+  }
+
+  const nearest = [
+    { distance: firstDistance, value: firstValue },
+    { distance: secondDistance, value: secondValue },
+    { distance: thirdDistance, value: thirdValue },
+    { distance: fourthDistance, value: fourthValue }
+  ]
   let weightedValue = 0
   let totalWeight = 0
 
   for (const sample of nearest) {
+    if (!Number.isFinite(sample.distance)) {
+      continue
+    }
+
     const weight = 1 / (sample.distance + 400)
 
     weightedValue += sample.value * weight

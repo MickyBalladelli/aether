@@ -90,6 +90,7 @@ export function createAetherMapLayers({
     '/api/fire-tile?z={z}&x={x}&y={y}',
     {
       keepBuffer: 6,
+      minNativeZoom: 2,
       maxNativeZoom: 12,
       maxZoom: 19,
       noWrap: true,

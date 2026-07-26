@@ -20,6 +20,22 @@ export function parseFireTileCoordinates(zValue, xValue, yValue) {
   return { z, x, y }
 }
 
+export function fireDetectionSymbolSize(zoom) {
+  if (zoom <= 3) {
+    return 9
+  }
+
+  if (zoom <= 5) {
+    return 7
+  }
+
+  if (zoom <= 7) {
+    return 6
+  }
+
+  return 5
+}
+
 export function buildFireTileUrl(mapKey, tile) {
   const tileSpan = WEB_MERCATOR_LIMIT * 2 / (2 ** tile.z)
   const west = -WEB_MERCATOR_LIMIT + tile.x * tileSpan
@@ -38,13 +54,14 @@ export function buildFireTileUrl(mapKey, tile) {
     BBOX: `${west},${south},${east},${north}`
   })
 
+  const size = fireDetectionSymbolSize(tile.z)
   const layers = [
     'tsd_4_viirs_00_06',
     'tsd_4_viirs_06_12',
     'tsd_4_viirs_12_24'
   ].join(',')
   const symbols = 'circle,circle,circle'
-  const sizes = '5,5,5'
+  const sizes = `${size},${size},${size}`
   const colors = '209+0+217,255+145+174,255+36+23'
 
   return `https://firms.modaps.eosdis.nasa.gov/mapserver/wms/time_since_detection_4/${encodeURIComponent(mapKey)}/${layers}/${symbols}/${sizes}/${colors}/?${params.toString()}`

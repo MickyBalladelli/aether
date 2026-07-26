@@ -44,6 +44,27 @@ export class ParticleModeRenderer {
     }
   }
 
+  shift(deltaX: number, deltaY: number) {
+    if (deltaX === 0 && deltaY === 0) {
+      return
+    }
+
+    for (const particle of this.particles) {
+      if (particle.life <= 0) {
+        continue
+      }
+
+      particle.x += deltaX
+      particle.y += deltaY
+    }
+
+    this.invalidateCachedFields()
+  }
+
+  invalidateCachedFields() {
+    // Subclasses with vector grids override this.
+  }
+
   protected resetFlowParticle(particle: Particle) {
     particle.x = Math.random() * this.width
     particle.y = Math.random() * this.height

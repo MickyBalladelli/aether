@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, test, vi } from 'vitest'
 import {
   buildFireTileUrl,
+  fireDetectionSymbolSize,
   parseFireTileCoordinates
 } from '../server/fireTile.js'
 import {
@@ -20,6 +21,18 @@ describe('fire tile coordinates', () => {
     expect(bounds[1]).toBeCloseTo(-20037508.342789244)
     expect(bounds[2]).toBeCloseTo(20037508.342789244)
     expect(bounds[3]).toBeCloseTo(0)
+    expect(url.pathname).toContain('/9,9,9/')
+  })
+
+  test('uses larger FIRMS detection marks at lower zoom levels', () => {
+    expect(fireDetectionSymbolSize(2)).toBe(9)
+    expect(fireDetectionSymbolSize(5)).toBe(7)
+    expect(fireDetectionSymbolSize(7)).toBe(6)
+    expect(fireDetectionSymbolSize(10)).toBe(5)
+
+    const close = new URL(buildFireTileUrl('map-key', { z: 10, x: 1, y: 1 }))
+
+    expect(close.pathname).toContain('/5,5,5/')
   })
 
   test('rejects out-of-range and non-integer tile coordinates', () => {

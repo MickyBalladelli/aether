@@ -54,6 +54,20 @@ export class WeatherParticleRenderer {
     this.storm.reset()
   }
 
+  shift(deltaX: number, deltaY: number) {
+    this.wind.shift(deltaX, deltaY)
+    this.jetStream.shift(deltaX, deltaY)
+    this.oceanCurrent.shift(deltaX, deltaY)
+    this.precipitation.shift(deltaX, deltaY)
+  }
+
+  invalidateCachedFields() {
+    this.wind.invalidateCachedFields()
+    this.jetStream.invalidateCachedFields()
+    this.oceanCurrent.invalidateCachedFields()
+    this.precipitation.invalidateCachedFields()
+  }
+
   drawWind(samples: ProjectedSample[], deltaTime: number) {
     this.wind.draw(samples, deltaTime)
   }

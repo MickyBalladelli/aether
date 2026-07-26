@@ -20,6 +20,10 @@ export class PrecipitationParticleRenderer extends ParticleModeRenderer {
     this.vectorGrid = null
   }
 
+  override invalidateCachedFields() {
+    this.vectorGrid = null
+  }
+
   draw(samples: ProjectedSample[], deltaTime: number) {
     const wetSamples = samples.filter(({ sample }) => (
       sample.precipitation > 0.02 || sample.snowfall > 0.02

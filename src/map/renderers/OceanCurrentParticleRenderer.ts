@@ -32,6 +32,10 @@ export class OceanCurrentParticleRenderer extends ParticleModeRenderer {
     this.vectorGrid = null
   }
 
+  override invalidateCachedFields() {
+    this.vectorGrid = null
+  }
+
   draw(samples: ProjectedOceanCurrentSample[], deltaTime: number) {
     if (samples.length === 0) {
       return
