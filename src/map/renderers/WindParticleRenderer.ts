@@ -11,8 +11,6 @@ import {
 
 const LEGEND_BOTTOM_INSET = 42
 const WIND_BASE_SPEED_BOOST = 1.5
-const WIND_MAX_ZOOM_SCALE = 8
-const WIND_REFERENCE_ZOOM = 10
 
 export class WindParticleRenderer extends ParticleModeRenderer {
   private vectorGrid: ScreenVectorGrid | null = null
@@ -46,11 +44,6 @@ export class WindParticleRenderer extends ParticleModeRenderer {
     const paths = WIND_COLORS.map(() => new Path2D())
     const usedBuckets = new Set<number>()
     const vectorGrid = this.getVectorGrid(samples)
-    const zoomScale = Math.min(
-      WIND_MAX_ZOOM_SCALE,
-      Math.max(0.75, 2 ** ((this.map.getZoom() - WIND_REFERENCE_ZOOM) * 0.5))
-    )
-
     this.context.save()
     this.context.lineCap = 'round'
 
@@ -68,11 +61,7 @@ export class WindParticleRenderer extends ParticleModeRenderer {
         continue
       }
 
-      const speed = (
-        (25 + field.speed * 2.5) *
-        WIND_BASE_SPEED_BOOST *
-        zoomScale
-      )
+      const speed = (25 + field.speed * 2.5) * WIND_BASE_SPEED_BOOST
       const tail = 5 + Math.min(field.speed, 80) * 0.28
       const movement = speed * deltaTime
       const streak = Math.max(tail, movement * 1.2)
